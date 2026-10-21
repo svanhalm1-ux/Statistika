@@ -74,7 +74,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .nav button.active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--amber)}
 .nav .sep{height:1px;background:var(--border-soft);margin:10px 12px}
 .nav .nav-h{display:flex;align-items:center;gap:7px;width:100%;background:none;border:none;cursor:pointer;padding:12px 12px 5px;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-family:inherit}
-.nav .nav-h .car{font-size:9px;width:10px;color:var(--muted)}
+.nav .nav-h .car{display:inline-flex;align-items:center;width:16px;color:var(--muted);transition:transform .18s}.nav .nav-h .car svg{width:14px;height:14px}.nav .nav-h .car.shut{transform:rotate(-90deg)}
 .nav .nav-grp{display:flex;flex-direction:column}
 .nav .nav-grp.closed{display:none}
 .nav .nav-grp button{padding-left:26px}
@@ -121,7 +121,7 @@ input[type=number]:focus{outline:none;border-color:var(--teal)}
 .dd-btn:focus-visible{outline:none;border-color:var(--teal)}
 .dd.open .dd-btn{border-color:var(--teal)}
 .dd-lb{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dd-cv{flex:0 0 auto;color:var(--text);font-size:11px;transition:transform .18s}
+.dd-cv{flex:0 0 auto;display:inline-flex;align-items:center;color:var(--text);transition:transform .18s}
 .dd.open .dd-cv{transform:rotate(180deg)}
 .dd-menu{position:absolute;top:calc(100% + 5px);left:0;right:0;z-index:60;background:var(--panel);border:1px solid var(--border);border-radius:11px;box-shadow:0 16px 40px -12px rgba(0,0,0,.55);padding:5px;max-height:min(300px,55vh);overflow-y:auto;display:none;animation:ddin .14s ease both}
 .dd.open .dd-menu{display:block}
@@ -372,6 +372,7 @@ input[type=number],.practice-input{border-color:transparent}
 .symmore{padding-top:8px;font-size:13.5px}
 .symgh{margin:18px 0 4px;font-size:15px}
 @media (max-width:520px){.symrow{grid-template-columns:72px 1fr;gap:2px 10px}.symrow .sy{white-space:normal;font-size:15px}}
+.homelink{cursor:pointer;-webkit-tap-highlight-color:transparent}.topbrand.homelink{flex:0 1 auto;margin:0 auto}.homelink:hover span,.homelink:hover h1{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}.homelink:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:6px}
 </style>
 </head>
 <body>
@@ -1023,9 +1024,10 @@ function el(tag,props,...kids){const e=document.createElement(tag);props=props||
   return e;}
 const tpl=id=>document.getElementById(id).content.cloneNode(true);
 function typeset(root){}
+const CHEV='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function themeSelect(sel){if(sel.dataset.themed)return;sel.dataset.themed='1';
   const wrap=el('div',{class:'dd'});const btn=el('button',{class:'dd-btn',type:'button'});
-  const lb=el('span',{class:'dd-lb'});const cv=el('span',{class:'dd-cv'},'▾');btn.append(lb,cv);
+  const lb=el('span',{class:'dd-lb'});const cv=el('span',{class:'dd-cv',html:CHEV});btn.append(lb,cv);
   const menu=el('div',{class:'dd-menu'});
   sel.parentNode.insertBefore(wrap,sel);wrap.append(sel,btn,menu);sel.style.display='none';
   function refresh(){const o=sel.options[sel.selectedIndex];lb.textContent=o?o.textContent:'';
@@ -4288,7 +4290,7 @@ window.addEventListener('hashchange',()=>{const h=hashModule();if(h&&h!==current
 function navigate(id,keepScroll){Anim.stop();window.__softHooks=[];if(window.__mapFSexit){try{window.__mapFSexit();}catch(e){}window.__mapFSexit=null;}const mod=MODULES.find(m=>m.id===id)||MODULES[0];current=mod.id;
   stageEl.innerHTML='';const box=el('div',{class:'module'});stageEl.append(box);mod.render(box);typeset(box);[].forEach.call(box.querySelectorAll('select'),themeSelect);
   [].forEach.call(navEl.querySelectorAll('button[data-id]'),b=>{const on=b.dataset.id===current;b.classList.toggle('active',on);
-    if(on){const g=b.closest('.nav-grp');if(g&&g.classList.contains('closed')){g.classList.remove('closed');const hh=g.previousElementSibling;if(hh){const c=hh.querySelector('.car');if(c)c.textContent='▾';}}}});
+    if(on){const g=b.closest('.nav-grp');if(g&&g.classList.contains('closed')){g.classList.remove('closed');const hh=g.previousElementSibling;if(hh){const c=hh.querySelector('.car');if(c)c.classList.remove('shut');}}}});
   window.__chapFocus=null;syncHash();
   if(!keepScroll)window.scrollTo({top:0,behavior:REDUCE?'auto':'smooth'});closeDrawer();}
 function softRefresh(){const st=document.getElementById('stage');
@@ -4307,8 +4309,8 @@ const NAVGRP=[
 function buildNav(){navEl.innerHTML='';const used=new Set();
   NAVGRP.forEach(g=>{
     const grp=el('div',{class:'nav-grp'});
-    const head=el('button',{class:'nav-h'},el('span',{class:'car'},'▾'),el('span',{},g.t));
-    head.addEventListener('click',()=>{const c=grp.classList.toggle('closed');head.querySelector('.car').textContent=c?'▸':'▾';});
+    const head=el('button',{class:'nav-h'},el('span',{class:'car',html:CHEV}),el('span',{},g.t));
+    head.addEventListener('click',()=>{const c=grp.classList.toggle('closed');head.querySelector('.car').classList.toggle('shut',c);});
     navEl.append(head,grp);
     g.ids.forEach(id=>{const m=MODULES.find(x=>x.id===id);if(!m)return;used.add(id);
       grp.append(el('button',{'data-id':m.id,onClick:()=>navigate(m.id)},el('span',{class:'nm'},m.num),el('span',{},m.label)));});});
@@ -4326,6 +4328,8 @@ function boot(){buildNav();applyThemeCore('flkr');wireChrome();
     if(t.dataset.dist)window.__chapFocus={t:'dist',k:t.dataset.dist};
     else if(t.dataset.stat)window.__chapFocus={t:'stat',k:t.dataset.stat};
     navigate(t.getAttribute('data-nav'));});
+  (function(){const home=e=>{if(e&&e.type==='keydown'&&e.key!=='Enter'&&e.key!==' ')return;if(e)e.preventDefault();closeDrawer();navigate('intro');try{window.scrollTo({top:0});}catch(_){}};
+    [document.querySelector('.topbrand'),document.querySelector('.drawer-head')].forEach(t=>{if(!t)return;t.setAttribute('role','link');t.setAttribute('tabindex','0');t.setAttribute('title','Na úvodní stránku');t.setAttribute('aria-label','Od náhody ke statistice — úvodní stránka');t.classList.add('homelink');t.addEventListener('click',home);t.addEventListener('keydown',home);});})();
   navigate(hashModule()||'intro');}
 if(document.readyState==='loading')window.addEventListener('DOMContentLoaded',boot);else boot();
 </script>
