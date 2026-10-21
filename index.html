@@ -1373,8 +1373,8 @@ const introModule={id:'intro',num:'00',label:'Úvod',render(stage){
   const Lp=12,bins=Lp+1,counts=new Array(bins).fill(0);let balls=[],total=0;const MAX=520;
   const target=[];for(let k=0;k<=Lp;k++)target.push(Math.exp(lchoose(Lp,k)-Lp*Math.log(2)));
   const tmax=Math.max.apply(null,target);
-  function draw(){ch.resize();ch.clear();const w=ch.w,h=ch.h;const cw=w/bins;const maxC=Math.max(MAX*tmax*1.2,Math.max.apply(null,counts));const baseY=h-6;
-    for(let i=0;i<bins;i++){const bh=(counts[i]/maxC)*(h*.62);const x=i*cw;
+  function draw(){ch.resize();ch.clear();const w=ch.w,h=ch.h;const cw=w/bins;const maxC=MAX*tmax*1.35;const baseY=h-6;
+    for(let i=0;i<bins;i++){const bh=Math.min(1,counts[i]/maxC)*(h*.62);const x=i*cw;
       let g=null;try{g=ch.ctx.createLinearGradient(0,baseY-bh,0,baseY);g.addColorStop(0,hexA(C.teal,.85));g.addColorStop(1,hexA(C.teal,.18));}catch(e){g=hexA(C.teal,.5);}
       ch.ctx.fillStyle=g||hexA(C.teal,.5);ch.ctx.fillRect(x+cw*.16,baseY-bh,cw*.68,bh);}
     ch.ctx.beginPath();for(let i=0;i<bins;i++){const x=i*cw+cw/2;const y=baseY-(target[i]*MAX/maxC)*(h*.62);i?ch.ctx.lineTo(x,y):ch.ctx.moveTo(x,y);}
@@ -1383,15 +1383,17 @@ const introModule={id:'intro',num:'00',label:'Úvod',render(stage){
   let acc=0;
   function fillStatic(){for(let i=0;i<bins;i++)counts[i]=Math.round(target[i]*MAX);total=MAX;balls=[];draw();}
   function playAnim(){acc=0;total=0;balls=[];for(let i=0;i<bins;i++)counts[i]=0;
-    Anim.start(()=>{acc++;
-      if(acc%4===0&&total<MAX){const tb=rbinom(Lp,.5);balls.push({bin:tb,x:ch.w/2,y:-4,vy:1.4+Math.random(),tx:(tb+.5)*(ch.w/bins)});total++;}
-      balls.forEach(b=>{b.y+=b.vy;b.vy+=.05;b.x+=(b.tx-b.x)*.06;});
+    const SP=0.7,LX=1-Math.pow(1-.06,SP);
+    Anim.start(()=>{acc+=SP;
+      if(acc>=4&&total<MAX){acc-=4;const tb=rbinom(Lp,.5);balls.push({bin:tb,x:ch.w/2,y:-4,vy:1.4+Math.random(),tx:(tb+.5)*(ch.w/bins)});total++;}
+      balls.forEach(b=>{b.y+=b.vy*SP;b.vy+=.05*SP;b.x+=(b.tx-b.x)*LX;});
       balls=balls.filter(b=>{if(b.y>=ch.h-8){counts[b.bin]++;return false;}return true;});draw();});}
   const replay=btn('▶ Přehrát','ghost',playAnim);replay.style.cssText='position:absolute;top:12px;right:12px;z-index:3;padding:7px 13px;font-size:12.5px;background:var(--panel);opacity:.92';
   hero.append(replay);
   // hotový obrázek hned; animaci spusť, až bude karta opravdu vidět (karta otevřená na pozadí snímky nevykresluje)
-  fillStatic();
-  if(!REDUCE||!window.__heroPlayed){const go=()=>{if(document.body.contains(cv)){window.__heroPlayed=true;playAnim();}};
+  const willPlay=!REDUCE||!window.__heroPlayed;
+  if(willPlay)draw();else fillStatic();
+  if(willPlay){const go=()=>{if(document.body.contains(cv)){window.__heroPlayed=true;playAnim();}};
     if(document.visibilityState!=='hidden')go();
     else{const onVis=()=>{if(document.visibilityState!=='hidden'){document.removeEventListener('visibilitychange',onVis);go();}};document.addEventListener('visibilitychange',onVis);}}
   (window.__softHooks=window.__softHooks||[]).push(()=>{Anim.stop();fillStatic();});
