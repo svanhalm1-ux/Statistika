@@ -163,6 +163,7 @@ table.ct td.tp .v{color:var(--coral)}table.ct td.fp .v{color:var(--amber)}table.
 .opt.correct{border-color:var(--green);background:rgba(95,214,138,.13)}
 .opt.wrong{border-color:var(--coral);background:var(--coral-d)}
 .opt.sel{border-color:var(--amber);background:var(--amber-d)}
+.opt .optl{display:inline-block;min-width:1.6em;font-weight:600;color:var(--muted)}
 .btn:disabled{opacity:.45;cursor:default}
 .explain{font-size:13.5px;color:var(--muted);margin-top:10px;padding:11px 14px;border-left:2px solid var(--teal);background:var(--panel2);border-radius:0 8px 8px 0}
 .quiz-score{position:sticky;top:0;z-index:5;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;backdrop-filter:blur(6px)}
@@ -760,7 +761,7 @@ input[type=number],.practice-input{border-color:transparent}
 </div></template>
 
 <template id="L-practice"><div class="prose">
-<p>Procvič si pravděpodobnost i statistiku na příkladech s <b>postupem řešení</b>. Vyber kapitolu nebo celou část kurzu, spočítej odpověď (stačí zlomek jako 1/6, desetinné číslo zaokrouhlené aspoň na 3 desetinná místa, nebo procenta) a zkontroluj se — nebo si rovnou zobraz řešení. „Další příklad“ vygeneruje nový. Každý okruh má víc typů úloh — na stejnou věc tak narazíš pokaždé jinak zadanou.</p>
+<p>Procvič si pravděpodobnost i statistiku na příkladech s <b>postupem řešení</b>. Vyber kapitolu nebo celou část kurzu, spočítej odpověď (stačí zlomek jako 1/6, desetinné číslo zaokrouhlené aspoň na 3 desetinná místa, nebo procenta) a zkontroluj se — nebo si rovnou zobraz řešení. „Další příklad“ vygeneruje nový. Každý okruh má víc typů úloh — na stejnou věc tak narazíš pokaždé jinak zadanou. Mezi výpočty se objevují i <b>otázky z teorie</b> s výběrem ze čtyř odpovědí (a–d); okruhy Paradoxy a Historie obsahují jen je.</p>
 </div></template>
 
 <template id="L-popis"><div class="prose">
@@ -794,7 +795,7 @@ input[type=number],.practice-input{border-color:transparent}
 </div></template>
 
 <template id="L-quiz"><div class="prose">
-<p>Krátký test napříč tématy. U každé otázky vyber odpověď — hned uvidíš vysvětlení. Skóre se počítá nahoře.</p>
+<p>Krátký test napříč tématy. U každé otázky vyber jednu ze čtyř odpovědí (a–d) a potvrď ji — hned uvidíš vysvětlení. Skóre se počítá nahoře. Otázky se pokaždé losují znovu, takže kvíz si můžeš zopakovat.</p>
 </div></template>
 
 <template id="L-cov"><div class="prose">
@@ -1355,7 +1356,7 @@ const introModule={id:'intro',num:'00',label:'Úvod',render(stage){
     vartest:'Stabilita procesu: χ² a F-test',param:'t-testy — když platí předpoklady',anova:'Více skupin jedním testem',
     pair:'Před a po na týchž jednotkách',nonparam:'Mann–Whitney a robustnost',boot:'Nejistota převzorkováním vlastních dat',
     gof:'Sedí četnosti rozdělení? Kostka i Mendel',kval:'Kontingenční tabulka a χ² nezávislosti',
-    paradox:'Monty Hall, Simpson a další',practice:'Příklady s postupem řešení',quiz:'Otestuj si intuici — 54 otázek'};
+    paradox:'Monty Hall, Simpson a další',practice:'Výpočty s postupem řešení i otázky z teorie',quiz:'Pokaždé jiných 30 otázek — teorie i výpočty'};
   const LNAME={T:'Teorie',H:'Historie',P:'Pojmy',M:'Mapa'};
   const picker=el('div',{style:'margin-top:30px'});
   NAVGRP.forEach(sec=>{const items=sec.ids.filter(id=>id!=='intro');if(!items.length)return;
@@ -1370,7 +1371,7 @@ const introModule={id:'intro',num:'00',label:'Úvod',render(stage){
     picker.append(g);});
   stage.append(picker);
   const ch=new Chart(cv,{padL:0,padR:0,padT:0,padB:0});
-  const Lp=12,bins=Lp+1,counts=new Array(bins).fill(0);let balls=[],total=0;const MAX=520;
+  const Lp=12,bins=Lp+1,counts=new Array(bins).fill(0);let balls=[],total=0;const MAX=350;
   const target=[];for(let k=0;k<=Lp;k++)target.push(Math.exp(lchoose(Lp,k)-Lp*Math.log(2)));
   const tmax=Math.max.apply(null,target);
   function draw(){ch.resize();ch.clear();const w=ch.w,h=ch.h;const cw=w/bins;const maxC=MAX*tmax*1.35;const baseY=h-6;
@@ -1382,11 +1383,14 @@ const introModule={id:'intro',num:'00',label:'Úvod',render(stage){
     ch.ctx.fillStyle=C.coral;balls.forEach(b=>{ch.ctx.beginPath();ch.ctx.arc(b.x,b.y,3,0,7);ch.ctx.fill();});}
   let acc=0;
   function fillStatic(){for(let i=0;i<bins;i++)counts[i]=Math.round(target[i]*MAX);total=MAX;balls=[];draw();}
-  function playAnim(){acc=0;total=0;balls=[];for(let i=0;i<bins;i++)counts[i]=0;
-    const SP=0.7,LX=1-Math.pow(1-.06,SP);
-    Anim.start(()=>{acc+=SP;
-      if(acc>=4&&total<MAX){acc-=4;const tb=rbinom(Lp,.5);balls.push({bin:tb,x:ch.w/2,y:-4,vy:1.4+Math.random(),tx:(tb+.5)*(ch.w/bins)});total++;}
-      balls.forEach(b=>{b.y+=b.vy*SP;b.vy+=.05*SP;b.x+=(b.tx-b.x)*LX;});
+  function playAnim(){acc=0;total=0;balls=[];window.__heroDone=null;for(let i=0;i<bins;i++)counts[i]=0;
+    // časově řízené (nezávislé na obnovovací frekvenci displeje); 350 kuliček, plnění trvá zhruba 19 s
+    const SP=0.86,GAP=2.97;let last=null;window.__heroT0=performance.now();
+    Anim.start(t=>{const fr=last===null?1:Math.min(4,Math.max(0,(t-last)/16.667));last=t;const k=SP*fr;acc+=fr;
+      while(acc>=GAP&&total<MAX){acc-=GAP;const tb=rbinom(Lp,.5);balls.push({bin:tb,x:ch.w/2,y:-4,vy:1.4+Math.random(),tx:(tb+.5)*(ch.w/bins)});total++;}
+      const LX=1-Math.pow(1-.06,k);
+      balls.forEach(b=>{b.y+=b.vy*k;b.vy+=.05*k;b.x+=(b.tx-b.x)*LX;});
+      if(total>=MAX&&!balls.length&&!window.__heroDone){window.__heroDone=(performance.now()-window.__heroT0)/1000;}
       balls=balls.filter(b=>{if(b.y>=ch.h-8){counts[b.bin]++;return false;}return true;});draw();});}
   const replay=btn('▶ Přehrát','ghost',playAnim);replay.style.cssText='position:absolute;top:12px;right:12px;z-index:3;padding:7px 13px;font-size:12.5px;background:var(--panel);opacity:.92';
   hero.append(replay);
@@ -2251,103 +2255,317 @@ const paradoxModule={id:'paradox',num:'25',label:'Paradoxy',render(stage){
 }};
 
 /* 09 QUIZ */
+const QBANK=[
+    {c:'c01k',q:'Hodíme dvěma kostkami. Jaká je pravděpodobnost součtu 7?',o:['1/12','1/6','1/9','7/36'],a:1,e:'Příznivých je 6 dvojic (1+6, …, 6+1) z 36, tedy 6/36 = 1/6. Sedmička je nejpravděpodobnější součet.'},
+    {c:'c01',q:'Jevy A a B jsou nezávislé, P(A) = 0,5 a P(B) = 0,4. Kolik je P(A∩B)?',o:['0,9','0,2','0,1','0,45'],a:1,e:'Pro nezávislé jevy se pravděpodobnosti násobí: 0,5 · 0,4 = 0,2.'},
+    {c:'c03',q:'Test má senzitivitu 99 % i specificitu 99 %, prevalence je 1 ‰. Po pozitivním testu je pravděpodobnost nemoci přibližně…',o:['99 %','90 %','9 %','50 %'],a:2,e:'Past základní míry: z 1000 lidí je 1 nemocný (zachycen) a ~10 falešně pozitivních zdravých. P ≈ 1/11 ≈ 9 %.'},
+    {c:'c02',q:'Kolika způsoby vybereme 2 lidi z 5, když nezáleží na pořadí?',o:['25','20','10','5'],a:2,e:'C(5,2) = 5!/(2!·3!) = 10. Kdyby záleželo na pořadí, bylo by to 20 (variace).'},
+    {c:'c04',q:'Co popisuje binomické rozdělení?',o:['dobu čekání na první úspěch','počet úspěchů v n nezávislých pokusech','vzácné události za časový interval','spojitou veličinu'],a:1,e:'Binomické počítá počet úspěchů v pevném počtu n nezávislých pokusů se stejnou pravděpodobností p.'},
+    {c:'c05',q:'Spravedlivá kostka (1–6). Kolik je E(X)?',o:['3','3,5','4','6'],a:1,e:'E(X) = (1+2+3+4+5+6)/6 = 21/6 = 3,5. Střední hodnota nemusí být dosažitelná hodnota.'},
+    {c:'c05',q:'Jak souvisí D(X + 5) a D(X)?',o:['je o 25 větší','je o 5 větší','jsou stejné','je o 5 menší'],a:2,e:'Posun o konstantu rozptyl nemění: D(X + c) = D(X). Mění ho jen násobení (D(aX) = a²·D(X)).'},
+    {c:'c07',q:'Veličina má rozptyl σ². Jaký rozptyl má průměr n nezávislých hodnot?',o:['σ/√n','σ²/n','σ²','n·σ²'],a:1,e:'D(X̄) = σ²/n; σ/√n je směrodatná chyba (odmocnina z rozptylu). CLT k tomu dodává, že průměr má přibližně normální rozdělení. Větší vzorek = užší rozdělení průměru.'},
+    {c:'c07',q:'Hodíme mincí 5× a pětkrát padne panna. Jaká je pravděpodobnost orla v 6. hodu?',o:['vyšší než 1/2','1/2','nižší než 1/2','jistě orel'],a:1,e:'Hody jsou nezávislé — mince „nepamatuje“. Žádná kompenzace neexistuje (klam hazardního hráče).'},
+    {c:'c01',q:'A a B jsou neslučitelné, P(A) = 0,3 a P(B) = 0,2. Kolik je P(A∪B)?',o:['0,06','0,5','0,1','0,25'],a:1,e:'Neslučitelné znamená P(A∩B) = 0, takže P(A∪B) = P(A) + P(B) = 0,5.'},
+    {c:'c14',q:'Co znamená „95% interval spolehlivosti“?',o:['μ je uvnitř s pravděpodobností 95 %','95 % takto sestrojených intervalů obsahuje μ','95 % dat leží v intervalu','odhad je přesný na 95 %'],a:1,e:'Frekventistický výklad: kdybychom pokus mnohokrát opakovali, 95 % vzniklých intervalů by skutečné μ obsahovalo. O tomto konkrétním intervalu takto nemluvíme.'},
+    {c:'c15',q:'Chyba I. druhu (falešně pozitivní) nastane, když…',o:['nezamítneme nepravdivou H₀','zamítneme pravdivou H₀','správně přijmeme H₁','zvětšíme vzorek'],a:1,e:'Chyba I. druhu = zamítnutí platné nulové hypotézy. Její pravděpodobnost je hladina významnosti α.'},
+    {c:'c11',q:'Výběrová korelace r = 0 znamená, že…',o:['veličiny jsou nezávislé','neexistuje žádný vztah','není lineární vztah (nelineární může být)','data jsou chybná'],a:2,e:'r měří jen lineární souvislost. Data na parabole či kruhu mají r ≈ 0, přestože jasný vztah existuje.'},
+    {c:'c21',q:'Bootstrap vytváří nové vzorky…',o:['z normálního rozdělení','s vracením z původního vzorku','bez vracení z populace','čistým šumem'],a:1,e:'Bootstrap losuje s vracením z původního vzorku (stejné n) a z mnoha opakování odhadne rozdělení statistiky.'},
+    {c:'c15',q:'Malá p-hodnota (např. 0,001) znamená, že…',o:['H₀ je určitě nepravdivá','efekt je velký','data by byla za platnosti H₀ velmi nepravděpodobná','α je malé'],a:2,e:'p-hodnota je pravděpodobnost dat aspoň tak extrémních jako naše, pokud platí H₀. Malá hodnota svědčí proti H₀, ale sama neměří velikost efektu.'},
+    {c:'c21',q:'Který test je odolnější vůči odlehlým hodnotám?',o:['t-test','Mann–Whitneyův (neparametrický)','oba stejně','žádný'],a:1,e:'Neparametrické testy pracují s pořadím, takže pár extrémních hodnot výsledek téměř neovlivní. t-test přes průměr a rozptyl je vůči odlehlým hodnotám citlivý.'},
+    {c:'c18',q:'Parametrický t-test typicky předpokládá, že data jsou…',o:['přibližně normální','vždy diskrétní','bez jakéhokoli rozdělení','jen ordinální'],a:0,e:'Parametrické testy předpokládají konkrétní rozdělení (u t-testu přibližně normální) a testují jeho parametry; neparametrické to nevyžadují.'},
+    {c:'c25',q:'Simpsonův paradox nastává, když…',o:['data jsou nesprávná','trend platný v každé skupině se po sloučení obrátí','vzorek je příliš malý','test má malou sílu'],a:1,e:'Kvůli matoucí proměnné může trend, který platí v každé podskupině, po sloučení skupin změnit směr.'},
+    {c:'c07',q:'Podle centrální limitní věty má průměr velkého vzorku přibližně jaké rozdělení — ať je zdroj jakýkoli?',o:['stejné jako zdroj','normální','rovnoměrné','Poissonovo'],a:1,e:'Jádro CLT: rozdělení výběrového průměru se s rostoucím n blíží normálnímu bez ohledu na tvar zdroje (má-li konečný rozptyl).'},
+    {c:'c07',q:'Zákon velkých čísel říká, že s rostoucím počtem pokusů se výběrový průměr blíží…',o:['nule','střední hodnotě μ','mediánu','maximu'],a:1,e:'Průměr nezávislých opakování konverguje ke střední hodnotě E(X); proto lze pravděpodobnost odhadovat relativní četností.'},
+    {c:'c21',q:'Co říká velikost efektu (např. Cohenovo d), co p-hodnota neříká?',o:['zda je výsledek náhodný','jak velký je rozdíl','kolik je pozorování','jaký je rozptyl'],a:1,e:'p-hodnota říká, zda je rozdíl rozlišitelný od náhody; velikost efektu kvantifikuje, jak velký rozdíl je — nezávisle na n.'},
+    {c:'c11',q:'Silná korelace mezi X a Y znamená, že…',o:['X způsobuje Y','Y způsobuje X','je mezi nimi lineární vztah, ne nutně příčinný','jsou nezávislé'],a:2,e:'Korelace měří lineární souvislost, ne příčinnost — vztah může způsobovat třetí (matoucí) proměnná nebo jde o náhodu.'},
+    {c:'c04',q:'Které rozdělení typicky popisuje počet vzácných nezávislých událostí za daný interval?',o:['normální','binomické','Poissonovo','rovnoměrné'],a:2,e:'Poissonovo rozdělení popisuje počet událostí za interval s průměrem λ; platí u něj E(X) = D(X) = λ.'},
+    {c:'c05',q:'Spravedlivá (férová) sázka má očekávanou hodnotu…',o:['kladnou','zápornou','nulovou','rovnou vkladu'],a:2,e:'Férová hra má z definice nulovou očekávanou hodnotu — dlouhodobě ani nevyděláš, ani neproděláš. Kasina nabízejí hry se zápornou E(X).'},
+    {c:'c07',q:'Zvětšíme-li velikost vzorku 4×, směrodatná chyba průměru se…',o:['zmenší na polovinu','zmenší na čtvrtinu','zdvojnásobí','nezmění'],a:0,e:'SE = σ/√n. Při 4× větším n je √4 = 2× větší jmenovatel, takže SE klesne na polovinu — přesnost roste jen s odmocninou z n.'},
+    {c:'c02',q:'Kolik je 0! (nula faktoriál)?',o:['0','1','nedefinováno','nekonečno'],a:1,e:'Konvence 0! = 1 (prázdný součin). Díky ní vycházejí vzorce jako C(n,0) = 1 správně.'},
+    {c:'c01',q:'Čemu se podle De Morganova pravidla rovná (A∪B)′?',o:['A′∪B′','A′∩B′','A∩B','A∖B'],a:1,e:'Doplněk sjednocení je průnik doplňků: nebýt v A ani v B znamená být mimo A a zároveň mimo B.'},
+    {c:'c01',q:'Čemu se rovná P(A∖B)?',o:['P(A)−P(B)','P(A)−P(A∩B)','P(A)·P(B)','1−P(A)'],a:1,e:'Z A odečítáme jen část, která je zároveň v B — tedy P(A∩B). Odečíst celé P(B) by bylo špatně, pokud B zasahuje i mimo A.'},
+    {c:'c01',q:'|U| = 10, |A| = 4, |B| = 3, |A∩B| = 2. Jaká je P(A∪B) při stejně pravděpodobných prvcích?',o:['0,7','0,5','0,9','0,2'],a:1,e:'Inkluze–exkluze: |A∪B| = 4 + 3 − 2 = 5, takže P = 5/10 = 0,5.'},
+    {c:'c01',q:'Symetrický rozdíl A△B obsahuje prvky, které…',o:['patří do obou množin','patří právě do jedné z nich','nepatří do žádné','tvoří universum'],a:1,e:'A△B = (A∖B)∪(B∖A) — prvky, které jsou v A nebo v B, ale ne v obou zároveň.'},
+    {c:'c10',q:'V souboru platů je jedna extrémně vysoká hodnota. Který ukazatel „typického platu“ je důvěryhodnější?',o:['aritmetický průměr','medián','maximum','rozpětí'],a:1,e:'Medián je robustní — odlehlá hodnota s ním téměř nepohne, kdežto průměr utrhne směrem k extrému.'},
+    {c:'c10',q:'Variační koeficient V se počítá jako…',o:['s / x̄ (·100 %)','x̄ / s','s²','max − min'],a:0,e:'V = s/x̄ vyjadřuje variabilitu relativně vůči úrovni dat — hodí se pro srovnání souborů s různými jednotkami.'},
+    {c:'c13',q:'Koeficient determinace R² = 0,8 znamená, že…',o:['přímka je na 80 % správně','model vysvětluje 80 % variability Y','korelace je 0,8','chyba je 80 %'],a:1,e:'R² udává podíl rozptylu vysvětlované proměnné, který regresní model vysvětluje; zbylých 20 % zůstává v reziduích.'},
+    {c:'c13',q:'Predikce z regresní přímky daleko mimo rozsah naměřených x je…',o:['přesnější','riskantní extrapolace','vždy nemožná','totéž co interpolace'],a:1,e:'Mimo rozsah dat model nemá oporu — vztah se tam může zlomit, aniž by to data mohla prozradit.'},
+    {c:'c23',q:'Očekávaná četnost buňky kontingenční tabulky při nezávislosti je…',o:['(řádkový součet · sloupcový součet) / n','n / počet buněk','pozorovaná četnost','vždy 5'],a:0,e:'E = nᵢ.·n.ⱼ/n — kdyby veličiny byly nezávislé, četnosti by odpovídaly součinu marginálních podílů.'},
+    {c:'c23',q:'χ² test nezávislosti v kontingenční tabulce r×s má stupně volnosti…',o:['r·s','(r−1)(s−1)','n−1','r+s'],a:1,e:'df = (r−1)(s−1); pro tabulku 2×2 tedy 1 stupeň volnosti.'},
+    {c:'hist',q:'Studentovo t-rozdělení vzniklo, když W. S. Gosset řešil malé vzorky. Kde pracoval?',o:['na observatoři','v pivovaru Guinness','v pojišťovně','na univerzitě v Cambridge'],a:1,e:'Gosset byl sládek v Guinnessu; firma zakazovala publikovat, proto vydal objev pod pseudonymem „Student“.'},
+    {c:'hist',q:'Teorie pravděpodobnosti se zrodila roku 1654 z korespondence Pascala a Fermata o…',o:['pohybu planet','spravedlivém rozdělení banku přerušené hry','sčítání lidu','chybách měření'],a:1,e:'Otázka rytíře de Méré, jak férově rozdělit sázky nedohrané hry, spustila výměnu dopisů, z níž vzešla teorie pravděpodobnosti.'},
+      {c:'c06',q:'Výška má μ = 165 a σ = 10. Jaké z-skóre má hodnota 175?',o:['0,5','1','1,5','10'],a:1,e:'u = (175−165)/10 = 1 — jedna směrodatná odchylka nad průměrem; Φ(1) ≈ 0,84.'},
+    {c:'c07',q:'Jaké rozdělení má statistika (n−1)s²/σ², když výběr pochází z normálního rozdělení?',o:['normální','Studentovo t','χ² s n−1 stupni volnosti','F'],a:2,e:'Výběrový rozptyl škálovaný skutečným σ² sleduje χ² s df = n−1 — základ testů o rozptylu.'},
+    {c:'c16',q:'Z n = 400 respondentů volí stranu 100. Bodový odhad podílu a jeho SE jsou přibližně…',o:['0,25 a 0,022','0,25 a 0,05','0,40 a 0,022','0,25 a 0,002'],a:0,e:'p̂ = 100/400 = 0,25; SE = √(0,25·0,75/400) ≈ 0,0217.'},
+    {c:'c17',q:'Shodu rozptylů dvou výběrů testujeme…',o:['t-testem','F-testem s F = s₁²/s₂²','χ² testem nezávislosti','znaménkovým testem'],a:1,e:'Poměr výběrových rozptylů sleduje F(n₁−1, n₂−1); podle výsledku volíme klasický t-test, nebo Welchovu variantu.'},
+    {c:'c18',q:'Párový t-test se počítá…',o:['ze dvou nezávislých výběrů','z rozdílů dᵢ u týchž jednotek','jen když známe σ','z pořadí hodnot'],a:1,e:'Párový návrh převede data na rozdíly dᵢ = po − před a testuje, zda je jejich průměr nula; párování odečte mezisubjektovou variabilitu.'},
+    {c:'c23',q:'χ² test dobré shody pro férovou kostku (6 kategorií, žádný parametr odhadnutý z dat) má stupně volnosti…',o:['6','5','1','35'],a:1,e:'df = k − 1 − m = 6 − 1 − 0 = 5.'},
+    {c:'c11',q:'Data leží přesně na rostoucí exponenciále. Potom…',o:['r = 1 i ρS = 1','ρS = 1, ale r < 1','r = 1, ale ρS < 1','oba jsou ≈ 0'],a:1,e:'Vztah je dokonale monotónní (ρS = 1), ale ne lineární — Pearsonovo r zůstane pod jedničkou.'},
+  
+    {c:'c04',q:'Binomické rozdělení s obrovským n a titěrným p (součin np = λ zůstává konečný) se blíží…',o:['normálnímu','Poissonovu','geometrickému','rovnoměrnému'],a:1,e:'Limita Bi(n, p) → Po(λ) při n → ∞, p → 0, np = λ. Tomuto limitnímu přechodu se říká zákon vzácných jevů.'},
+    {c:'c07',q:'Součet čtverců ν nezávislých normovaných normálních veličin má rozdělení…',o:['normální','Studentovo t','chí-kvadrát s ν stupni volnosti','Fisherovo F'],a:2,e:'To je přímo definice χ²(ν) — proto se objevuje všude, kde se sčítají čtverce odchylek.'},
+  
+    {c:'c18',q:'Proč se pro porovnání pěti skupin používá ANOVA místo deseti t-testů?',o:['ANOVA je výpočetně rychlejší','mnoho testů hromadí riziko chyby I. druhu','t-test neumí spojitá data','ANOVA nepotřebuje žádné předpoklady'],a:1,e:'Deset testů na hladině 5 % dá dohromady ~40% šanci aspoň jednoho falešného poplachu. ANOVA testuje vše najednou jediným F-testem.'},
+    {c:'c04s',q:'Intenzita poruch z(t) vyjadřuje…',o:['pravděpodobnost, že kus selže do času t','riziko, že kus selže v čase t, když dosud vydržel','střední dobu do poruchy','pravděpodobnost, že kus vydrží déle než t'],a:1,e:'z(t) = f(t)/R(t) — riziko poruchy u kusu, který do času t vydržel. Pravděpodobnost poruchy do času t je F(t), vydržení déle než t je R(t) = 1 − F(t) a střední doba do poruchy je MTTF.'},
+    {c:'c04s',q:'Weibullovo rozdělení Wb(λ, α) má α = 0,5. Jak se s časem mění intenzita poruch?',o:['roste','klesá','je stálá','nejdřív roste, pak klesá'],a:1,e:'z(t) = αλ^α·t^(α−1) a exponent α − 1 = −0,5 je záporný, takže z(t) s časem klesá. Odpovídá to „dětským nemocem“: vadné kusy selžou brzy.'},
+    {c:'c04s',q:'Weibullovo rozdělení Wb(λ, α) s α = 1 je totéž co…',o:['normální rozdělení','exponenciální rozdělení Ex(λ)','rovnoměrné rozdělení','Poissonovo rozdělení'],a:1,e:'Pro α = 1 je F(t) = 1 − e^(−λt) a intenzita poruch z(t) = λ je stálá — to je exponenciální rozdělení se stejným λ.'},
+    {c:'c04s',q:'Doba do poruchy má exponenciální rozdělení s MTTF = 2000 h. Jaká je pravděpodobnost, že součástka vydrží déle než 2000 h?',o:['50 %','asi 37 %','asi 63 %','100 %'],a:1,e:'R(t) = e^(−λt) s λ = 1/MTTF, takže R(2000) = e^(−1) ≈ 0,368. Do doby MTTF tedy selže asi 63 % kusů — MTTF není doba, kterou vydrží polovina kusů.'},
+    {c:'c04s',q:'Stroj má MTTF = 99 dní a MTTR = 1 den. Jaká je pravděpodobnost, že v náhodný okamžik nefunguje?',o:['0,01','1/99 ≈ 0,0101','0,99','0,5'],a:0,e:'Nepohotovost Q ≈ MTTR/(MTTR + MTTF) = 1/(1 + 99) = 0,01. Častá chyba je dělit jen MTTF (1/99) — jmenovatel je celý cyklus provozu a opravy.'},
+    {c:'c04s',q:'Doba do poruchy má Wb(λ, α) s λ = 0,1 za rok a α = 2. Jaká je MTTF, je-li Γ(1,5) ≈ 0,886?',o:['5 let','asi 8,9 roku','10 let','20 let'],a:1,e:'MTTF = (1/λ)·Γ(1 + 1/α) = 10·Γ(1,5) ≈ 10·0,886 = 8,86 roku. Pro α = 1 by to bylo přesně 1/λ = 10 let.'},
+  // ── 01 · Základy ──
+  {c:'c01',q:'Co je základní prostor Ω?',o:['množina všech možných výsledků pokusu','jeden konkrétní výsledek pokusu','jev, který nemůže nastat','pravděpodobnost jistého jevu'],a:0,e:'Ω obsahuje všechny možné výsledky; jevy jsou jeho podmnožiny. U kostky je Ω = {1, …, 6}.'},
+  {c:'c01',q:'Který Kolmogorovův axiom říká, že P(Ω) = 1?',o:['normovanost','nezápornost','aditivita','nezávislost'],a:0,e:'Normovanost nastavuje měřítko: něco z možných výsledků nastat musí, takže jev jistý má pravděpodobnost 1.'},
+  {c:'c01',q:'Jevy A a B jsou neslučitelné a oba mají kladnou pravděpodobnost. Pak jsou…',o:['závislé','nezávislé','totéž co nezávislé','neslučitelné i nezávislé zároveň'],a:0,e:'P(A∩B) = 0, ale P(A)·P(B) > 0 — součin neplatí, jevy jsou závislé. Když nastal A, víme jistě, že B nenastal. Neslučitelnost není totéž co nezávislost.'},
+  {c:'c01',q:'Doplněk A′ jevu A znamená, že…',o:['A nenastane','A nastane dvakrát','nastane A i B','A je nemožný jev'],a:0,e:'A′ obsahuje všechny výsledky mimo A; P(A′) = 1 − P(A).'},
+  {c:'c01',q:'Klasická (Laplaceova) definice P(A) = |A| / |Ω| se smí použít, když…',o:['výsledků je konečně mnoho a všechny jsou stejně pravděpodobné','pokus opakujeme mnohokrát','jevy jsou neslučitelné','známe hustotu rozdělení'],a:0,e:'„Příznivé ku všem“ funguje jen pro konečně mnoho stejně pravděpodobných výsledků — férová kostka, karty, mince.'},
+  {c:'c01',q:'Jak se s rostoucím počtem pokusů chová relativní četnost jevu?',o:['blíží se jeho pravděpodobnosti','roste nade všechny meze','je vždy přesně rovna pravděpodobnosti','klesá k nule'],a:0,e:'To je frekvenční pohled na pravděpodobnost a zároveň obsah zákona velkých čísel; při malém počtu pokusů ale relativní četnost kolísá.'},
+  {c:'c01',q:'Pro libovolné jevy A, B platí P(A ∪ B) =',o:['P(A) + P(B) − P(A ∩ B)','P(A) + P(B)','P(A) · P(B)','1 − P(A ∩ B)'],a:0,e:'Inkluze–exkluze: průnik se při sečtení započítá dvakrát, proto se jednou odečte. P(A) + P(B) platí jen pro neslučitelné jevy.'},
+  {c:'c01',q:'Předpověď „30% šance deště“ znamená, že…',o:['ze dnů s takovou předpovědí zaprší zhruba ve 3 z 10','bude pršet 30 % dne','zaprší na 30 % území','déšť bude slabý'],a:0,e:'Pravděpodobnost se týká dlouhé řady opakování (dnů se stejnou předpovědí), ne délky ani síly deště jednoho dne.'},
+  {c:'c01',q:'Které tvrzení plyne z axiomů pravděpodobnosti?',o:['P(A) ≤ 1 pro každý jev','pravděpodobnost může být záporná','P(Ω) = 0','P(A ∪ B) = P(A) + P(B) pro libovolné jevy'],a:0,e:'A a A′ jsou neslučitelné a dohromady dají Ω, takže P(A) + P(A′) = 1 a P(A′) ≥ 0 — odtud P(A) ≤ 1.'},
+  // ── 02 · Kombinatorika ──
+  {c:'c02',q:'Kolika způsoby lze seřadit 4 různé knihy do řady?',o:['24','16','12','4'],a:0,e:'Permutace: 4! = 4·3·2·1 = 24.'},
+  {c:'c02',q:'Kdy použijeme variace místo kombinací?',o:['když záleží na pořadí vybraných prvků','když na pořadí nezáleží','vždy, když se prvky smějí opakovat','když vybíráme všechny prvky'],a:0,e:'Variace počítají uspořádané výběry (medaile), kombinace neuspořádané (výbor, karty v ruce).'},
+  {c:'c02',q:'Kolik existuje čtyřmístných PINů z číslic 0–9, když se číslice smějí opakovat?',o:['10 000','5 040','210','40'],a:0,e:'Variace s opakováním: na každé ze 4 pozic je 10 možností, tedy 10⁴ = 10 000.'},
+  {c:'c02',q:'Kombinační číslo C(n, k) je vždy rovno…',o:['C(n, n − k)','C(n − k, k)','n!/k!','k!·(n − k)!'],a:0,e:'Symetrie: vybrat k prvků je totéž jako vybrat n − k prvků, které necháme stranou.'},
+  {c:'c02',q:'Součet všech čísel v n-tém řádku Pascalova trojúhelníku je…',o:['2ⁿ','n²','n!','2n'],a:0,e:'Součet C(n, 0) + … + C(n, n) = 2ⁿ — tolik je všech podmnožin n-prvkové množiny.'},
+  {c:'c02',q:'Kolika způsoby lze rozdělit zlato, stříbro a bronz mezi 10 běžců?',o:['720','120','1 000','30'],a:0,e:'Záleží na pořadí, bez opakování: V(10, 3) = 10·9·8 = 720. C(10, 3) = 120 by nerozlišovalo, kdo má kterou medaili.'},
+  {c:'c02',q:'Prohodíš dva vybrané prvky a vznikne jiný výsledek. Jde o výběr, kde…',o:['záleží na pořadí (variace)','nezáleží na pořadí (kombinace)','se prvky musí opakovat','vybíráme všechny prvky najednou'],a:0,e:'Test zdravého rozumu z kurzu: když prohození mění výsledek, rozhoduje pořadí.'},
+  {c:'c02',q:'Kolik lidí stačí, aby pravděpodobnost, že dva z nich mají narozeniny ve stejný den, přesáhla 50 %?',o:['23','183','365','50'],a:0,e:'Narozeninový paradox: přes doplněk vychází pro 23 lidí 50,7 %. Rozhoduje počet dvojic — u 23 lidí je jich 253.'},
+  // ── 03 · Podmíněná pravděpodobnost a Bayes ──
+  {c:'c03',q:'Podmíněná pravděpodobnost P(A | B) je rovna…',o:['P(A ∩ B) / P(B)','P(A ∩ B) / P(A)','P(A) · P(B)','P(B | A)'],a:0,e:'Zúžíme svět na B a ptáme se, jaký podíl z něj tvoří A ∩ B (předpokládá se P(B) > 0).'},
+  {c:'c03',q:'K čemu slouží Bayesova věta?',o:['otočí podmínku: z P(B | A) spočítá P(A | B)','sčítá pravděpodobnosti neslučitelných jevů','počítá počet kombinací','odhaduje rozptyl'],a:0,e:'Typicky z P(test + | nemoc) spočítá P(nemoc | test +), což zajímá pacienta.'},
+  {c:'c03',q:'Senzitivita diagnostického testu je…',o:['P(test + | nemocný)','P(nemocný | test +)','P(test − | zdravý)','podíl nemocných v populaci'],a:0,e:'Senzitivita říká, kolik nemocných test zachytí. P(nemocný | test +) je až výsledek Bayesovy věty.'},
+  {c:'c03',q:'Specificita diagnostického testu je…',o:['P(test − | zdravý)','P(test + | nemocný)','P(zdravý | test −)','podíl zdravých v populaci'],a:0,e:'Specificita říká, kolik zdravých test správně označí jako negativní; 1 − specificita je podíl falešných poplachů mezi zdravými.'},
+  {c:'c03',q:'Proč je u vzácné nemoci většina pozitivních výsledků falešná i u velmi přesného testu?',o:['zdravých je tolik, že i malé procento omylů převáží nemocné','test je špatně zkalibrovaný','senzitivita je u vzácných nemocí vždy nízká','nemocní mají vždy negativní test'],a:0,e:'Past základní míry: výsledek po pozitivním testu závisí na prevalenci, ne jen na přesnosti testu.'},
+  {c:'c03',q:'Tzv. klam žalobce je záměna…',o:['P(A | B) a P(B | A)','P(A) a P(A′)','průměru a mediánu','α a β'],a:0,e:'Příklad z kurzu: P(muž | fotbalista) je vysoká, P(fotbalista | muž) nízká. Záměna obou směrů podmínky je častá chyba.'},
+  {c:'c03',q:'Věta o úplné pravděpodobnosti zapíše P(B) jako…',o:['P(B | A)·P(A) + P(B | A′)·P(A′)','P(B | A) + P(B | A′)','P(A | B)·P(B)','P(A) + P(B)'],a:0,e:'Svět rozdělíme na neslučitelné scénáře A a A′ a poskládáme příspěvky obou.'},
+  {c:'c25',q:'Rodina má dvě děti a víme, že starší je chlapec. Jaká je pravděpodobnost, že jsou oba chlapci?',o:['1/2','1/3','1/4','2/3'],a:0,e:'Podmínka nechá KK a KH, jen jedna z nich je „oba chlapci“: 1/2. U podmínky „aspoň jeden je chlapec“ by to bylo 1/3.'},
+  {c:'c25',q:'Monty Hall: vybereš dveře, moderátor otevře jiné prázdné. Jaká je pravděpodobnost výhry, když dveře vyměníš?',o:['2/3','1/2','1/3','1'],a:0,e:'Původní volba trefí výhru s pravděpodobností 1/3; ve 2/3 případů je výhra za zbývajícími dveřmi, které ti moderátor nechal.'},
+  {c:'c25',q:'Co obvykle způsobuje Simpsonův paradox?',o:['matoucí proměnná, která ovlivňuje zařazení do skupin i výsledek','příliš malý vzorek','chyba ve výpočtu průměru','nezávislost skupin'],a:0,e:'V kurzu: léčba A dostává převážně těžké případy, takže celkově vyjde hůř, i když je lepší v každé skupině.'},
+  {c:'c25',q:'Co je zkreslení přeživších?',o:['díváme se jen na případy, které „dojely do cíle“','chyba měřicího přístroje','vliv odlehlé hodnoty na průměr','záměna P(A | B) a P(B | A)'],a:0,e:'Klasický příklad: pancéřovat bombardéry podle děr na strojích, které se vrátily — zásahy, po kterých se nevrátily, nevidíme.'},
+  // ── 04 · Rozdělení ──
+  {c:'c04',q:'Distribuční funkce F(x) náhodné veličiny X je…',o:['P(X ≤ x)','P(X = x)','hustota v bodě x','střední hodnota X'],a:0,e:'F(x) „načítá“ pravděpodobnost zleva; je neklesající a jde od 0 do 1.'},
+  {c:'c04',q:'X je spojitá náhodná veličina. Kolik je P(X = 3)?',o:['0','f(3)','F(3)','1/2'],a:0,e:'U spojité veličiny je pravděpodobnost plocha pod hustotou; nad jediným bodem je plocha nulová, smysl mají jen intervaly.'},
+  {c:'c04',q:'Geometrické rozdělení popisuje…',o:['na kolikátý pokus přijde první úspěch','počet úspěchů v n pokusech','dobu čekání ve spojitém čase','počet událostí za časový interval'],a:0,e:'P(X = k) = (1 − p)^(k−1)·p — k − 1 neúspěchů a pak úspěch.'},
+  {c:'c04',q:'Čím se hypergeometrické rozdělení liší od binomického?',o:['výběr probíhá bez vracení, takže pokusy jsou závislé','je spojité','pokusy jsou nezávislé','nabývá jen dvou hodnot'],a:0,e:'Typicky kontrola dávky: vytažený kus se nevrací, a tak se mění složení zbytku.'},
+  {c:'c04',q:'Pro Poissonovo rozdělení Po(λ) platí…',o:['E(X) = D(X) = λ','E(X) = λ, D(X) = λ²','E(X) = 1/λ','D(X) = 0'],a:0,e:'Zvláštnost Poissonova rozdělení: střední hodnota i rozptyl jsou rovny λ.'},
+  {c:'c04',q:'Exponenciální rozdělení je „bez paměti“. Co to znamená?',o:['už odčekaná doba nemění rozdělení zbývajícího čekání','po dlouhém čekání událost přijde jistě','čekání je vždy stejně dlouhé','střední hodnota je nulová'],a:0,e:'Kus, který dosud funguje, má stejné riziko poruchy jako nový — intenzita poruch je stálá λ.'},
+  {c:'c04',q:'Jakou střední hodnotu a rozptyl má binomické rozdělení Bi(n, p)?',o:['E = np, D = np(1 − p)','E = np, D = np','E = n/p, D = np²','E = p, D = p(1 − p)'],a:0,e:'Binomická veličina je součet n nezávislých alternativních (0/1) veličin, každá má E = p a D = p(1 − p).'},
+  {c:'c04',q:'Binomické rozdělení je součtem nezávislých…',o:['alternativních (Bernoulliho) veličin','exponenciálních veličin','normálních veličin','Poissonových veličin s různým λ'],a:0,e:'Mapa rozdělení: Bi(n, p) = součet n nezávislých pokusů ano/ne, každý s pravděpodobností p.'},
+  {c:'c04',q:'Rovnoměrné rozdělení na intervalu (0, 1) je speciálním případem…',o:['rozdělení Beta(1, 1)','normálního rozdělení','Poissonova rozdělení','χ² rozdělení'],a:0,e:'Beta(α, β) s α = β = 1 má na (0, 1) konstantní hustotu.'},
+  {c:'c04',q:'Součet několika nezávislých exponenciálních čekání (se stejným λ) má rozdělení…',o:['gama (Erlangovo)','exponenciální','rovnoměrné','binomické'],a:0,e:'Doba do k-té události Poissonova procesu je součet k exponenciálních čekání — gama (pro celé k Erlangovo) rozdělení.'},
+  // ── 04 · Spolehlivost ──
+  {c:'c04s',q:'Funkce přežití R(t) je…',o:['P(T > t) = 1 − F(t)','P(T ≤ t)','f(t) / R(t)','střední doba do poruchy'],a:0,e:'R(t) je pravděpodobnost, že kus vydrží déle než t. F(t) je pravděpodobnost poruchy do času t.'},
+  {c:'c04s',q:'Intenzita poruch exponenciálního rozdělení je…',o:['stálá, rovná λ','s časem rostoucí','s časem klesající','nulová'],a:0,e:'Exponenciální rozdělení je bez paměti, riziko poruchy na čase nezávisí: z(t) = λ.'},
+  {c:'c04s',q:'Doba do poruchy je exponenciální s λ = 0,002 za hodinu. Jaká je MTTF?',o:['500 h','0,002 h','2 000 h','50 h'],a:0,e:'MTTF = 1/λ = 1/0,002 = 500 h.'},
+  {c:'c04s',q:'Weibullovo rozdělení s α > 1 popisuje situaci, kdy…',o:['riziko poruchy s časem roste (opotřebení)','riziko poruchy s časem klesá (dětské nemoci)','riziko je stálé','porucha nastane hned na začátku'],a:0,e:'Exponent α − 1 > 0, takže intenzita poruch z(t) s časem roste — typické stárnutí a opotřebení.'},
+  {c:'c04s',q:'Pohotovost obnovovaného prvku je…',o:['MTTF / (MTTF + MTTR)','MTTR / (MTTF + MTTR)','MTTF / MTTR','1 − MTTF'],a:0,e:'Pohotovost A je podíl času, kdy prvek funguje; doplněk Q = MTTR/(MTTR + MTTF) je nepohotovost.'},
+  {c:'c04s',q:'Co popisuje tzv. vanová křivka?',o:['intenzita poruch nejdřív klesá, pak je stálá a nakonec roste','počet vyrobených kusů v čase','rozdělení výšky postavy','průběh distribuční funkce'],a:0,e:'Skutečné výrobky mívají za sebou dětské nemoci (α < 1), období náhodných poruch (α = 1) a opotřebení (α > 1).'},
+  {c:'c04s',q:'Neobnovovaný prvek má exponenciální dobu do poruchy. Pravděpodobnost, že v čase t už nefunguje, je…',o:['Q(t) = 1 − e^(−λt)','e^(−λt)','λt','MTTR/(MTTR + MTTF)'],a:0,e:'Q(t) = F(t) = 1 − e^(−λt). Výraz e^(−λt) je naopak pravděpodobnost, že prvek ještě funguje.'},
+  {c:'c04s',q:'Do doby η = 1/λ u Weibullova rozdělení Wb(λ, α) selže vždy…',o:['63,2 % kusů','50 % kusů','36,8 % kusů','95 % kusů'],a:0,e:'F(η) = 1 − e^(−(λη)^α) = 1 − e^(−1) ≈ 0,632 bez ohledu na α. Proto se η říká charakteristická životnost.'},
+  // ── 05 · Střední hodnota a rozptyl ──
+  {c:'c05',q:'Střední hodnota E(X) je…',o:['vážený průměr možných hodnot — těžiště rozdělení','nejčastější hodnota','prostřední hodnota','největší možná hodnota'],a:0,e:'Každou hodnotu vážíme její pravděpodobností. Nejčastější hodnota je modus, prostřední medián.'},
+  {c:'c05',q:'E(aX + b) je rovno…',o:['a·E(X) + b','a²·E(X) + b','a·E(X)','E(X) + b'],a:0,e:'Střední hodnota je lineární: posun i změna měřítka se do ní přenesou přímo.'},
+  {c:'c05',q:'D(aX + b) je rovno…',o:['a²·D(X)','a·D(X) + b','a²·D(X) + b','D(X)'],a:0,e:'Posun b rozptyl nemění, změna měřítka a ho násobí druhou mocninou.'},
+  {c:'c05',q:'Který vztah pro rozptyl platí?',o:['D(X) = E(X²) − (E(X))²','D(X) = E(X²) + (E(X))²','D(X) = (E(X))²','D(X) = E(X) − E(X²)'],a:0,e:'Výpočetní tvar definice D(X) = E((X − μ)²).'},
+  {c:'c05',q:'X a Y jsou nezávislé, σ(X) = 3 a σ(Y) = 4. Jaká je σ(X + Y)?',o:['5','7','12','25'],a:0,e:'Sčítají se rozptyly, ne odchylky: D = 9 + 16 = 25, σ = √25 = 5.'},
+  {c:'c05',q:'Rovnost E(X + Y) = E(X) + E(Y) platí…',o:['vždy, i pro závislé veličiny','jen pro nezávislé veličiny','jen pro normální rozdělení','jen když E(X) = E(Y)'],a:0,e:'Linearita střední hodnoty nepotřebuje nezávislost; tu potřebuje až vzorec D(X + Y) = D(X) + D(Y).'},
+  {c:'c05',q:'Proč se místo rozptylu často uvádí směrodatná odchylka?',o:['je ve stejných jednotkách jako data','je vždy menší než 1','nezávisí na odlehlých hodnotách','je rovna průměru'],a:0,e:'Rozptyl je ve čtvercích jednotek (cm²); σ = √D(X) se vrací do původních jednotek.'},
+  // ── 06 · z-skóre ──
+  {c:'c06',q:'Normovaná veličina U = (X − μ)/σ má…',o:['E(U) = 0 a D(U) = 1','E(U) = μ a D(U) = σ²','E(U) = 1 a D(U) = 0','E(U) = 0 a D(U) = σ'],a:0,e:'Odečtení μ posune těžiště do nuly, dělení σ srovná měřítko na jedničku.'},
+  {c:'c06',q:'Kolik hodnot normálního rozdělení padne zhruba do intervalu μ ± 2σ?',o:['95 %','68 %','99,7 %','50 %'],a:0,e:'Pravidlo 68–95–99,7: ±1σ ≈ 68 %, ±2σ ≈ 95 %, ±3σ ≈ 99,7 %.'},
+  {c:'c06',q:'Kolik je Φ(0)?',o:['0,5','0','1','0,68'],a:0,e:'Normované normální rozdělení je symetrické kolem 0, nalevo od nuly leží právě polovina plochy.'},
+  {c:'c06',q:'Pro distribuční funkci normovaného normálního rozdělení platí Φ(−u) =',o:['1 − Φ(u)','−Φ(u)','Φ(u)','Φ(u) − 1'],a:0,e:'Ze symetrie zvonovky: plocha nalevo od −u je stejná jako plocha napravo od u.'},
+  {c:'c06',q:'Výška žen má N(168, 7²). Jaké z-skóre má výška 154 cm?',o:['−2','2','−14','−1'],a:0,e:'u = (154 − 168)/7 = −14/7 = −2: dvě směrodatné odchylky pod průměrem.'},
+  {c:'c06',q:'IQ má μ = 100 a σ = 15 (normální rozdělení). Zhruba kolik procent lidí má IQ nižší než 130?',o:['97,7 %','84 %','99,9 %','95 %'],a:0,e:'u = (130 − 100)/15 = 2, Φ(2) ≈ 0,977.'},
+  // ── 07–09 · Velká čísla, CLT, výběrová rozdělení ──
+  {c:'c07',q:'Co zákon velkých čísel NETVRDÍ?',o:['že po sérii pann je orel pravděpodobnější','že se průměr blíží střední hodnotě','že se relativní četnost blíží pravděpodobnosti','že kolísání průměru s počtem pokusů klesá'],a:0,e:'Žádná kompenzace neexistuje (klam hazardního hráče). Výkyvy se neruší, jen se „rozředí“ v dalších pokusech.'},
+  {c:'c07',q:'Směrodatná chyba výběrového průměru je…',o:['σ/√n','σ/n','σ²/n','σ·√n'],a:0,e:'D(X̄) = σ²/n, odmocnina dává σ/√n.'},
+  {c:'c07',q:'Kolikrát musíš zvětšit vzorek, aby se směrodatná chyba průměru zmenšila na třetinu?',o:['9×','3×','6×','27×'],a:0,e:'SE = σ/√n; aby √n vzrostla 3×, musí n vzrůst 9×.'},
+  {c:'c07',q:'Co centrální limitní věta vyžaduje od jednotlivých sčítaných veličin?',o:['nezávislost a konečný rozptyl','normální rozdělení','stejné hodnoty','nulovou střední hodnotu'],a:0,e:'Výchozí rozdělení může být jakékoli (i bimodální), musí ale mít konečný rozptyl.'},
+  {c:'c07',q:'Pro které rozdělení centrální limitní věta neplatí (průměr se nesrovná do zvonu)?',o:['Cauchyho','exponenciální','rovnoměrné','binomické'],a:0,e:'Cauchyho rozdělení nemá konečný rozptyl ani střední hodnotu, proto se průměr nikdy neustálí do normálního tvaru.'},
+  {c:'c07',q:'Sečteme n nezávislých veličin se střední hodnotou μ a směrodatnou odchylkou σ. Součet má…',o:['E = nμ a SD = σ√n','E = nμ a SD = nσ','E = μ a SD = σ/√n','E = nμ a SD = σ/n'],a:0,e:'Střední hodnoty i rozptyly se sčítají: D = nσ², takže SD = σ√n. (σ/√n platí pro průměr.)'},
+  {c:'c07',q:'Statistika T = (X̄ − μ)/(s/√n) má u výběru z normálního rozdělení…',o:['Studentovo t s n − 1 stupni volnosti','přesně normované normální rozdělení','χ² rozdělení','F rozdělení'],a:0,e:'Protože σ nahrazujeme odhadem s, rozdělení má těžší ocasy než N(0, 1).'},
+  {c:'c07',q:'Jak se mění Studentovo t-rozdělení s rostoucím počtem stupňů volnosti?',o:['blíží se normovanému normálnímu','blíží se χ²','stále se zplošťuje','posouvá se doprava'],a:0,e:'S rostoucím df je odhad s stále přesnější a ocasy t-rozdělení se zužují k normálním.'},
+  {c:'c07',q:'Proč se ve výběrovém rozptylu s² dělí n − 1 místo n?',o:['aby odhad rozptylu populace nebyl podhodnocený','aby byl výpočet jednodušší','protože jedna hodnota se vždy vyřadí','aby výsledek vyšel celé číslo'],a:0,e:'Průměr je spočten ze stejných dat („spotřebuje“ jeden stupeň volnosti); dělení n − 1 to vyrovná a odhad je nestranný.'},
+  {c:'c07',q:'Jaká je střední hodnota rozdělení χ² s ν stupni volnosti?',o:['ν','0','1','ν²'],a:0,e:'χ²(ν) je součet ν čtverců normovaných normálních veličin, každý má střední hodnotu 1.'},
+  // ── 10 · Popisná statistika ──
+  {c:'c10',q:'Medián souboru je…',o:['prostřední hodnota seřazených dat','nejčastější hodnota','průměr minima a maxima','aritmetický průměr'],a:0,e:'Polovina dat leží pod mediánem a polovina nad ním.'},
+  {c:'c10',q:'Které míry jsou odolné vůči odlehlým hodnotám?',o:['medián a mezikvartilové rozpětí','průměr a rozptyl','variační rozpětí','průměr a variační rozpětí'],a:0,e:'Medián ani kvartily se jedním extrémem téměř nepohnou; průměr, rozptyl i rozpětí ano.'},
+  {c:'c10',q:'Mezikvartilové rozpětí IQR je…',o:['Q3 − Q1','max − min','Q3 + Q1','medián − Q1'],a:0,e:'Rozpětí prostřední poloviny dat.'},
+  {c:'c10',q:'Co zobrazuje krabicový graf?',o:['medián, kvartily a odlehlé hodnoty','průměr a směrodatnou odchylku','četnosti všech hodnot','regresní přímku'],a:0,e:'Krabice sahá od Q1 do Q3, čára uvnitř je medián, vousy a body ukazují rozsah a odlehlé hodnoty.'},
+  {c:'c10',q:'Platy mají dlouhý pravý konec (několik velmi vysokých). Jak se zpravidla liší průměr a medián?',o:['průměr je větší než medián','průměr je menší než medián','jsou stejné','medián nelze spočítat'],a:0,e:'Extrémně vysoké hodnoty táhnou průměr nahoru, medián zůstává u „typického“ platu.'},
+  {c:'c10',q:'K čemu slouží variační koeficient V = s / x̄?',o:['k porovnání variability souborů s různými jednotkami či úrovněmi','k měření polohy dat','k odhadu mediánu','k testování normality'],a:0,e:'Je to relativní míra variability — například rozptýlenost váhy myší a slonů.'},
+  {c:'c10',q:'Jaký je modus souboru 2, 3, 3, 5, 7?',o:['3','4','5','3,5'],a:0,e:'Modus je nejčastější hodnota; trojka se vyskytuje dvakrát.'},
+  {c:'c10',q:'Všechna data vynásobíme dvěma. Co se stane se směrodatnou odchylkou s?',o:['zdvojnásobí se','zčtyřnásobí se','nezmění se','zmenší se na polovinu'],a:0,e:'Rozptyl se násobí a² = 4, směrodatná odchylka tedy |a| = 2.'},
+  // ── 11–12 · Kovariance, korelace, Spearman ──
+  {c:'c11',q:'Proč se kovariance normuje na korelační koeficient?',o:['kovariance závisí na jednotkách měření','kovariance je vždy kladná','kovariance neumí měřit směr vztahu','korelace se počítá snadněji'],a:0,e:'ρ = Cov(X, Y)/(σx·σy) leží vždy mezi −1 a 1 a nezávisí na jednotkách.'},
+  {c:'c11',q:'Korelační koeficient ρ = −1 znamená…',o:['dokonalý klesající lineární vztah','žádný vztah','velmi slabý vztah','dokonalý rostoucí lineární vztah'],a:0,e:'Body leží přesně na klesající přímce.'},
+  {c:'c11',q:'Spearmanův koeficient ρS se počítá…',o:['z pořadí hodnot','z druhých mocnin hodnot','jen ze znamének rozdílů','z mediánů skupin'],a:0,e:'Hodnoty se nejdřív převedou na pořadí a teprve ta se korelují.'},
+  {c:'c11',q:'Co měří Spearmanův koeficient ρS?',o:['monotónní vztah (když x roste, y roste nebo klesá)','pouze lineární vztah','příčinný vztah','rozptyl dat'],a:0,e:'Proto je na exponenciále ρS = 1, zatímco Pearsonovo r < 1.'},
+  {c:'c11',q:'Proč s ρS jedna odlehlá hodnota skoro nepohne?',o:['pořadí nezávisí na tom, jak daleko extrém leží','odlehlé hodnoty se automaticky mažou','ρS používá jen prostřední hodnoty','ρS je vždy rovno 1'],a:0,e:'Extrém dostane nejvyšší pořadí bez ohledu na to, o kolik je větší.'},
+  {c:'c11',q:'Prodej zmrzliny a počet utonutí spolu silně korelují. Nejpravděpodobnější vysvětlení je…',o:['obojí roste v létě — třetí (matoucí) proměnná','zmrzlina způsobuje utonutí','utonutí zvyšuje prodej zmrzliny','korelace je chybně spočtená'],a:0,e:'Korelace není příčinnost; za oběma veličinami stojí počasí a léto.'},
+  {c:'c11',q:'Kovarianci lze spočítat jako Cov(X, Y) =',o:['E(XY) − E(X)·E(Y)','E(X) · E(Y)','E(XY) + E(X)·E(Y)','D(X) + D(Y)'],a:0,e:'Výpočetní tvar definice E((X − μX)(Y − μY)).'},
+  // ── 13 · Regrese ──
+  {c:'c13',q:'Co minimalizuje metoda nejmenších čtverců?',o:['součet čtverců svislých odchylek bodů od přímky','součet vodorovných vzdáleností','počet bodů mimo přímku','korelační koeficient'],a:0,e:'Minimalizuje reziduální součet čtverců; čtverce trestají velké odchylky víc než malé.'},
+  {c:'c13',q:'Sklon regresní přímky b₁ se spočítá jako…',o:['sxy / sx²','sx² / sxy','ȳ − x̄','r · n'],a:0,e:'Kovariance x a y dělená rozptylem x.'},
+  {c:'c13',q:'Absolutní člen regresní přímky je b₀ =',o:['ȳ − b₁·x̄','x̄ − b₁·ȳ','ȳ / x̄','b₁·x̄'],a:0,e:'Z toho plyne, že přímka nejmenších čtverců prochází bodem (x̄, ȳ).'},
+  {c:'c13',q:'Reziduum je…',o:['rozdíl skutečné a předpovězené hodnoty y − ŷ','předpověď přímky ŷ','sklon přímky','korelace x a y'],a:0,e:'Kladné reziduum znamená, že bod leží nad přímkou.'},
+  {c:'c13',q:'Korelační koeficient je r = −0,9. Jaký je koeficient determinace R² přímkové regrese?',o:['0,81','−0,81','0,9','0,19'],a:0,e:'R² = r² = 0,81: přímka vysvětlí 81 % variability Y. Znaménko se ve druhé mocnině ztratí.'},
+  {c:'c13',q:'Kterým bodem vždy prochází regresní přímka nejmenších čtverců?',o:['(x̄, ȳ)','(0, 0)','(min x, min y)','(medián x, medián y)'],a:0,e:'Dosazením x = x̄ do ŷ = b₀ + b₁x s b₀ = ȳ − b₁x̄ dostaneme ŷ = ȳ.'},
+  {c:'c13',q:'Kolem stejné přímky přibude náhodného šumu. Co se stane s R²?',o:['klesne','vzroste','nezmění se','změní se jeho znaménko'],a:0,e:'Přímka vysvětluje menší podíl celkové variability, víc jí zůstane v reziduích.'},
+  // ── 14 · Intervaly spolehlivosti ──
+  {c:'c14',q:'Jaký kvantil u se používá pro 99% interval spolehlivosti?',o:['2,576','1,96','1,645','3'],a:0,e:'u₀,₉₉₅ ≈ 2,576; pro 95 % je to 1,96 a pro 90 % 1,645.'},
+  {c:'c14',q:'Zvýšíme spolehlivost intervalu z 95 % na 99 %. Interval bude…',o:['širší','užší','stejně široký','záleží jen na n'],a:0,e:'Větší jistota pokrytí se platí šířkou: kvantil vzroste z 1,96 na 2,576.'},
+  {c:'c14',q:'Neznáme σ a vzorek je malý. Interval pro průměr sestrojíme pomocí…',o:['t-rozdělení s n − 1 stupni volnosti','kvantilu u = 1,96','χ² rozdělení','F rozdělení'],a:0,e:'Odhad s místo σ přináší další nejistotu, kterou t-rozdělení s těžšími ocasy zohlední.'},
+  {c:'c14',q:'Co je u intervalu spolehlivosti náhodné?',o:['interval (jeho meze), parametr μ je pevný','parametr μ, interval je pevný','obojí','nic'],a:0,e:'μ je pevné, i když neznámé číslo; s každým výběrem vyjde jiný interval.'},
+  {c:'c14',q:'Co znamená, že odhad je nestranný?',o:['jeho střední hodnota je rovna odhadovanému parametru','s rostoucím n se blíží parametru','má nejmenší možný rozptyl','nezávisí na datech'],a:0,e:'V průměru přes všechny možné výběry trefuje pravdu, například E(X̄) = μ.'},
+  {c:'c14',q:'Co znamená, že odhad je konzistentní?',o:['s rostoucím počtem dat se blíží skutečné hodnotě','jeho střední hodnota je rovna parametru','je vždy přesný','je stejný pro všechny výběry'],a:0,e:'Konzistence je vlastnost pro velké n: víc dat, přesnější odhad.'},
+  {c:'c14',q:'Ze dvou nestranných odhadů téhož parametru volíme ten, který…',o:['má menší rozptyl (je eficientnější)','má větší rozptyl','používá méně dat','je větší'],a:0,e:'Eficience: přesnější odhad méně kolísá kolem pravé hodnoty.'},
+  // ── 15 · Testování hypotéz ──
+  {c:'c15',q:'Hladina významnosti α je…',o:['předem zvolená přípustná pravděpodobnost chyby I. druhu','pravděpodobnost, že H₀ platí','síla testu','p-hodnota'],a:0,e:'Typicky 0,05: riziko, že zamítneme H₀, která ve skutečnosti platí.'},
+  {c:'c15',q:'Síla testu je…',o:['1 − β, pravděpodobnost odhalit skutečný efekt','pravděpodobnost chyby I. druhu','p-hodnota','velikost efektu'],a:0,e:'β je pravděpodobnost chyby II. druhu (efekt přehlédneme), síla je její doplněk.'},
+  {c:'c15',q:'Co zvýší sílu testu (při stejném α)?',o:['větší vzorek','menší vzorek','menší skutečný efekt','větší rozptyl dat'],a:0,e:'Větší n zúží rozdělení výběrového průměru, křivky H₀ a H₁ se méně překrývají.'},
+  {c:'c15',q:'Snížíme α z 0,05 na 0,01 a vzorek necháme stejný. Co se stane s β?',o:['zvětší se','zmenší se','nezmění se','bude rovno α'],a:0,e:'Kritická hodnota se posune dál, test zamítá méně často — častěji přehlédne skutečný efekt.'},
+  {c:'c15',q:'Jaká je kritická hodnota u oboustranného testu na hladině 5 %?',o:['1,96','1,645','2,576','0,05'],a:0,e:'Na každou stranu připadá 2,5 %, tedy u₀,₉₇₅ ≈ 1,96. Jednostranný test by měl 1,645.'},
+  {c:'c15',q:'Jaká je kritická hodnota u pravostranného testu na hladině 5 %?',o:['1,645','1,96','2,326','0,95'],a:0,e:'Celých 5 % leží v jednom ocasu: u₀,₉₅ ≈ 1,645.'},
+  {c:'c15',q:'Při obrovském vzorku vyjde test statisticky významný. Co z toho plyne?',o:['rozdíl je rozlišitelný od náhody, ale může být věcně zanedbatelný','rozdíl je určitě velký a důležitý','H₀ určitě platí','test je chybný'],a:0,e:'Statistická významnost ≠ důležitost; proto se uvádí i velikost efektu.'},
+  {c:'c15',q:'Co obvykle tvrdí nulová hypotéza H₀?',o:['žádný efekt, žádný rozdíl','že efekt existuje','že data jsou chybná','že p-hodnota je malá'],a:0,e:'H₀ je jako presumpce neviny; data proti ní musí přinést dostatečně silný důkaz.'},
+  {c:'c15',q:'Test H₀ nezamítl. Jak to správně vyložit?',o:['data neposkytla dost důkazů proti H₀','H₀ je prokázaně pravdivá','H₁ je prokázaně nepravdivá','test byl zbytečný'],a:0,e:'Nezamítnutí není důkaz platnosti H₀ — „nevinen pro nedostatek důkazů“.'},
+  {c:'c15',q:'Co je p-hacking?',o:['zkoušet testy tak dlouho, dokud něco nevyjde významné','použít jednostranný test','zvětšit vzorek','zvolit α = 0,01'],a:0,e:'Při dvaceti testech na hladině 5 % vyjde aspoň jeden „významný“ výsledek i v čirém šumu s pravděpodobností asi 64 %.'},
+  // ── 16 · Podíl ──
+  {c:'c16',q:'Směrodatná chyba výběrového podílu p̂ je…',o:['√(p̂(1 − p̂)/n)','p̂/√n','√(p̂/n)','p̂(1 − p̂)'],a:0,e:'p̂ je průměr nul a jedniček, jedno pozorování má rozptyl p(1 − p).'},
+  {c:'c16',q:'Kdy je normální aproximace pro podíl rozumná?',o:['když n·p̂ ≥ 5 a n·(1 − p̂) ≥ 5','vždy','jen když p̂ = 0,5','když n < 30'],a:0,e:'U malých vzorků či extrémních podílů aproximace selhává.'},
+  {c:'c16',q:'Když dopředu nevíme nic o podílu, jaké p dosadíme do výpočtu potřebné velikosti vzorku?',o:['0,5 (nejhorší případ)','0','1','0,95'],a:0,e:'Součin p(1 − p) je největší pro p = 0,5, takže vzorek bude stačit pro jakýkoli skutečný podíl.'},
+  {c:'c16',q:'Z čeho se počítá SE v testu o podílu proti hodnotě p₀?',o:['z hypotetické hodnoty p₀','z výběrového podílu p̂','z velikosti vzorku a α','z kritické hodnoty'],a:0,e:'Test předpokládá platnost H₀, proto SE = √(p₀(1 − p₀)/n).'},
+  {c:'c16',q:'Chceme interval pro podíl dvakrát užší (poloviční ±). Kolikrát větší vzorek potřebujeme?',o:['4×','2×','√2×','8×'],a:0,e:'Šířka klesá s 1/√n; poloviční šířka vyžaduje čtyřnásobné n.'},
+  {c:'c16',q:'Jakou „statistickou chybu“ má volební průzkum s n = 1000 při podpoře kolem 50 %?',o:['zhruba ±3 procentní body','±0,5 bodu','±10 bodů','±1 bod'],a:0,e:'1,96·√(0,25/1000) ≈ 0,031, tedy asi ±3 p. b.'},
+  // ── 17 · Testy rozptylu ──
+  {c:'c17',q:'Test H₀: σ² = σ₀² (jedna populace) používá rozdělení…',o:['χ² s n − 1 stupni volnosti','F','Studentovo t','normované normální'],a:0,e:'Statistika (n − 1)s²/σ₀² má za H₀ rozdělení χ²(n − 1).'},
+  {c:'c17',q:'Co porovnává F-test?',o:['rozptyly dvou výběrů','průměry dvou výběrů','mediány více skupin','podíly dvou skupin'],a:0,e:'F = s₁²/s₂²; za H₀ shodných rozptylů vychází kolem 1.'},
+  {c:'c17',q:'Na co jsou testy o rozptylu (χ² test, F-test) citlivé?',o:['na nenormalitu dat','na velikost průměru','na pořadí hodnot','na jednotky měření'],a:0,e:'Oba předpokládají výběry z normálního rozdělení; při porušení dávají nespolehlivé p-hodnoty.'},
+  {c:'c17',q:'Výběr 1 má s₁ = 2, výběr 2 má s₂ = 1. Jaká je statistika F = s₁²/s₂²?',o:['4','2','0,5','1'],a:0,e:'Do F jdou rozptyly: 2² / 1² = 4.'},
+  // ── 18–20 · t-testy, ANOVA, párové testy ──
+  {c:'c18',q:'Čím se Welchův t-test liší od klasického dvouvýběrového?',o:['nepředpokládá shodné rozptyly obou skupin','nepředpokládá normalitu','pracuje s pořadím','je jen pro párová data'],a:0,e:'Proto je bezpečný v obou případech a moderní praxe po něm často sahá rovnou.'},
+  {c:'c18',q:'Kolem jaké hodnoty vychází F statistika ANOVY, když platí H₀?',o:['kolem 1','kolem 0','velmi velká','záporná'],a:0,e:'Mezi skupinami pak není o nic víc variability než uvnitř skupin.'},
+  {c:'c18',q:'ANOVA zamítla H₀. Co to znamená?',o:['aspoň jedna skupina se liší, ale ANOVA neřekne která','všechny skupiny se liší','žádná skupina se neliší','rozptyly skupin jsou různé'],a:0,e:'Viníka dohledávají post-hoc testy, například Tukeyho.'},
+  {c:'c18',q:'ANOVA porovnává k = 4 skupiny s celkem N = 40 měřeními. Jaké jsou stupně volnosti F statistiky?',o:['(3, 36)','(4, 40)','(3, 39)','(4, 36)'],a:0,e:'Mezi skupinami k − 1 = 3, uvnitř skupin N − k = 36.'},
+  {c:'c18',q:'Kdy je párový t-test výrazně silnější než dvouvýběrový?',o:['když měření před a po spolu silně kladně korelují','když jsou skupiny nezávislé','když je vzorek velký','vždy stejně'],a:0,e:'Rozdíly odečtou variabilitu mezi lidmi, s_d je pak malé.'},
+  {c:'c18',q:'Párová data (před/po u týchž lidí) analyzujeme dvouvýběrovým t-testem. Co se stane?',o:['test zbytečně ztratí sílu','test bude silnější','výsledek bude stejný','test nelze spočítat'],a:0,e:'Párový návrh je vlastnost sběru dat — ignorovat páry znamená ignorovat informaci.'},
+  {c:'c18',q:'Jaké rozdělení má za H₀ počet kladných rozdílů ve znaménkovém testu?',o:['Bi(n, ½)','Po(n/2)','N(0, 1)','rovnoměrné'],a:0,e:'Bez efektu je kladný i záporný rozdíl stejně pravděpodobný.'},
+  {c:'c18',q:'Jak se ve znaménkovém a Wilcoxonově testu zachází s nulovými rozdíly (d = 0)?',o:['vyřazují se','počítají se jako kladné','počítají se jako záporné','test nelze použít'],a:0,e:'Nulový rozdíl nenese informaci o směru; n se o ně zmenší.'},
+  {c:'c18',q:'Proč bývá Wilcoxonův párový test silnější než znaménkový?',o:['využívá i velikost rozdílů (pořadí |d|)','používá průměr','nepotřebuje data','vyřazuje odlehlé hodnoty'],a:0,e:'Znaménkový test bere jen znaménka, Wilcoxon i to, jak velké rozdíly jsou.'},
+  {c:'c18',q:'Kdy se používá z-test místo t-testu?',o:['když je rozptyl populace známý','když jsou data ordinální','když porovnáváme víc skupin','když jsou data párová'],a:0,e:'Se známým σ se nemusí nic odhadovat a statistika má přímo normované normální rozdělení.'},
+  {c:'c18',q:'Jaký test je neparametrickou obdobou ANOVY?',o:['Kruskalův–Wallisův test','Mann–Whitneyův test','F-test','znaménkový test'],a:0,e:'Porovnává tři a více skupin přes pořadí, bez předpokladu normality.'},
+  // ── 21–22 · Neparametrické testy a bootstrap ──
+  {c:'c21',q:'Mann–Whitneyův test je neparametrickou obdobou…',o:['dvouvýběrového t-testu','párového t-testu','ANOVY','χ² testu nezávislosti'],a:0,e:'Porovnává dvě nezávislé skupiny přes pořadí hodnot.'},
+  {c:'c21',q:'S čím pracují neparametrické testy místo přímých hodnot?',o:['s pořadím hodnot','s druhými mocninami','s průměry','s logaritmy'],a:0,e:'Díky tomu jsou odolné vůči odlehlým hodnotám a šikmosti a zvládnou i ordinální data.'},
+  {c:'c21',q:'Jaká je cena za robustnost neparametrických testů?',o:['když předpoklady parametrického testu platí, jsou o něco slabší','jsou vždy nepřesné','potřebují normální data','nelze je spočítat ručně'],a:0,e:'Za odolnost platí nižší silou v ideálním (normálním) případě.'},
+  {c:'c21',q:'Co vyjadřuje Cohenovo d?',o:['rozdíl průměrů v jednotkách směrodatné odchylky','p-hodnotu','počet pozorování','korelaci dvou skupin'],a:0,e:'Velikost efektu nezávislá na n — odpovídá na otázku „jak moc“, ne „vůbec?“.'},
+  {c:'c21',q:'Jak vzniká 95% percentilový bootstrapový interval?',o:['z 2,5. a 97,5. percentilu bootstrapových hodnot statistiky','jako x̄ ± 1,96·s','z minima a maxima dat','z mediánu a kvartilů původních dat'],a:0,e:'Statistiku spočítáme na mnoha převzorkovaných vzorcích a vezmeme prostředních 95 % jejích hodnot.'},
+  {c:'c21',q:'Kdy se bootstrap hodí nejvíc?',o:['když pro statistiku (např. medián) nemáme jednoduchý vzorec','když známe σ populace','když máme celou populaci','když jsou data párová'],a:0,e:'Bootstrap odhadne nejistotu přímo z dat, bez vzorce a bez předpokladu normality.'},
+  {c:'c21',q:'Jak velký je jeden bootstrapový vzorek?',o:['stejně velký jako původní vzorek, losovaný s vracením','poloviční, bez vracení','dvojnásobný','jediné pozorování'],a:0,e:'Vzorek se chová, jako by byl celou populací; díky vracení se hodnoty mohou opakovat.'},
+  // ── 23–24 · χ² testy ──
+  {c:'c23',q:'Kolik stupňů volnosti má χ² test nezávislosti v tabulce 3 × 4?',o:['6','12','7','11'],a:0,e:'df = (r − 1)(s − 1) = 2·3 = 6.'},
+  {c:'c23',q:'Jaká je podmínka použití χ² testů?',o:['očekávané četnosti by neměly klesnout pod 5','pozorované četnosti musí být sudé','tabulka musí být 2 × 2','data musí být normální'],a:0,e:'Jinak je aproximace χ² rozdělením nespolehlivá; řídké kategorie se slučují.'},
+  {c:'c23',q:'Test dobré shody vyjde s extrémně malým χ² (p ≈ 1). Co to může znamenat?',o:['podezřele dobrou shodu, jako u Mendelových dat','že data jsou určitě v pořádku','že je potřeba víc kategorií','že H₀ zamítáme'],a:0,e:'Fisher si tak všiml, že Mendelova data sedí na teorii až příliš dobře.'},
+  {c:'c23',q:'Test dobré shody má 6 kategorií a jeden parametr odhadnutý z dat. Kolik je stupňů volnosti?',o:['4','5','6','3'],a:0,e:'df = k − 1 − m = 6 − 1 − 1 = 4.'},
+  {c:'c23',q:'χ² test nezávislosti vyjde s malou p-hodnotou. Co to znamená?',o:['veličiny spolu souvisejí (nezávislost zamítáme)','veličiny jsou nezávislé','tabulka je špatně sestavená','očekávané četnosti jsou malé'],a:0,e:'Rozdíly mezi pozorovanými a očekávanými četnostmi jsou příliš velké na náhodu.'},
+  {c:'c23',q:'Co obsahuje kontingenční tabulka?',o:['četnosti kombinací dvou kategoriálních znaků','průměry skupin','korelační koeficienty','pořadí hodnot'],a:0,e:'V buňkách jsou simultánní četnosti, na okrajích marginální součty.'},
+  {c:'c23',q:'Jak se v χ² testech řeší kategorie s očekávanou četností pod 5?',o:['slučují se se sousedními','vynásobí se dvěma','vynechají se z celého testu bez náhrady','nahradí se nulou'],a:0,e:'Sloučením se zvýší očekávané četnosti a aproximace χ² rozdělením je pak spolehlivá.'},
+  // ── Historie ──
+  {c:'hist',q:'Kdo dokázal zákon velkých čísel (Ars Conjectandi, 1713)?',o:['Jacob Bernoulli','Carl Friedrich Gauss','Thomas Bayes','Ronald Fisher'],a:0,e:'Bernoulli ukázal, že relativní četnost se s počtem pokusů blíží pravděpodobnosti.'},
+  {c:'hist',q:'Kdo roku 1933 postavil teorii pravděpodobnosti na tři axiomy?',o:['Andrej Kolmogorov','Blaise Pascal','Pierre-Simon Laplace','Karl Pearson'],a:0,e:'Nezápornost, normovanost a aditivita — od té doby je pravděpodobnost regulérní matematika.'},
+  {c:'hist',q:'Kdo jako první publikoval metodu nejmenších čtverců?',o:['Adrien-Marie Legendre','William Gosset','Ronald Fisher','Francis Galton'],a:0,e:'Legendre ji publikoval roku 1805; Gauss tvrdil, že ji používal dřív, a proslavil ji výpočtem dráhy planetky Ceres.'},
+  {c:'hist',q:'Kdo vymyslel ANOVU a znáhodněné experimenty?',o:['Ronald Fisher','Karl Pearson','John Tukey','Jerzy Neyman'],a:0,e:'Fisher na zemědělské stanici Rothamsted porovnával odrůdy a hnojiva.'},
+  {c:'hist',q:'Kdo přišel s metodou bootstrap?',o:['Bradley Efron','John Tukey','Andrej Kolmogorov','Abraham de Moivre'],a:0,e:'Efron roku 1979 ukázal, že s počítačem lze nejistotu odhadnout převzorkováním vlastních dat.'},
+  {c:'hist',q:'Kdo vynalezl krabicový graf a prosadil průzkumovou analýzu dat?',o:['John Tukey','Francis Galton','Karl Pearson','Walter Shewhart'],a:0,e:'Tukeyho motto: nejdřív se na data podívej, pak teprve testuj.'},
+  {c:'hist',q:'Kdo roku 1900 přišel s χ² testem?',o:['Karl Pearson','Ronald Fisher','William Gosset','Jacob Bernoulli'],a:0,e:'Mimo jiné aby šlo ověřit, zda ruleta a kostky hrají poctivě.'},
+  {c:'hist',q:'Kdo objevil regresi k průměru při studiu dědičnosti výšky?',o:['Francis Galton','Gregor Mendel','Adolphe Quetelet','Thomas Bayes'],a:0,e:'Synové vysokých otců bývají vysocí, ale o něco blíž průměru.'},
+  {c:'hist',q:'Co objevil Gregor Mendel počítáním znaků u hrachu?',o:['poměry jako 3 : 1 při dědičnosti znaků','zákon velkých čísel','normální rozdělení','metodu nejmenších čtverců'],a:0,e:'Dědičnost se ukázala jako hra pravděpodobnosti; genetika se zrodila jako aplikovaná statistika.'},
+  {c:'hist',q:'Čím se proslavili Jaroslav Hájek a Zbyněk Šidák?',o:['teorií pořadových (neparametrických) testů','objevem t-rozdělení','založením Státního úřadu statistického','Bayesovou větou'],a:0,e:'Jejich kniha Theory of Rank Tests (1967) se stala světovou biblí neparametrických metod.'},
+  {c:'hist',q:'Kdo dal testování hypotéz dnešní rámec H₀ vs. H₁ s chybami I. a II. druhu?',o:['Jerzy Neyman a Egon Pearson','Pascal a Fermat','Gauss a Legendre','Galton a Quetelet'],a:0,e:'Neyman (1937) navíc zavedl intervaly spolehlivosti.'},
+  {c:'hist',q:'Z čeho pochází slovo „statistika“?',o:['z latinského status — stát','z řeckého stathmos — váha','z latinského stare — stát na místě','ze jména statistika Statiuse'],a:0,e:'Původně šlo doslova o „vědu o státu“ — sčítání lidí, půdy a majetku.'},
+  {c:'hist',q:'Co udělal John Graunt roku 1662?',o:['z úmrtních listů sestavil první úmrtnostní tabulku','zformuloval axiomy pravděpodobnosti','objevil normální rozdělení','vynalezl t-test'],a:0,e:'Poprvé někdo z dat odhalil skryté zákonitosti — zrod statistické úvahy.'},
+  {c:'hist',q:'Kdy vznikl Státní úřad statistický Československa?',o:['1919','1848','1945','1968'],a:0,e:'Zákon z 28. ledna 1919, pouhé tři měsíce po vzniku republiky.'}
+];
+/* ── otázky s výběrem a–d: sdílené kvízem i procvičováním ── */
+function shuffled(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+const qid=t=>{let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return (h>>>0).toString(36);};
+const QIDX=new Map(QBANK.map((q,i)=>[qid(q.q),i]));
+const escHtml=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function ansTol(a,kind){return kind==='int'?0.5:kind==='prob'?Math.max(0.0005,Math.min(0.02,Math.abs(a)*0.05)):Math.max(0.001,Math.abs(a)*0.02);}
+function numDisp(v,kind){if(kind==='int')return fmt(Math.round(v),0);const a=Math.abs(v);const d=a>=1000?0:a>=100?1:a>=10?2:a>=0.1?3:a>=0.01?4:5;
+  let t=fmt(v,d);if(t.indexOf(',')>-1)t=t.replace(/0+$/,'').replace(/,$/,'');return t;}
+const MCQ_RANGE={spearman:[-1,1],correl:[-1,1]};
+// výpočetní příklad z procvičování převedený na otázku a–d (správná odpověď + 3 věrohodné chybné; správná není systematicky „uprostřed“)
+function genMCQ(key){const PB=getPB();
+  for(let tries=0;tries<30;tries++){const o=PB.GEN[key]();const a=o.ans,k=o.kind;if(!isFinite(a))continue;
+    const A=Math.abs(a),tol=ansTol(a,k),gap=Math.max(2*tol,A*0.08,k==='int'?1:0),rg=MCQ_RANGE[key];
+    const cand=[];
+    if(k==='prob')cand.push(1-a,a/2,a*2,a*1.5,a/1.5,a*1.25,a/1.25,a+0.1,a-0.1,a*a,Math.sqrt(a),a+0.05,a-0.05,a*3,a/3);
+    else if(k==='int'){cand.push(a*2,Math.round(a/2),Math.round(a*1.5),Math.round(a/1.5),Math.round(a*1.25),Math.round(a/1.25),a*3,Math.round(a/3));if(A<=50)cand.push(a+1,a-1,a+2,a-2,a+3,a-3);}
+    else{cand.push(a*2,a/2,a*1.5,a/1.5,a*1.25,a/1.25,a*3,a/3,a+Math.max(0.5,A*0.3),a-Math.max(0.5,A*0.3));if(a<0)cand.push(-a,-a/2);if(A>=2)cand.push(a+1,a-1,a+2,a-2);}
+    const right=numDisp(a,k);
+    const valid=c=>{if(!isFinite(c))return false;if(k==='prob'&&(c<=0||c>=1))return false;if(k==='int'&&(Math.abs(c-Math.round(c))>1e-9||(a>=0&&c<0)))return false;
+      if(k==='num'&&a>0&&c<=0)return false;if(rg&&(c<rg[0]||c>rg[1]))return false;if(Math.abs(c-a)<gap)return false;return numDisp(c,k)!==right;};
+    const pool=[...new Set(cand.filter(valid).map(c=>+numDisp(c,k).replace(/\s| /g,'').replace('−','-').replace(',','.')))];
+    const below=shuffled(pool.filter(c=>c<a)),above=shuffled(pool.filter(c=>c>a));
+    const r=Math.floor(Math.random()*4);let nb=Math.min(r,below.length),na=Math.min(3-nb,above.length);nb=Math.min(3-na,below.length);
+    const pickSep=(list,n,acc)=>{const out=[];for(const c of list){if(out.length>=n)break;if(acc.concat(out).every(d=>Math.abs(d-c)>=gap*0.75)){out.push(c);}}return out;};
+    const chosen=[];chosen.push(...pickSep(below,nb,[a]));chosen.push(...pickSep(above,3-chosen.length,[a].concat(chosen)));
+    if(chosen.length<3)chosen.push(...pickSep(below.concat(above),3-chosen.length,[a].concat(chosen)));
+    if(chosen.length<3)continue;
+    const vals=[a].concat(chosen).sort((x,y)=>x-y),disp=vals.map(v=>v===a?right:numDisp(v,k));
+    if(new Set(disp).size<4)continue;
+    return {g:1,key:key,q:o.q,o:disp,a:vals.indexOf(a),e:o.sol};}
+  return null;}
+// otázky z teorie pro okruh (kapitolu nebo část) procvičování
+function theoryFor(topic){const PB=getPB();let keys;
+  if(topic==='random')return QBANK.map((_,i)=>i);
+  const part=PB.PARTS.find(p=>p[0]===topic);keys=part?part[2]:[topic];
+  return QBANK.map((q,i)=>keys.indexOf(q.c)>-1?i:-1).filter(i=>i>-1);}
+function optLetter(i){return 'abcd'[i]||String(i+1);}
 const quizModule={id:'quiz',num:'27',label:'Kvíz',render(stage){
   header(stage,'27','Závěrečný kvíz','Otestuj si intuici napříč všemi kapitolami.');
   stage.append(tpl('L-quiz'));
-  const QS=[
-    {q:'Hodíme dvěma kostkami. Jaká je pravděpodobnost součtu 7?',o:['1/12','1/6','1/9','7/36'],a:1,e:'Příznivých je 6 dvojic (1+6, …, 6+1) z 36, tedy 6/36 = 1/6. Sedmička je nejpravděpodobnější součet.'},
-    {q:'Jevy A a B jsou nezávislé, P(A) = 0,5 a P(B) = 0,4. Kolik je P(A∩B)?',o:['0,9','0,2','0,1','0,45'],a:1,e:'Pro nezávislé jevy se pravděpodobnosti násobí: 0,5 · 0,4 = 0,2.'},
-    {q:'Test má senzitivitu 99 % i specificitu 99 %, prevalence je 1 ‰. Po pozitivním testu je pravděpodobnost nemoci přibližně…',o:['99 %','90 %','9 %','50 %'],a:2,e:'Past základní míry: z 1000 lidí je 1 nemocný (zachycen) a ~10 falešně pozitivních zdravých. P ≈ 1/11 ≈ 9 %.'},
-    {q:'Kolika způsoby vybereme 2 lidi z 5, když nezáleží na pořadí?',o:['25','20','10','5'],a:2,e:'C(5,2) = 5!/(2!·3!) = 10. Kdyby záleželo na pořadí, bylo by to 20 (variace).'},
-    {q:'Co popisuje binomické rozdělení?',o:['dobu čekání na první úspěch','počet úspěchů v n nezávislých pokusech','vzácné události za časový interval','spojitou veličinu'],a:1,e:'Binomické počítá počet úspěchů v pevném počtu n nezávislých pokusů se stejnou pravděpodobností p.'},
-    {q:'Spravedlivá kostka (1–6). Kolik je E(X)?',o:['3','3,5','4','6'],a:1,e:'E(X) = (1+2+3+4+5+6)/6 = 21/6 = 3,5. Střední hodnota nemusí být dosažitelná hodnota.'},
-    {q:'Jak souvisí D(X + 5) a D(X)?',o:['je o 25 větší','je o 5 větší','jsou stejné','je o 5 menší'],a:2,e:'Posun o konstantu rozptyl nemění: D(X + c) = D(X). Mění ho jen násobení (D(aX) = a²·D(X)).'},
-    {q:'Veličina má rozptyl σ². Jaký rozptyl má průměr n nezávislých hodnot?',o:['σ/√n','σ²/n','σ²','n·σ²'],a:1,e:'D(X̄) = σ²/n; σ/√n je směrodatná chyba (odmocnina z rozptylu). CLT k tomu dodává, že průměr má přibližně normální rozdělení. Větší vzorek = užší rozdělení průměru.'},
-    {q:'Hodíme mincí 5× a pětkrát padne panna. Jaká je pravděpodobnost orla v 6. hodu?',o:['vyšší než 1/2','1/2','nižší než 1/2','jistě orel'],a:1,e:'Hody jsou nezávislé — mince „nepamatuje“. Žádná kompenzace neexistuje (klam hazardního hráče).'},
-    {q:'A a B jsou neslučitelné, P(A) = 0,3 a P(B) = 0,2. Kolik je P(A∪B)?',o:['0,06','0,5','0,1','0,25'],a:1,e:'Neslučitelné znamená P(A∩B) = 0, takže P(A∪B) = P(A) + P(B) = 0,5.'},
-    {q:'Co znamená „95% interval spolehlivosti“?',o:['μ je uvnitř s pravděpodobností 95 %','95 % takto sestrojených intervalů obsahuje μ','95 % dat leží v intervalu','odhad je přesný na 95 %'],a:1,e:'Frekventistický výklad: kdybychom pokus mnohokrát opakovali, 95 % vzniklých intervalů by skutečné μ obsahovalo. O tomto konkrétním intervalu takto nemluvíme.'},
-    {q:'Chyba I. druhu (falešně pozitivní) nastane, když…',o:['nezamítneme nepravdivou H₀','zamítneme pravdivou H₀','správně přijmeme H₁','zvětšíme vzorek'],a:1,e:'Chyba I. druhu = zamítnutí platné nulové hypotézy. Její pravděpodobnost je hladina významnosti α.'},
-    {q:'Výběrová korelace r = 0 znamená, že…',o:['veličiny jsou nezávislé','neexistuje žádný vztah','není lineární vztah (nelineární může být)','data jsou chybná'],a:2,e:'r měří jen lineární souvislost. Data na parabole či kruhu mají r ≈ 0, přestože jasný vztah existuje.'},
-    {q:'Bootstrap vytváří nové vzorky…',o:['z normálního rozdělení','s vracením z původního vzorku','bez vracení z populace','čistým šumem'],a:1,e:'Bootstrap losuje s vracením z původního vzorku (stejné n) a z mnoha opakování odhadne rozdělení statistiky.'},
-    {q:'Malá p-hodnota (např. 0,001) znamená, že…',o:['H₀ je určitě nepravdivá','efekt je velký','data by byla za platnosti H₀ velmi nepravděpodobná','α je malé'],a:2,e:'p-hodnota je pravděpodobnost dat aspoň tak extrémních jako naše, pokud platí H₀. Malá hodnota svědčí proti H₀, ale sama neměří velikost efektu.'},
-    {q:'Který test je odolnější vůči odlehlým hodnotám?',o:['t-test','Mann–Whitneyův (neparametrický)','oba stejně','žádný'],a:1,e:'Neparametrické testy pracují s pořadím, takže pár extrémních hodnot výsledek téměř neovlivní. t-test přes průměr a rozptyl je vůči odlehlým hodnotám citlivý.'},
-    {q:'Parametrický t-test typicky předpokládá, že data jsou…',o:['přibližně normální','vždy diskrétní','bez jakéhokoli rozdělení','jen ordinální'],a:0,e:'Parametrické testy předpokládají konkrétní rozdělení (u t-testu přibližně normální) a testují jeho parametry; neparametrické to nevyžadují.'},
-    {q:'Simpsonův paradox nastává, když…',o:['data jsou nesprávná','trend platný v každé skupině se po sloučení obrátí','vzorek je příliš malý','test má malou sílu'],a:1,e:'Kvůli matoucí proměnné může trend, který platí v každé podskupině, po sloučení skupin změnit směr.'},
-    {q:'Podle centrální limitní věty má průměr velkého vzorku přibližně jaké rozdělení — ať je zdroj jakýkoli?',o:['stejné jako zdroj','normální','rovnoměrné','Poissonovo'],a:1,e:'Jádro CLT: rozdělení výběrového průměru se s rostoucím n blíží normálnímu bez ohledu na tvar zdroje (má-li konečný rozptyl).'},
-    {q:'Zákon velkých čísel říká, že s rostoucím počtem pokusů se výběrový průměr blíží…',o:['nule','střední hodnotě μ','mediánu','maximu'],a:1,e:'Průměr nezávislých opakování konverguje ke střední hodnotě E(X); proto lze pravděpodobnost odhadovat relativní četností.'},
-    {q:'Co říká velikost efektu (např. Cohenovo d), co p-hodnota neříká?',o:['zda je výsledek náhodný','jak velký je rozdíl','kolik je pozorování','jaký je rozptyl'],a:1,e:'p-hodnota říká, zda je rozdíl rozlišitelný od náhody; velikost efektu kvantifikuje, jak velký rozdíl je — nezávisle na n.'},
-    {q:'Silná korelace mezi X a Y znamená, že…',o:['X způsobuje Y','Y způsobuje X','je mezi nimi lineární vztah, ne nutně příčinný','jsou nezávislé'],a:2,e:'Korelace měří lineární souvislost, ne příčinnost — vztah může způsobovat třetí (matoucí) proměnná nebo jde o náhodu.'},
-    {q:'Které rozdělení typicky popisuje počet vzácných nezávislých událostí za daný interval?',o:['normální','binomické','Poissonovo','rovnoměrné'],a:2,e:'Poissonovo rozdělení popisuje počet událostí za interval s průměrem λ; platí u něj E(X) = D(X) = λ.'},
-    {q:'Spravedlivá (férová) sázka má očekávanou hodnotu…',o:['kladnou','zápornou','nulovou','rovnou vkladu'],a:2,e:'Férová hra má z definice nulovou očekávanou hodnotu — dlouhodobě ani nevyděláš, ani neproděláš. Kasina nabízejí hry se zápornou E(X).'},
-    {q:'Zvětšíme-li velikost vzorku 4×, směrodatná chyba průměru se…',o:['zmenší na polovinu','zmenší na čtvrtinu','zdvojnásobí','nezmění'],a:0,e:'SE = σ/√n. Při 4× větším n je √4 = 2× větší jmenovatel, takže SE klesne na polovinu — přesnost roste jen s odmocninou z n.'},
-    {q:'Kolik je 0! (nula faktoriál)?',o:['0','1','nedefinováno','nekonečno'],a:1,e:'Konvence 0! = 1 (prázdný součin). Díky ní vycházejí vzorce jako C(n,0) = 1 správně.'},
-    {q:'Čemu se podle De Morganova pravidla rovná (A∪B)′?',o:['A′∪B′','A′∩B′','A∩B','A∖B'],a:1,e:'Doplněk sjednocení je průnik doplňků: nebýt v A ani v B znamená být mimo A a zároveň mimo B.'},
-    {q:'Čemu se rovná P(A∖B)?',o:['P(A)−P(B)','P(A)−P(A∩B)','P(A)·P(B)','1−P(A)'],a:1,e:'Z A odečítáme jen část, která je zároveň v B — tedy P(A∩B). Odečíst celé P(B) by bylo špatně, pokud B zasahuje i mimo A.'},
-    {q:'|U| = 10, |A| = 4, |B| = 3, |A∩B| = 2. Jaká je P(A∪B) při stejně pravděpodobných prvcích?',o:['0,7','0,5','0,9','0,2'],a:1,e:'Inkluze–exkluze: |A∪B| = 4 + 3 − 2 = 5, takže P = 5/10 = 0,5.'},
-    {q:'Symetrický rozdíl A△B obsahuje prvky, které…',o:['patří do obou množin','patří právě do jedné z nich','nepatří do žádné','tvoří universum'],a:1,e:'A△B = (A∖B)∪(B∖A) — prvky, které jsou v A nebo v B, ale ne v obou zároveň.'},
-    {q:'V souboru platů je jedna extrémně vysoká hodnota. Který ukazatel „typického platu“ je důvěryhodnější?',o:['aritmetický průměr','medián','maximum','rozpětí'],a:1,e:'Medián je robustní — odlehlá hodnota s ním téměř nepohne, kdežto průměr utrhne směrem k extrému.'},
-    {q:'Variační koeficient V se počítá jako…',o:['s / x̄ (·100 %)','x̄ / s','s²','max − min'],a:0,e:'V = s/x̄ vyjadřuje variabilitu relativně vůči úrovni dat — hodí se pro srovnání souborů s různými jednotkami.'},
-    {q:'Koeficient determinace R² = 0,8 znamená, že…',o:['přímka je na 80 % správně','model vysvětluje 80 % variability Y','korelace je 0,8','chyba je 80 %'],a:1,e:'R² udává podíl rozptylu vysvětlované proměnné, který regresní model vysvětluje; zbylých 20 % zůstává v reziduích.'},
-    {q:'Predikce z regresní přímky daleko mimo rozsah naměřených x je…',o:['přesnější','riskantní extrapolace','vždy nemožná','totéž co interpolace'],a:1,e:'Mimo rozsah dat model nemá oporu — vztah se tam může zlomit, aniž by to data mohla prozradit.'},
-    {q:'Očekávaná četnost buňky kontingenční tabulky při nezávislosti je…',o:['(řádkový součet · sloupcový součet) / n','n / počet buněk','pozorovaná četnost','vždy 5'],a:0,e:'E = nᵢ.·n.ⱼ/n — kdyby veličiny byly nezávislé, četnosti by odpovídaly součinu marginálních podílů.'},
-    {q:'χ² test nezávislosti v kontingenční tabulce r×s má stupně volnosti…',o:['r·s','(r−1)(s−1)','n−1','r+s'],a:1,e:'df = (r−1)(s−1); pro tabulku 2×2 tedy 1 stupeň volnosti.'},
-    {q:'Studentovo t-rozdělení vzniklo, když W. S. Gosset řešil malé vzorky. Kde pracoval?',o:['na observatoři','v pivovaru Guinness','v pojišťovně','na univerzitě v Cambridge'],a:1,e:'Gosset byl sládek v Guinnessu; firma zakazovala publikovat, proto vydal objev pod pseudonymem „Student“.'},
-    {q:'Teorie pravděpodobnosti se zrodila roku 1654 z korespondence Pascala a Fermata o…',o:['pohybu planet','spravedlivém rozdělení banku přerušené hry','sčítání lidu','chybách měření'],a:1,e:'Otázka rytíře de Méré, jak férově rozdělit sázky nedohrané hry, spustila výměnu dopisů, z níž vzešla teorie pravděpodobnosti.'},
-      {q:'Výška má μ = 165 a σ = 10. Jaké z-skóre má hodnota 175?',o:['0,5','1','1,5','10'],a:1,e:'u = (175−165)/10 = 1 — jedna směrodatná odchylka nad průměrem; Φ(1) ≈ 0,84.'},
-    {q:'Jaké rozdělení má statistika (n−1)s²/σ², když výběr pochází z normálního rozdělení?',o:['normální','Studentovo t','χ² s n−1 stupni volnosti','F'],a:2,e:'Výběrový rozptyl škálovaný skutečným σ² sleduje χ² s df = n−1 — základ testů o rozptylu.'},
-    {q:'Z n = 400 respondentů volí stranu 100. Bodový odhad podílu a jeho SE jsou přibližně…',o:['0,25 a 0,022','0,25 a 0,05','0,40 a 0,022','0,25 a 0,002'],a:0,e:'p̂ = 100/400 = 0,25; SE = √(0,25·0,75/400) ≈ 0,0217.'},
-    {q:'Shodu rozptylů dvou výběrů testujeme…',o:['t-testem','F-testem s F = s₁²/s₂²','χ² testem nezávislosti','znaménkovým testem'],a:1,e:'Poměr výběrových rozptylů sleduje F(n₁−1, n₂−1); podle výsledku volíme klasický t-test, nebo Welchovu variantu.'},
-    {q:'Párový t-test se počítá…',o:['ze dvou nezávislých výběrů','z rozdílů dᵢ u týchž jednotek','jen když známe σ','z pořadí hodnot'],a:1,e:'Párový návrh převede data na rozdíly dᵢ = po − před a testuje, zda je jejich průměr nula; párování odečte mezisubjektovou variabilitu.'},
-    {q:'χ² test dobré shody pro férovou kostku (6 kategorií, žádný parametr odhadnutý z dat) má stupně volnosti…',o:['6','5','1','35'],a:1,e:'df = k − 1 − m = 6 − 1 − 0 = 5.'},
-    {q:'Data leží přesně na rostoucí exponenciále. Potom…',o:['r = 1 i ρS = 1','ρS = 1, ale r < 1','r = 1, ale ρS < 1','oba jsou ≈ 0'],a:1,e:'Vztah je dokonale monotónní (ρS = 1), ale ne lineární — Pearsonovo r zůstane pod jedničkou.'},
-  
-    {q:'Binomické rozdělení s obrovským n a titěrným p (součin np = λ zůstává konečný) se blíží…',o:['normálnímu','Poissonovu','geometrickému','rovnoměrnému'],a:1,e:'Limita Bi(n, p) → Po(λ) při n → ∞, p → 0, np = λ. Tomuto limitnímu přechodu se říká zákon vzácných jevů.'},
-    {q:'Součet čtverců ν nezávislých normovaných normálních veličin má rozdělení…',o:['normální','Studentovo t','chí-kvadrát s ν stupni volnosti','Fisherovo F'],a:2,e:'To je přímo definice χ²(ν) — proto se objevuje všude, kde se sčítají čtverce odchylek.'},
-  
-    {q:'Proč se pro porovnání pěti skupin používá ANOVA místo deseti t-testů?',o:['ANOVA je výpočetně rychlejší','mnoho testů hromadí riziko chyby I. druhu','t-test neumí spojitá data','ANOVA nepotřebuje žádné předpoklady'],a:1,e:'Deset testů na hladině 5 % dá dohromady ~40% šanci aspoň jednoho falešného poplachu. ANOVA testuje vše najednou jediným F-testem.'},
-    {q:'Intenzita poruch z(t) vyjadřuje…',o:['pravděpodobnost, že kus selže do času t','riziko, že kus selže v čase t, když dosud vydržel','střední dobu do poruchy','pravděpodobnost, že kus vydrží déle než t'],a:1,e:'z(t) = f(t)/R(t) — riziko poruchy u kusu, který do času t vydržel. Pravděpodobnost poruchy do času t je F(t), vydržení déle než t je R(t) = 1 − F(t) a střední doba do poruchy je MTTF.'},
-    {q:'Weibullovo rozdělení Wb(λ, α) má α = 0,5. Jak se s časem mění intenzita poruch?',o:['roste','klesá','je stálá','nejdřív roste, pak klesá'],a:1,e:'z(t) = αλ^α·t^(α−1) a exponent α − 1 = −0,5 je záporný, takže z(t) s časem klesá. Odpovídá to „dětským nemocem“: vadné kusy selžou brzy.'},
-    {q:'Weibullovo rozdělení Wb(λ, α) s α = 1 je totéž co…',o:['normální rozdělení','exponenciální rozdělení Ex(λ)','rovnoměrné rozdělení','Poissonovo rozdělení'],a:1,e:'Pro α = 1 je F(t) = 1 − e^(−λt) a intenzita poruch z(t) = λ je stálá — to je exponenciální rozdělení se stejným λ.'},
-    {q:'Doba do poruchy má exponenciální rozdělení s MTTF = 2000 h. Jaká je pravděpodobnost, že součástka vydrží déle než 2000 h?',o:['50 %','asi 37 %','asi 63 %','100 %'],a:1,e:'R(t) = e^(−λt) s λ = 1/MTTF, takže R(2000) = e^(−1) ≈ 0,368. Do doby MTTF tedy selže asi 63 % kusů — MTTF není doba, kterou vydrží polovina kusů.'},
-    {q:'Stroj má MTTF = 99 dní a MTTR = 1 den. Jaká je pravděpodobnost, že v náhodný okamžik nefunguje?',o:['0,01','1/99 ≈ 0,0101','0,99','0,5'],a:0,e:'Nepohotovost Q ≈ MTTR/(MTTR + MTTF) = 1/(1 + 99) = 0,01. Častá chyba je dělit jen MTTF (1/99) — jmenovatel je celý cyklus provozu a opravy.'},
-    {q:'Doba do poruchy má Wb(λ, α) s λ = 0,1 za rok a α = 2. Jaká je MTTF, je-li Γ(1,5) ≈ 0,886?',o:['5 let','asi 8,9 roku','10 let','20 let'],a:1,e:'MTTF = (1/λ)·Γ(1 + 1/α) = 10·Γ(1,5) ≈ 10·0,886 = 8,86 roku. Pro α = 1 by to bylo přesně 1/λ = 10 let.'},
-  ];
-  const scoreEl=el('span',{class:'s'},'0 / '+QS.length);
-  const head=el('div',{class:'quiz-score'},el('span',{},'Skóre'),el('div',{style:'display:flex;gap:12px;align-items:center'},scoreEl,btn('Spustit znovu','ghost',()=>build(true))));
+  const N_T=20,N_G=10;
+  const scoreEl=el('span',{class:'s'},'0 / '+(N_T+N_G));
+  const head=el('div',{class:'quiz-score'},el('span',{},'Skóre'),el('div',{style:'display:flex;gap:12px;align-items:center'},scoreEl,btn('Nová sada otázek','ghost',()=>build(true))));
   const list=el('div');
-  stage.append(head,el('div',{style:'font-size:12.5px;color:var(--faint);margin:-6px 0 10px'},'Odpovědi se ukládají jen v tomto prohlížeči. „Spustit znovu“ je smaže a otázky zamíchá.'),list);
-  let score=0;
-  // uložený postup: otázky se poznávají podle textu, takže přidání nových otázek v další verzi postup nerozbije
-  const QKEY='odnahody.kviz.v1';
-  const qid=t=>{let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return (h>>>0).toString(36);};
-  const IDS=QS.map(q=>qid(q.q));
-  function build(fresh){list.innerHTML='';score=0;scoreEl.textContent='0 / '+QS.length;
-    let saved=fresh===true?null:Store.get(QKEY,null),order;
-    if(saved&&Array.isArray(saved.order)&&saved.ans){const pos=new Map(IDS.map((id,i)=>[id,i]));
-      order=saved.order.map(id=>pos.get(id)).filter(i=>i!==undefined);IDS.forEach((id,i)=>{if(saved.order.indexOf(id)<0)order.push(i);});}
-    else{order=QS.map((_,i)=>i);for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)),t=order[i];order[i]=order[j];order[j]=t;}saved={ans:{}};}
-    saved.order=order.map(i=>IDS[i]);if(!saved.perm||typeof saved.perm!=='object')saved.perm={};
-    order.forEach(qi=>{const id=IDS[qi],len=QS[qi].o.length;let pm=saved.perm[id];
-      if(!Array.isArray(pm)||pm.length!==len||pm.slice().sort((a,b)=>a-b).some((v,i)=>v!==i)){pm=QS[qi].o.map((_,i)=>i);for(let i=pm.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)),t=pm[i];pm[i]=pm[j];pm[j]=t;}saved.perm[id]=pm;}});
-    Store.set(QKEY,saved);
-    order.forEach((qi,idx)=>{const item=QS[qi],qd=el('div',{class:'q'});
-      qd.append(el('div',{class:'qn'},'Otázka '+(idx+1)),el('div',{class:'qt'},item.q));
-      const exp=el('div',{class:'explain'},item.e);exp.style.display='none';
-      let selected=-1;
-      const optBtns=item.o.map((o,oi)=>{const b=el('button',{class:'opt'},o);
-        b.addEventListener('click',()=>{if(qd.dataset.done)return;selected=oi;optBtns.forEach((bb,bi)=>bb.classList.toggle('sel',bi===oi));confirmBtn.disabled=false;});
-        return b;});
-      const finish=(remember)=>{if(qd.dataset.done||selected<0)return;qd.dataset.done='1';
-        optBtns.forEach((bb,bi)=>{bb.disabled=true;bb.classList.remove('sel');if(bi===item.a)bb.classList.add('correct');});
-        if(selected===item.a){optBtns[selected].classList.add('correct');score++;}else optBtns[selected].classList.add('wrong');
-        exp.style.display='block';confirmBtn.style.display='none';scoreEl.textContent=score+' / '+QS.length;
-        if(remember){saved.ans[IDS[qi]]=selected;Store.set(QKEY,saved);}};
-      const confirmBtn=btn('Potvrdit odpověď','teal',()=>finish(true));
-      confirmBtn.disabled=true;
-      saved.perm[IDS[qi]].forEach(i=>qd.append(optBtns[i]));
-      qd.append(el('div',{class:'btn-row'},confirmBtn),exp);
-      list.append(qd);
-      const prev=saved.ans[IDS[qi]];if(typeof prev==='number'&&prev>=0&&prev<item.o.length){selected=prev;finish(false);}});}
+  stage.append(head,el('div',{style:'font-size:12.5px;color:var(--faint);margin:-6px 0 10px'},'Každá sada má '+N_T+' otázek z teorie (losují se z '+QBANK.length+') a '+N_G+' výpočetních příkladů jako v procvičování. Odpovědi se ukládají jen v tomto prohlížeči; „Nová sada otázek“ je smaže a vylosuje jiné.'),list);
+  let score=0,total=0;
+  const QKEY='odnahody.kviz.v2';
+  function newSet(){const byC={};QBANK.forEach((q,i)=>{(byC[q.c]=byC[q.c]||[]).push(i);});
+    const cs=shuffled(Object.keys(byC));const pools={};cs.forEach(c=>pools[c]=shuffled(byC[c]));const th=[];
+    while(th.length<N_T&&cs.some(c=>pools[c].length))cs.forEach(c=>{if(th.length<N_T&&pools[c].length)th.push(pools[c].pop());});
+    const PB=getPB();const chs=shuffled(Object.keys(PB.CH).filter(c=>PB.CH[c][1].length));const gs=[];
+    for(let i=0;gs.length<N_G&&i<chs.length*3;i++){const c=chs[i%chs.length];const m=genMCQ(shuffled(PB.CH[c][1])[0]);if(m&&!gs.some(x=>x.q===m.q))gs.push(m);}
+    const items=th.map(i=>({t:'T',id:qid(QBANK[i].q),perm:shuffled([0,1,2,3])})).concat(gs.map(m=>({t:'G',q:m.q,o:m.o,a:m.a,e:m.e})));
+    return {items:shuffled(items),ans:{}};}
+  function build(fresh){list.innerHTML='';score=0;
+    let saved=fresh===true?null:Store.get(QKEY,null);
+    if(!saved||!Array.isArray(saved.items)||!saved.items.length||typeof saved.ans!=='object'||!saved.ans)saved=newSet();
+    saved.items=saved.items.filter(it=>it.t==='G'?(Array.isArray(it.o)&&it.o.length===4):QIDX.has(it.id));
+    Store.set(QKEY,saved);total=saved.items.length;scoreEl.textContent='0 / '+total;
+    saved.items.forEach((it,idx)=>{const qd=el('div',{class:'q'});
+      let qtext,opts,correct,expl,order;
+      if(it.t==='T'){const b=QBANK[QIDX.get(it.id)];qtext=el('div',{class:'qt'},b.q);opts=b.o;correct=b.a;expl=el('div',{class:'explain'},b.e);
+        order=(Array.isArray(it.perm)&&it.perm.length===4)?it.perm:[0,1,2,3];}
+      else{qtext=el('div',{class:'qt',html:it.q});opts=it.o;correct=it.a;expl=el('div',{class:'explain',html:'<b>Řešení:</b> '+it.e});order=[0,1,2,3];}
+      qd.append(el('div',{class:'qn'},'Otázka '+(idx+1)+(it.t==='G'?' · výpočet':'')),qtext);
+      expl.style.display='none';let selected=-1;
+      const optBtns=opts.map((o,oi)=>{const bt=el('button',{class:'opt'},el('span',{class:'optl'}),document.createTextNode(o));
+        bt.addEventListener('click',()=>{if(qd.dataset.done)return;selected=oi;optBtns.forEach((bb,bi)=>bb.classList.toggle('sel',bi===oi));confirmBtn.disabled=false;});return bt;});
+      order.forEach((oi,pos)=>{optBtns[oi].firstChild.textContent=optLetter(pos)+')';qd.append(optBtns[oi]);});
+      const finish=remember=>{if(qd.dataset.done||selected<0)return;qd.dataset.done='1';
+        optBtns.forEach((bb,bi)=>{bb.disabled=true;bb.classList.remove('sel');if(bi===correct)bb.classList.add('correct');});
+        if(selected===correct){score++;}else optBtns[selected].classList.add('wrong');
+        expl.style.display='block';confirmBtn.style.display='none';scoreEl.textContent=score+' / '+total;
+        if(remember){saved.ans[idx]=selected;Store.set(QKEY,saved);}};
+      const confirmBtn=btn('Potvrdit odpověď','teal',()=>finish(true));confirmBtn.disabled=true;
+      qd.append(el('div',{class:'btn-row'},confirmBtn),expl);list.append(qd);
+      const prev=saved.ans[idx];if(typeof prev==='number'&&prev>=0&&prev<4){selected=prev;finish(false);}});}
   build();
   appendAppHint(stage);
 }};
@@ -2610,9 +2828,8 @@ const nonparamModule={id:'nonparam',num:'21',label:'Neparametrické',render(stag
 }};
 
 /* 15 PRACTICE */
-const practiceModule={id:'practice',num:'26',label:'Procvičování',render(stage){
-  header(stage,'26','Procvičování','');
-  stage.append(tpl('L-practice'));
+/* banka úloh pro procvičování a kvíz (generátory, kapitoly, části) */
+function practiceBank(){
   const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
   const pick=a=>a[Math.floor(Math.random()*a.length)];
   const pl=(n,a,b,c)=>n===1?a:(n>=2&&n<=4)?b:c;const zze=n=>([2,3,4,7,17].indexOf(n)>-1||(n>=30&&n<50)||(n>=70&&n<80)||(n>=100&&n<500))?'ze':'z';
@@ -3009,11 +3226,22 @@ const practiceModule={id:'practice',num:'26',label:'Procvičování',render(stag
     c17:['17 · Testy rozptylu',['vartest','fTest']],
     c18:['18–20 · t-testy, ANOVA a párové testy',['t2vyb','anovaF','htMnoho','parovyt','znamenkovy']],
     c21:['21–22 · Neparametrické testy a bootstrap',['mannU','znamenkovy','bootPerc']],
-    c23:['23–24 · χ² testy',['gof','chi2tab','ocek']]};
-  const PARTS=[['p1','I · Pravděpodobnost',['c01','c01k','c02','c03','c04','c04s','c05','c06','c07']],['p2','II · Data a vztahy',['c10','c11','c13']],['p3','III · Inference',['c14','c15','c16','c17','c18','c21','c23']]];
+    c23:['23–24 · χ² testy',['gof','chi2tab','ocek']],
+    c25:['25 · Slavné paradoxy',[]],
+    hist:['H · Historie statistiky',[]]};
+  const PARTS=[['p1','I · Pravděpodobnost',['c01','c01k','c02','c03','c04','c04s','c05','c06','c07']],['p2','II · Data a vztahy',['c10','c11','c13']],['p3','III · Inference',['c14','c15','c16','c17','c18','c21','c23']],['p4','IV · Paradoxy a historie',['c25','hist']]];
+  return {GEN,CH,PARTS,pl,zze,T975,CHI95,F95};}
+let __PB=null;const getPB=()=>__PB||(__PB=practiceBank());
+const practiceModule={id:'practice',num:'26',label:'Procvičování',render(stage){
+  header(stage,'26','Procvičování','');
+  stage.append(tpl('L-practice'));
+  const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+  const {GEN,CH,PARTS}=getPB();
   const TOPICS={random:Object.keys(GEN)};Object.keys(CH).forEach(k=>TOPICS[k]=CH[k][1]);
   PARTS.forEach(pp=>{TOPICS[pp[0]]=[...new Set([].concat(...pp[2].map(k=>CH[k][1])))];});
-  let topic=Store.get('odnahody.procvicovani.okruh','random');if(!TOPICS[topic])topic='random';let cur=null;
+  const THEO={};Object.keys(TOPICS).forEach(k=>THEO[k]=theoryFor(k));
+  let topic=Store.get('odnahody.procvicovani.okruh','random');if(!TOPICS[topic])topic='random';let cur=null;const recentT=[];
   const PKEY='odnahody.procvicovani.v1';let pst=Store.get(PKEY,null);if(!pst||typeof pst.total!=='number')pst={total:0,byTopic:{}};
   const showScore=()=>{scoreEl.textContent='Správně vyřešeno: '+(pst.byTopic[topic]||0)+' v tomto okruhu · '+pst.total+' celkem';};
   const sel=el('select',{});sel.append(el('option',{value:'random'},'Náhodně z celého kurzu'));
@@ -3034,18 +3262,36 @@ const practiceModule={id:'practice',num:'26',label:'Procvičování',render(stag
     const NUM=/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i;
     if(s.indexOf('/')>-1){const q=s.split('/');if(q.length!==2||!NUM.test(q[0])||!NUM.test(q[1]))return null;const a=parseFloat(q[0]),b=parseFloat(q[1]);return (isFinite(a)&&isFinite(b)&&b!==0)?a/b:null;}
     if(!NUM.test(s))return null;const v=parseFloat(s);return isFinite(v)?v:null;}
-  function newProblem(){cur=GEN[pick(TOPICS[topic])]();cur.done=false;qEl.innerHTML=cur.q;input.value='';feedback.textContent='';feedback.className='pfeedback';solEl.style.display='none';solEl.innerHTML='<b>Řešení:</b> '+cur.sol;if(typeof solBtn!=='undefined'&&solBtn)solBtn.textContent='Zobrazit řešení';if(typeof updLegend==='function')updLegend();input.focus();}
-  function reveal(){solEl.style.display='block';if(solBtn)solBtn.textContent='Skrýt řešení';updLegend();}
-  function toggleSol(){const vis=solEl.style.display==='block';solEl.style.display=vis?'none':'block';solBtn.textContent=vis?'Zobrazit řešení':'Skrýt řešení';updLegend();}
-  function check(){let v=parseAns(input.value);if(v!==null&&cur.kind==='prob'&&!/%/.test(input.value)&&Math.abs(v)>1&&Math.abs(v)<=100&&Math.abs(cur.ans)<=1)v=v/100;if(v===null){feedback.textContent='Zadej číslo — zlomek (1/6) nebo desetinné číslo (0,167).';feedback.className='pfeedback';return;}
+  const optsEl=el('div',{class:'practice-opts'});let mcSel=-1,mcBtns=[];
+  function pickTheory(){const pool=THEO[topic].filter(i=>recentT.indexOf(i)<0);const i=pick(pool.length?pool:THEO[topic]);recentT.push(i);if(recentT.length>Math.min(8,Math.floor(THEO[topic].length/2)))recentT.shift();return i;}
+  function newProblem(){const gens=TOPICS[topic],th=THEO[topic];
+    const useT=th.length&&(!gens.length||Math.random()<0.3);
+    if(useT){const b=QBANK[pickTheory()],order=shuffled([0,1,2,3]);cur={mc:true,q:escHtml(b.q),o:b.o,a:b.a,order:order,sol:'Správná odpověď: <b>'+optLetter(order.indexOf(b.a))+') '+escHtml(b.o[b.a])+'</b>. '+escHtml(b.e)};}
+    else cur=GEN[pick(gens)]();
+    cur.done=false;mcSel=-1;optsEl.innerHTML='';mcBtns=[];
+    if(cur.mc){mcBtns=cur.o.map((o,oi)=>{const bt=el('button',{class:'opt'},el('span',{class:'optl'}),document.createTextNode(o));
+        bt.addEventListener('click',()=>{if(cur.done)return;mcSel=oi;mcBtns.forEach((bb,bi)=>bb.classList.toggle('sel',bi===oi));});return bt;});
+      cur.order.forEach((oi,pos)=>{mcBtns[oi].firstChild.textContent=optLetter(pos)+')';optsEl.append(mcBtns[oi]);});}
+    optsEl.style.display=cur.mc?'':'none';input.style.display=cur.mc?'none':'';
+    qEl.innerHTML=cur.q;input.value='';feedback.textContent='';feedback.className='pfeedback';solEl.style.display='none';solEl.innerHTML='<b>Řešení:</b> '+cur.sol;if(typeof solBtn!=='undefined'&&solBtn)solBtn.textContent='Zobrazit řešení';if(typeof updLegend==='function')updLegend();input.focus();}
+  function markMC(){if(!cur||!cur.mc)return;mcBtns.forEach((bb,bi)=>{if(bi===cur.a)bb.classList.add('correct');});}
+  function reveal(){solEl.style.display='block';if(solBtn)solBtn.textContent='Skrýt řešení';markMC();updLegend();}
+  function toggleSol(){const vis=solEl.style.display==='block';solEl.style.display=vis?'none':'block';solBtn.textContent=vis?'Zobrazit řešení':'Skrýt řešení';if(!vis)markMC();updLegend();}
+  function checkMC(){if(cur.done){return;}if(mcSel<0){feedback.textContent='Vyber jednu z možností a–d.';feedback.className='pfeedback';return;}
+    const ok=mcSel===cur.a;cur.done=true;mcBtns.forEach(bb=>{bb.disabled=true;bb.classList.remove('sel');});
+    if(!ok)mcBtns[mcSel].classList.add('wrong');
+    feedback.textContent=ok?'✓ Správně!':'✗ Tohle není správně — správná odpověď je vyznačená zeleně.';feedback.className='pfeedback '+(ok?'ok':'no');
+    reveal();if(ok){pst.total++;pst.byTopic[topic]=(pst.byTopic[topic]||0)+1;Store.set(PKEY,pst);showScore();}}
+  function check(){if(cur&&cur.mc)return checkMC();let v=parseAns(input.value);if(v!==null&&cur.kind==='prob'&&!/%/.test(input.value)&&Math.abs(v)>1&&Math.abs(v)<=100&&Math.abs(cur.ans)<=1)v=v/100;if(v===null){feedback.textContent='Zadej číslo — zlomek (1/6) nebo desetinné číslo (0,167).';feedback.className='pfeedback';return;}
     const tol=cur.kind==='int'?0.5:cur.kind==='prob'?Math.max(0.0005,Math.min(0.02,Math.abs(cur.ans)*0.05)):Math.max(0.001,Math.abs(cur.ans)*0.02);
     const ok=Math.abs(v-cur.ans)<=tol,near=!ok&&cur.kind!=='int'&&Math.abs(v-cur.ans)<=Math.max(3*tol,0.006);
     feedback.textContent=ok?'✓ Správně!':near?'≈ Skoro — výsledek je blízko, ale zaokrouhli přesněji (aspoň na 3 desetinná místa) nebo zadej zlomek.':'✗ Zatím ne — zkus to znovu nebo si zobraz řešení.';
     feedback.className='pfeedback '+(ok?'ok':'no');
     if(ok){reveal();if(!cur.done){cur.done=true;pst.total++;pst.byTopic[topic]=(pst.byTopic[topic]||0)+1;Store.set(PKEY,pst);showScore();}}}
   c.append(el('div',{class:'ctl',style:'margin-bottom:14px'},el('label',{},'Okruh'),sel,el('span')));
-  c.append(qEl);
-  c.append(el('div',{style:'display:flex;gap:10px;flex-wrap:wrap;align-items:center'},input,btn('Zkontrolovat','teal',check)));
+  c.append(qEl,optsEl);
+  const ansRow=el('div',{style:'display:flex;gap:10px;flex-wrap:wrap;align-items:center'},input,btn('Zkontrolovat','teal',check));
+  c.append(ansRow);
   c.append(feedback);
   const solBtn=btn('Zobrazit řešení','ghost',toggleSol);
   c.append(el('div',{class:'btn-row'},solBtn,btn('Další příklad','amber',newProblem)));
