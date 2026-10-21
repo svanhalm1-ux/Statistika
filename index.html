@@ -1373,11 +1373,11 @@ const introModule={id:'intro',num:'00',label:'Úvod',render(stage){
   const Lp=12,bins=Lp+1,counts=new Array(bins).fill(0);let balls=[],total=0;const MAX=520;
   const target=[];for(let k=0;k<=Lp;k++)target.push(Math.exp(lchoose(Lp,k)-Lp*Math.log(2)));
   const tmax=Math.max.apply(null,target);
-  function draw(){ch.resize();ch.clear();const w=ch.w,h=ch.h;const cw=w/bins;const maxC=Math.max(10,Math.max.apply(null,counts));const baseY=h-6;
+  function draw(){ch.resize();ch.clear();const w=ch.w,h=ch.h;const cw=w/bins;const maxC=Math.max(MAX*tmax*1.2,Math.max.apply(null,counts));const baseY=h-6;
     for(let i=0;i<bins;i++){const bh=(counts[i]/maxC)*(h*.62);const x=i*cw;
       let g=null;try{g=ch.ctx.createLinearGradient(0,baseY-bh,0,baseY);g.addColorStop(0,hexA(C.teal,.85));g.addColorStop(1,hexA(C.teal,.18));}catch(e){g=hexA(C.teal,.5);}
       ch.ctx.fillStyle=g||hexA(C.teal,.5);ch.ctx.fillRect(x+cw*.16,baseY-bh,cw*.68,bh);}
-    ch.ctx.beginPath();for(let i=0;i<bins;i++){const x=i*cw+cw/2;const y=baseY-(target[i]/tmax)*(h*.62);i?ch.ctx.lineTo(x,y):ch.ctx.moveTo(x,y);}
+    ch.ctx.beginPath();for(let i=0;i<bins;i++){const x=i*cw+cw/2;const y=baseY-(target[i]*MAX/maxC)*(h*.62);i?ch.ctx.lineTo(x,y):ch.ctx.moveTo(x,y);}
     ch.ctx.strokeStyle=hexA(C.amber,.9);ch.ctx.lineWidth=2.4;ch.ctx.stroke();
     ch.ctx.fillStyle=C.coral;balls.forEach(b=>{ch.ctx.beginPath();ch.ctx.arc(b.x,b.y,3,0,7);ch.ctx.fill();});}
   let acc=0;
