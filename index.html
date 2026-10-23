@@ -145,7 +145,7 @@ select:focus{outline:none;border-color:var(--teal)}
 .legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
 .hero{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--border);margin-bottom:30px;background:var(--hero-bg)}
 .hero canvas{display:block;width:100%;height:340px}
-.hero .overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:34px;pointer-events:none;background:linear-gradient(180deg,transparent 30%,var(--hero-fade))}
+.hero .overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:34px;pointer-events:none;background:linear-gradient(180deg,transparent 30%,color-mix(in srgb,var(--hero-fade) 55%,transparent) 62%,color-mix(in srgb,var(--hero-fade) 72%,transparent) 100%)}
 .hero .kick{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--teal)}
 .hero h2{font-family:var(--display);font-weight:600;font-size:clamp(30px,5vw,46px);line-height:1.02;letter-spacing:-.02em;margin:10px 0 6px;max-width:28ch}
 .hero p{color:var(--prose);max-width:72ch;margin:0;font-size:16px}
@@ -356,7 +356,7 @@ body::before{display:none}
 .card{box-shadow:none}
 .stat{border:none;background:var(--bg)}
 .callout,.callout.warn{border:none}
-.hero{border:none}.hero .overlay{background:linear-gradient(180deg,transparent 0%,var(--hero-fade) 22%,var(--hero-fade) 100%);padding:24px 20px}
+.hero{border:none}.hero .overlay{background:linear-gradient(180deg,transparent 12%,color-mix(in srgb,var(--hero-fade) 60%,transparent) 42%,color-mix(in srgb,var(--hero-fade) 72%,transparent) 100%);padding:24px 20px}
 .topbar{border-bottom:none}
 .drawer{border-right:none}
 .chapcard:hover{transform:none;background:var(--panel2)}
