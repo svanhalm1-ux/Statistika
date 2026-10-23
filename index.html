@@ -286,6 +286,8 @@ table.ct td.tp .v{color:var(--coral)}table.ct td.fp .v{color:var(--amber)}table.
 .prose table.ct{margin:10px 0 16px}
 .prose .ex table.ct{margin:4px 0 12px}
 table.ct.tl th,table.ct.tl td{text-align:left;vertical-align:top}
+.prose .chapleg{margin:18px 0 6px;font-size:14px}
+.prose .chapleg .symrow{font-size:13.5px}
 </style>
 <style id="vzhled-pismo-barvy">
 /* Vzhled 2026-10: jedno písmo na text (Inter s tabulkovými číslicemi), Fraunces na nadpisy; plochy odstínem místo linek a stínů */
@@ -1135,9 +1137,10 @@ input[type=number],.practice-input{border-color:transparent}
 
 <template id="L-anova"><div class="prose">
 <p>Dvě skupiny porovná t-test. U <b>tří a více</b> skupin (tři dodavatelé, čtyři směny, pět hnojiv) by t-testy všech dvojic hromadily riziko falešného poplachu. U tří skupin jsou to tři testy a pravděpodobnost aspoň jednoho omylu je zhruba <span class="m">1 − 0,95<sup>3</sup> ≈ 14 %</span>; u sedmi skupin (21 dvojic) přes <b>65 %</b>, i kdyby byly všechny skupiny stejné.</p>
-<p><b>ANOVA</b> (analýza rozptylu; R. A. Fisher, pokusná stanice Rothamsted, 20. léta) to řeší jediným testem. Celková variabilita dat se rozloží na část <b>mezi skupinami</b> (jak daleko jsou průměry skupin od celkového průměru) a část <b>uvnitř skupin</b> (rozptyl jednotlivých hodnot kolem průměru své skupiny):</p>
+<p><b>ANOVA</b> (analýza rozptylu; R. A. Fisher, pokusná stanice Rothamsted, 20. léta) to řeší jediným testem. Celková variabilita dat se rozloží na část <b>mezi skupinami</b> (jak daleko jsou průměry skupin od celkového průměru) a část <b>uvnitř skupin</b> (rozptyl jednotlivých hodnot kolem průměru své skupiny). Obě části se měří <b>součtem čtverců</b> <span class="m">SS</span> (z angl. <i>sum of squares</i>): od každé hodnoty se odečte průměr, rozdíl se umocní na druhou a vše se sečte. Je to stejný součet jako v čitateli výběrového rozptylu <span class="m">s<sup>2</sup></span> (kap. 10), jen se zatím nedělí počtem stupňů volnosti.</p>
 <div class="formula"><span class="fp">SS<sub>celk</sub> = SS<sub>mezi</sub> + SS<sub>uvnitř</sub></span>&emsp;&emsp;<span class="fp">SS<sub>mezi</sub> = Σ<sub>j</sub> n<sub>j</sub>(x̄<sub>j</sub> − x̄)<sup>2</sup></span>&emsp;&emsp;<span class="fp">SS<sub>uvnitř</sub> = Σ<sub>j</sub>Σ<sub>i</sub>(x<sub>ij</sub> − x̄<sub>j</sub>)<sup>2</sup></span></div>
-<p>Podělením stupni volnosti vzniknou <b>průměrné čtverce</b> MS a jejich poměr je testová statistika (k je počet skupin, N počet všech pozorování):</p>
+<p>Ve vzorcích je <span class="m">x<sub>ij</sub></span> i-tá hodnota ve skupině j, <span class="m">x̄<sub>j</sub></span> průměr skupiny j, <span class="m">n<sub>j</sub></span> počet hodnot ve skupině j a <span class="m">x̄</span> celkový průměr všech dat. <span class="m">SS<sub>celk</sub></span> je součet čtverců odchylek všech hodnot od celkového průměru.</p>
+<p>Podělením stupni volnosti vzniknou <b>průměrné čtverce</b> <span class="m">MS = SS/df</span> (z angl. <i>mean square</i>), tedy odhady rozptylu. Jejich poměr je testová statistika (k je počet skupin, N počet všech pozorování):</p>
 <div class="formula"><span class="fp">F = <span class="frac"><span>MS<sub>mezi</sub></span><span>MS<sub>uvnitř</sub></span></span> = <span class="frac"><span>SS<sub>mezi</sub> / (k−1)</span><span>SS<sub>uvnitř</sub> / (N−k)</span></span></span>&emsp;<span class="fp">~ F(k−1, N−k)</span></div>
 <p>Za <span class="m">H<sub>0</sub></span> („všechny skupiny mají stejnou střední hodnotu“) vychází F kolem 1, protože mezi skupinami není víc variability, než kolik jí je uvnitř. Velké F znamená, že se průměry liší víc, než by odpovídalo náhodnému kolísání.</p>
 
@@ -4446,12 +4449,12 @@ const SYMS=[
  {g:'r',s:'Ω',n:'omega (velké)',d:'Základní prostor — množina všech možných výsledků pokusu.',re:'Ω'},
  /* písmena a funkce */
  {g:'l',s:'A, B',d:'Jevy (něco, co může nastat) nebo množiny. |A| je počet prvků množiny A.',re:'P\\([AB]|[∩∪∖△⊂]|\\|[AB]\\||{LB}[AB]′'},
- {g:'l',s:'U',d:'Universum — množina všech prvků, se kterými pracujeme (v pravděpodobnosti Ω). Pozor: ve statistice U znamená normovanou veličinu a v Mann–Whitneyově testu jeho statistiku (viz níže).',re:'\\|U\\||universu'},
+ {g:'l',s:'U',d:'Universum — množina všech prvků, se kterými pracujeme (v pravděpodobnosti Ω). Pozor: ve statistice U znamená normovanou veličinu a v Mann–Whitneyově testu jeho statistiku (viz níže).',re:'\\|U\\|(?! ≥)|universu'},
  {g:'l',s:'b₀, b₁',d:'Absolutní člen (průsečík s osou y) a sklon odhadnuté regresní přímky ŷ = b₀ + b₁·x.',re:'b₀|b₁'},
  {g:'l',s:'C(n, k)',d:'Kombinační číslo „n nad k“: kolika způsoby vybrat k prvků z n, když nezáleží na pořadí. Na kalkulačce nCr.',re:'C\\('},
  {g:'l',s:'V(n, k)',d:'Počet variací: výběr k prvků z n, když na pořadí záleží. Na kalkulačce nPr.',re:'V\\(n'},
  {g:'l',s:'Cov(X, Y)',d:'Kovariance — jak X a Y kolísají společně (kladná: rostou spolu).',re:'Cov'},
- {g:'l',s:'d, d̄',d:'Rozdíl v páru (po − před) a průměrný rozdíl; s<sub>d</sub> je směrodatná odchylka rozdílů. U Spearmana je d rozdíl pořadí, u velikosti efektu Cohenovo d.',re:'{LB}d(?:\\u0304|\\s*=\\s*\\[|_)|Σd'},
+ {g:'l',s:'d, d̄',d:'Rozdíl v páru (po − před) a průměrný rozdíl; s<sub>d</sub> je směrodatná odchylka rozdílů. U Spearmana je d rozdíl pořadí, u velikosti efektu Cohenovo d.',re:'Cohen|{LB}d(?:\\u0304|\\s*=\\s*\\[|_)|Σd'},
  {g:'l',s:'D(X)',d:'Rozptyl náhodné veličiny X (značí se i σ² nebo Var(X)).',re:'{LB}D\\('},
  {g:'l',s:'df',d:'Počet stupňů volnosti (degrees of freedom), například n − 1.',re:'{LB}df{LA}'},
  {g:'l',s:'e',d:'Eulerovo číslo e ≈ 2,718; e^x je na kalkulačce tlačítko eˣ.',re:'{LB}e\\^'},
@@ -4461,9 +4464,9 @@ const SYMS=[
  {g:'l',s:'E (přesnost)',d:'Požadovaná přesnost — poloviční šířka intervalu („±“).',re:'[/(]E\\)|≤ E{LA}'},
  {g:'l',s:'F',d:'F statistika — poměr dvou rozptylů (F-test, ANOVA). F₀,₉₅(a, b) je její kritická hodnota.',re:'F statistik|F-test|{LB}F = |F₀'},
  {g:'l',s:'F(t)',d:'Distribuční funkce F(t) = P(T ≤ t): pravděpodobnost, že kus selže nejpozději v čase t.',re:'F\\(t\\)'},
- {g:'l',s:'H₀, H₁',d:'Nulová hypotéza (výchozí tvrzení, „nic se neděje“) a alternativní hypotéza (to, co chceme prokázat).',re:'H₀|H₁'},
+ {g:'l',s:'H₀, H₁',d:'Nulová hypotéza (výchozí tvrzení, „nic se neděje“) a alternativní hypotéza (to, co chceme prokázat).',re:'H₀|H₁|H_0|H_1'},
  {g:'l',s:'k',d:'Počet vybíraných prvků, úspěchů nebo skupin — podle úlohy.',re:'{LB}k(?=\\s*[=−,)+·!]|\\s*\\))'},
- {g:'l',s:'n, N',d:'Rozsah výběru — počet pozorování, pokusů nebo prvků. n₁, n₂ (n<sub>A</sub>, n<sub>B</sub>) jsou rozsahy jednotlivých skupin, N celkový počet.',re:'{LB}n{LA}|{LB}N(?=\\s*=)|n₁|n_A'},
+ {g:'l',s:'n, N',d:'Rozsah výběru — počet pozorování, pokusů nebo prvků. n₁, n₂ (n<sub>A</sub>, n<sub>B</sub>) jsou rozsahy jednotlivých skupin, N celkový počet.',re:'{LB}n{LA}|{LB}N(?=\\s*=)|n₁|n_[0-9A-Za-z]'},
  {g:'l',s:'N(μ, σ²)',d:'Normální rozdělení se střední hodnotou μ a rozptylem σ². N(0, 1) je normované normální rozdělení.',re:'N\\((?:μ|\\d|−)'},
  {g:'l',s:'Bi(n, p)',d:'Binomické rozdělení: počet úspěchů v n nezávislých pokusech s pravděpodobností úspěchu p.',re:'Bi\\('},
  {g:'l',s:'Po(λ)',d:'Poissonovo rozdělení: počet vzácných událostí za čas, v průměru λ.',re:'Po\\('},
@@ -4479,22 +4482,32 @@ const SYMS=[
  {g:'l',s:'Q1, Q3, IQR',d:'Dolní a horní kvartil (pod nimi leží 25 % a 75 % dat); IQR = Q3 − Q1 je mezikvartilové rozpětí.',re:'Q1|Q3|IQR'},
  {g:'l',s:'r',d:'Výběrový (Pearsonův) korelační koeficient — odhad ρ z dat.',re:'{LB}r(?=\\s*=|²)'},
  {g:'l',s:'R²',d:'Koeficient determinace: jaký podíl variability Y vysvětlí regresní přímka (R² = r²).',re:'R²'},
- {g:'l',s:'R_A',h:'R<sub>A</sub>',d:'Součet pořadí skupiny A ve spojených (seřazených) datech — Mann–Whitneyův test.',re:'R_A'},
- {g:'l',s:'s, s²',d:'Výběrová směrodatná odchylka a výběrový rozptyl spočítané z dat (dělí se n − 1). s₁, s₂ patří ke skupinám 1 a 2.',re:'{LB}s(?=\\s*[=/²₁₂·)]|\\s*\\))|výběrov\\S* (?:rozptyl|směrodatn)'},
+ {g:'l',s:'R_A, R_j',h:'R<sub>A</sub>, R<sub>j</sub>',d:'Součet pořadí skupiny (A, j) ve spojených seřazených datech — Mann–Whitneyův a Kruskalův–Wallisův test.',re:'R_[A-Z0-9j]'},
+ {g:'l',s:'s, s²',d:'Výběrová směrodatná odchylka a výběrový rozptyl spočítané z dat (dělí se n − 1). s₁, s₂ patří ke skupinám 1 a 2.',re:'{LB}(?<!r, )s(?=\\s*[=/²₁₂·)]|\\s*\\))|výběrov\\S* (?:rozptyl|směrodatn)'},
  {g:'l',s:'s_xy, s_x²',h:'s<sub>xy</sub>, s<sub>x</sub>²',d:'Výběrová kovariance x a y a výběrový rozptyl x (v regresi b₁ = s<sub>xy</sub> / s<sub>x</sub>²).',re:'s_x'},
  {g:'l',s:'s_p',h:'s<sub>p</sub>',d:'Sdružená (pooled) směrodatná odchylka dvou skupin v klasickém dvouvýběrovém t-testu.',re:'s_p'},
  {g:'l',s:'s_e',h:'s<sub>e</sub>',d:'Reziduální směrodatná odchylka v regresi — typická velikost chyby předpovědi; dělí se n − 2.',re:'s_e'},
  {g:'l',s:'MS, HSD, q',d:'V ANOVĚ průměrný čtverec MS = SS/df, Tukeyho kritický rozdíl HSD = q·√(MS<sub>uvnitř</sub>/n) a q kvantil studentizovaného rozpětí.',re:'{LB}MS|HSD'},
- {g:'l',s:'W⁺, W⁻',d:'Součty pořadí kladných a záporných rozdílů ve Wilcoxonově párovém testu.',re:'W\^[+−]|W⁺|W⁻'},
+ {g:'l',s:'W⁺, W⁻',d:'Součty pořadí kladných a záporných rozdílů ve Wilcoxonově párovém testu.',re:'W\\^[+−]|W⁺|W⁻'},
  {g:'l',s:'H (Kruskal–Wallis)',d:'Statistika Kruskalova–Wallisova testu; za H₀ má přibližně rozdělení χ²(k − 1).',re:'Kruskal'},
  {g:'l',s:'V (Cramér)',d:'Cramérovo V — síla souvislosti v kontingenční tabulce, od 0 do 1.',re:'Cramér'},
+ {g:'l',s:'c',d:'Kritická hodnota testu: hranice mezi oborem nezamítnutí a kritickým oborem.',re:'od c{LA}|{LB}c(?=\\s*odděl)'},
+ {g:'l',s:'f(x), p(x)',d:'Hustota spojité veličiny f(x) (pravděpodobnost = plocha pod ní) a pravděpodobnostní funkce diskrétní veličiny p(x) = P(X = x).',re:'{LB}[fp]\\(x\\)'},
+ {g:'l',s:'z(t)',d:'Intenzita poruch z(t) = f(t)/R(t): riziko, že kus selže v čase t, když dosud vydržel.',re:'z\\(t\\)'},
+ {g:'l',s:'m',d:'Podle úlohy: počet testů (Bonferroniho korekce α/m), počet parametrů odhadnutých z dat (test dobré shody, df = k − 1 − m), m₀ medián v hypotéze.',re:'α/m|1/m|{LB}m(?=\\s*[=)]| počet)|m_0|m₀|− m{LA}'},
+ {g:'l',s:'n_i·, n_·j',h:'n<sub>i·</sub>, n<sub>·j</sub>',d:'Marginální (okrajové) četnosti kontingenční tabulky: součet i-tého řádku a j-tého sloupce. Očekávaná četnost E<sub>ij</sub> = n<sub>i·</sub>·n<sub>·j</sub>/n.',re:'n_i·|n_·'},
+ {g:'l',s:'r, s (tabulka)',d:'U kontingenční tabulky počet řádků r a počet sloupců s; df = (r − 1)(s − 1).',re:'\\(r−1\\)\\(s−1\\)|min\\(r, s\\)'},
+ {g:'l',s:'p̄',d:'Společný (sdružený) podíl dvou výběrů, p̄ = (x₁ + x₂)/(n₁ + n₂), používaný v testu shody dvou podílů.',re:'p\\u0304'},
+ {g:'l',s:'x_p, u_p, t_p(df)',h:'x<sub>p</sub>, u<sub>p</sub>, t<sub>p</sub>(df)',d:'Kvantil: hodnota, pod kterou leží podíl p rozdělení, P(X ≤ x<sub>p</sub>) = p. Například u<sub>0,975</sub> = 1,96 je 97,5% kvantil N(0, 1).',re:'x_p|u_α|u_1−|t_1−|u_0|χ\\^2_|F_[0-9α1]'},
+ {g:'l',s:'R (rozpětí)',d:'Variační rozpětí R = max − min.',re:'R=max|R = max'},
+ {g:'l',s:'V (variační koeficient)',d:'Variační koeficient V = s/x̄: variabilita vztažená k průměru, často v procentech.',re:'V=<|V = s|variační koeficient'},
  {g:'l',s:'S',d:'Součet hodnot, například celková hmotnost n osob.',re:'\\(S\\)'},
  {g:'l',s:'SE',d:'Směrodatná chyba (standard error) — jak moc kolísá odhad; u průměru SE = σ/√n.',re:'{LB}SE{LA}'},
  {g:'l',s:'SD',d:'Směrodatná odchylka (standard deviation), SD(X) = σ.',re:'{LB}SD{LA}'},
- {g:'l',s:'SS',d:'Součet čtverců (sum of squares) — míra variability v ANOVĚ (mezi skupinami a uvnitř skupin).',re:'{LB}SS{LA}'},
- {g:'l',s:'t (statistika)',d:'Testová statistika t-testu. t₀,₉₇₅(df) je kritická hodnota (97,5% kvantil) t-rozdělení s df stupni volnosti.',re:'statistik\\S* t{LA}|{LB}t = \\(|t₀|t·s'},
+ {g:'l',s:'SS',d:'Součet čtverců (sum of squares) Σ(x − x̄)²: součet druhých mocnin odchylek od průměru. V ANOVĚ SS<sub>mezi</sub> (průměry skupin od celkového průměru) a SS<sub>uvnitř</sub> (hodnoty od průměru své skupiny).',re:'{LB}SS{LA}'},
+ {g:'l',s:'t (statistika)',d:'Testová statistika t-testu. t₀,₉₇₅(df) je kritická hodnota (97,5% kvantil) t-rozdělení s df stupni volnosti.',re:'statistik\\S* t{LA}|{LB}t = \\(|t₀|t·s|{LB}t = |t_[01]'},
  {g:'l',s:'t, T (čas)',d:'Čas (doba). T je náhodná doba do poruchy, t konkrétní okamžik.',re:'T > t|λ·t|λt|e\\^\\(−t|déle než'},
- {g:'l',s:'u, U',d:'Normovaná veličina U ~ N(0, 1) a její hodnota u (z-skóre): o kolik σ leží hodnota od průměru. V testech u je testová statistika, u intervalů kvantil (1,96 pro 95 %).',re:'{LB}u(?=\\s*[=·₁₂)]|\\))|Φ\\(u|\\|u\\||U ~'},
+ {g:'l',s:'u, U',d:'Normovaná veličina U ~ N(0, 1) a její hodnota u (z-skóre): o kolik σ leží hodnota od průměru. V testech u je testová statistika, u intervalů kvantil (1,96 pro 95 %).',re:'{LB}u(?=\\s*[=·₁₂)]|\\))|Φ\\(u|\\|u\\||U ~|{LB}U = |\\|U\\| ≥'},
  {g:'l',s:'U (Mann–Whitney)',d:'Statistika Mann–Whitneyova testu: počet dvojic, kde hodnota ze skupiny A převyšuje hodnotu z B.',re:'Mann'},
  {g:'l',s:'w',d:'Váha u váženého průměru.',re:'Σw|w·'},
  {g:'l',s:'x, y',d:'Konkrétní hodnoty (pozorování); v regresi x vysvětlující a y vysvětlovaná proměnná.',re:'(?:^|[^A-Za-z\\u00C0-\\u024F0-9_σ])[xy]{LA}'},
@@ -4531,12 +4544,25 @@ const SYMS=[
  {g:'z',s:'CLT',d:'Centrální limitní věta: průměr (i součet) mnoha nezávislých hodnot má přibližně normální rozdělení.',re:'CLT'},
  {g:'z',s:'MTTF',d:'Mean Time To Failure — střední doba do poruchy.',re:'MTTF'},
  {g:'z',s:'MTTR',d:'Mean Time To Repair — střední doba opravy.',re:'MTTR'},
+ {g:'z',s:'CI',d:'Interval spolehlivosti (confidence interval).',re:'CI:|{LB}CI{LA}'},
  {g:'z',s:'IQ',d:'Inteligenční kvocient — škála s průměrem 100 a σ = 15.',re:'{LB}IQ{LA}'}
 ].map(x=>Object.assign(x,{rx:symRe(x.re)}));
 const SYM_GRP={r:'Řecká písmena',l:'Písmena, funkce a rozdělení',o:'Operátory a zápis',z:'Zkratky'};
 function symText(html){return String(html||'').replace(/<sub>(.*?)<\/sub>/g,'_$1').replace(/<sup>(.*?)<\/sup>/g,'^$1').replace(/<[^>]+>/g,'')
   .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&');}
 function symsIn(html){const t=symText(html);return SYMS.filter(x=>x.rx.test(t));}
+/* rozbalovací přehled značek použitých ve výkladu kapitoly */
+function chapLegend(box,id){if(['intro','pojmy','hist','practice','quiz'].indexOf(id)>-1)return;
+  const pr=[...box.querySelectorAll('.prose')];if(!pr.length)return;
+  const L=symsIn(pr.map(e=>e.innerHTML).join(' ')).filter(x=>x.g!=='o'||/[√~±≈≠|′∩∪]/.test(x.s));if(L.length<2)return;
+  const body=el('div',{class:'symlist'});L.forEach(x=>body.append(symRow(x)));
+  body.append(el('div',{class:'symmore'},el('a',{class:'kx','data-nav':'pojmy'},'Všechny značky kurzu → P · Pojmy')));
+  const prev=el('span',{class:'symprev'},L.filter(x=>x.g!=='o'&&x.g!=='z').slice(0,6).map(x=>x.s.split(' (')[0]).join('  '));
+  const d=el('details',{class:'symleg chapleg'},el('summary',{},el('span',{},'Co znamenají značky v této kapitole'),prev),body);
+  try{if(Store.get('odnahody.znacky.kap.open',false))d.open=true;}catch(e){}
+  d.addEventListener('toggle',()=>Store.set('odnahody.znacky.kap.open',d.open));
+  if(id==='teorie'){const l=pr[0].querySelector('.lede2');if(l){l.after(d);return;}}
+  const last=pr[0];last.append(d);}
 function symRow(x){return el('div',{class:'symrow'},el('span',{class:'sy',html:x.h||x.s}),
   el('span',{class:'sd',html:(x.n?'<b>'+x.n+'</b> — ':'')+x.d}));}
 const pojmyModule={id:'pojmy',num:'P',label:'Pojmy',render(stage){
@@ -4657,6 +4683,7 @@ const pojmyModule={id:'pojmy',num:'P',label:'Pojmy',render(stage){
    {t:'Znaménkový test',g:'t',nav:'pair',d:'Nejjednodušší párový test — počítá jen znaménka rozdílů. Za H₀ je počet kladných Bi(n, ½).'},
    {t:'ANOVA',g:'t',nav:'anova',d:'Analýza rozptylu: porovnává průměry tří a více skupin najednou, aby se předešlo hromadění chyby I. druhu z mnoha t-testů.'},
    {t:'Post-hoc testy (Tukeyho)',g:'t',nav:'anova',d:'Po zamítnutí H₀ v ANOVĚ určí, které dvojice skupin se liší. Tukeyho HSD = q·√(MS<sub>uvnitř</sub>/n) drží celkové riziko falešného poplachu na α.'},
+   {t:'Součet čtverců SS',g:'t',nav:'anova',d:'Sum of squares: součet druhých mocnin odchylek od průměru, Σ(x − x̄)². V ANOVĚ se celkový SS rozkládá na část mezi skupinami a uvnitř skupin; v regresi reziduální SS = Σe². Podělením stupni volnosti vznikne průměrný čtverec MS = SS/df, odhad rozptylu.'},
    {t:'η² (eta squared)',g:'t',nav:'anova',d:'Velikost efektu u ANOVY: η² = SS<sub>mezi</sub>/SS<sub>celk</sub>, podíl celkové variability vysvětlený rozdíly mezi skupinami.'},
    {t:'Kruskalův–Wallisův test',g:'t',nav:'nonparam',d:'Neparametrická obdoba ANOVY: porovnání tří a více skupin přes pořadí, bez předpokladu normality.'},
 
@@ -4803,7 +4830,7 @@ function syncHash(){try{const want='#'+current+(window.QA_MODE?'&qa':'');if(loca
 window.addEventListener('popstate',()=>{const h=hashModule()||'intro';if(h!==current){window.__navFromPop=true;try{navigate(h);}finally{window.__navFromPop=false;}}});
 window.addEventListener('hashchange',()=>{const h=hashModule();if(h&&h!==current){window.__navFromPop=true;try{navigate(h);}finally{window.__navFromPop=false;}}});
 function navigate(id,keepScroll){Anim.stop();window.__softHooks=[];if(window.__mapFSexit){try{window.__mapFSexit();}catch(e){}window.__mapFSexit=null;}const mod=MODULES.find(m=>m.id===id)||MODULES[0];current=mod.id;
-  stageEl.innerHTML='';const box=el('div',{class:'module'});stageEl.append(box);mod.render(box);typeset(box);[].forEach.call(box.querySelectorAll('select'),themeSelect);
+  stageEl.innerHTML='';const box=el('div',{class:'module'});stageEl.append(box);mod.render(box);typeset(box);try{chapLegend(box,mod.id);}catch(e){}[].forEach.call(box.querySelectorAll('select'),themeSelect);
   [].forEach.call(navEl.querySelectorAll('button[data-id]'),b=>{const on=b.dataset.id===current;b.classList.toggle('active',on);
     if(on){const g=b.closest('.nav-grp');if(g&&g.classList.contains('closed')){g.classList.remove('closed');const hh=g.previousElementSibling;if(hh){const c=hh.querySelector('.car');if(c)c.classList.remove('shut');}}}});
   window.__chapFocus=null;syncHash();
