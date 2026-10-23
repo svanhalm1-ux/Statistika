@@ -260,14 +260,16 @@ table.ct td.tp .v{color:var(--teal)}table.ct td.fp .v{color:var(--amber)}table.c
 .m sup,.m sub,.formula sup,.formula sub{font-size:.72em;font-style:italic}
 .formula{display:block;text-align:center;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:17.5px;margin:16px 0;padding:12px 14px;background:var(--panel);border:1px solid var(--border-soft);border-radius:12px;color:var(--text);line-height:1.9;overflow-x:auto}
 .frac{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;line-height:1.18;margin:0 2px;font-size:.85em}
-.frac>span{padding:0 5px}
+.frac>span{padding:3px 5px}
 .frac>span:last-child{border-top:1.3px solid currentColor}
 .formula .frac{font-size:.95em}
 .formula .fp{white-space:nowrap;display:inline-block;vertical-align:middle;margin:2px 0}
 .bin{display:inline-flex;align-items:center;vertical-align:middle;margin:0 1px}
 .bin i{font-style:normal;font-size:1.55em;font-weight:300;line-height:1}
 .bin .col{display:inline-flex;flex-direction:column;text-align:center;line-height:1.12;padding:0 2px;font-size:.82em}
-.ol{text-decoration:overline}
+.ol{display:inline-block;border-top:1.3px solid currentColor;line-height:1.2;padding:1px 1px 0;margin-top:1px}
+.frac .ol{margin-top:5px}
+sub,sup{line-height:0}
 .hist{display:flex;gap:16px;margin:18px 0;align-items:flex-start}
 .hyear{flex:0 0 74px;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--amber);background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:7px 4px;text-align:center;margin-top:2px}
 .hbody{flex:1;min-width:0}
@@ -972,7 +974,7 @@ input[type=number],.practice-input{border-color:transparent}
 <h3>Jaký test zvolit</h3>
 <table class="ct tl">
 <tr><th>Otázka</th><th>Test</th><th>Když předpoklady neplatí</th></tr>
-<tr><td>Střední hodnota proti normě, σ známé</td><td>z-test (15)</td><td>—</td></tr>
+<tr><td>Střední hodnota proti normě, σ známé</td><td>z-test (výše v této kapitole)</td><td>—</td></tr>
 <tr><td>Střední hodnota proti normě</td><td>jednovýběrový t-test (<a class="kx" data-nav="param">18</a>)</td><td>Wilcoxonův nebo znaménkový test (<a class="kx" data-nav="pair">20</a>)</td></tr>
 <tr><td>Dvě nezávislé skupiny</td><td>dvouvýběrový t-test, Welchův test (<a class="kx" data-nav="param">18</a>)</td><td>Mann–Whitneyův test (<a class="kx" data-nav="nonparam">21</a>)</td></tr>
 <tr><td>Párová data (před a po)</td><td>párový t-test (<a class="kx" data-nav="pair">20</a>)</td><td>Wilcoxonův párový, znaménkový test (<a class="kx" data-nav="pair">20</a>)</td></tr>
@@ -982,6 +984,7 @@ input[type=number],.practice-input{border-color:transparent}
 <tr><td>Souvislost dvou kategoriálních znaků</td><td>χ² test nezávislosti (<a class="kx" data-nav="kval">24</a>)</td><td>Fisherův přesný test (<a class="kx" data-nav="kval">24</a>)</td></tr>
 <tr><td>Četnosti proti zadanému rozdělení</td><td>χ² test dobré shody (<a class="kx" data-nav="gof">23</a>)</td><td>sloučení řídkých kategorií (<a class="kx" data-nav="gof">23</a>)</td></tr>
 <tr><td>Souvislost dvou číselných veličin</td><td>test Pearsonova r (<a class="kx" data-nav="cov">11</a>)</td><td>Spearmanovo ρ<sub>S</sub> (<a class="kx" data-nav="spearman">12</a>)</td></tr>
+<tr><td>Lineární vliv x na Y</td><td>t-test sklonu <span class="m">β<sub>1</sub> = 0</span> (<a class="kx" data-nav="regres">13</a>)</td><td>Spearmanovo ρ<sub>S</sub> pro monotónní vztah (<a class="kx" data-nav="spearman">12</a>)</td></tr>
 </table>
 
 <h3>Graf níže</h3>
