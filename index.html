@@ -153,7 +153,7 @@ table.ct{border-collapse:collapse;width:100%;font-size:13px;margin-top:6px}
 table.ct th,table.ct td{border:1px solid var(--border);padding:9px 10px;text-align:center}
 table.ct th{color:var(--muted);font-weight:500;background:var(--panel2)}
 table.ct td .v{font-family:var(--mono);font-size:16px;font-weight:500}
-table.ct td.tp .v{color:var(--coral)}table.ct td.fp .v{color:var(--amber)}table.ct td.tn .v{color:var(--faint)}table.ct td.fn .v{color:var(--violet)}
+table.ct td.tp .v{color:var(--teal)}table.ct td.fp .v{color:var(--amber)}table.ct td.tn .v{color:var(--faint)}table.ct td.fn .v{color:var(--violet)}
 .q{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin:16px 0}
 .q .qn{font-family:var(--mono);font-size:11px;color:var(--teal);letter-spacing:.16em;margin-bottom:8px}
 .q .qt{font-size:15.5px;font-weight:500;margin-bottom:14px}
@@ -2115,10 +2115,10 @@ const bayesModule={id:'bayes',num:'03',label:'Bayes',render(stage){
   function counts(){const N=1000;const sick=Math.round(prev*N);const healthy=N-sick;const tp=Math.round(sick*sens),fn=sick-tp;const tn=Math.round(healthy*spec),fp=healthy-tn;return {N,sick,healthy,tp,fn,tn,fp};}
   function drawGrid(){const o=counts();const dpr=window.devicePixelRatio||1;const w=gc.cv.clientWidth||520,h=250;gc.cv.width=w*dpr;gc.cv.height=h*dpr;gctx.setTransform(dpr,0,0,dpr,0,0);gctx.clearRect(0,0,w,h);
     const cols=40,rows=25;const cw=w/cols,chh=h/rows;const rr=Math.min(cw,chh)*0.34;const order=[];
-    for(let i=0;i<o.tp;i++)order.push(C.coral);for(let i=0;i<o.fn;i++)order.push(C.violet);for(let i=0;i<o.fp;i++)order.push(C.amber);for(let i=0;i<o.tn;i++)order.push(hexA(C.faint,.5));
+    for(let i=0;i<o.tp;i++)order.push(C.teal);for(let i=0;i<o.fn;i++)order.push(C.violet);for(let i=0;i<o.fp;i++)order.push(C.amber);for(let i=0;i<o.tn;i++)order.push(hexA(C.faint,.5));
     for(let i=0;i<o.N;i++){const r=Math.floor(i/cols),col=i%cols;gctx.fillStyle=order[i]||hexA(C.faint,.5);gctx.beginPath();gctx.arc(col*cw+cw/2,r*chh+chh/2,rr,0,7);gctx.fill();}}
   function upd(){const o=counts();const p=prev*sens/((prev*sens+(1-prev)*(1-spec))||1);const pr=o.tp/((o.tp+o.fp)||1);const rn=Math.abs(pr-p)>0.0005?' (Počty lidí jsou zaokrouhlené na celé, proto podíl '+o.tp+'/'+(o.tp+o.fp)+' = '+pct(pr)+' vychází trochu jinak než přesný výpočet nahoře.)':'';
-    post.innerHTML='<div style="font-family:var(--mono);font-size:38px;font-weight:500;color:var(--coral);line-height:1">'+pct(p)+'</div><div style="font-size:13.5px;color:var(--muted);max-width:46ch;margin:8px auto 0">Pokud vyjde test <b>pozitivní</b>, je pravděpodobnost, že je člověk <b>skutečně nemocný</b>, jen tolik. Z '+(o.tp+o.fp)+' pozitivních je nemocných '+o.tp+', zdravých (falešný poplach) '+o.fp+'.'+rn+'</div>';
+    post.innerHTML='<div style="font-family:var(--mono);font-size:38px;font-weight:500;color:var(--teal);line-height:1">'+pct(p)+'</div><div style="font-size:13.5px;color:var(--muted);max-width:46ch;margin:8px auto 0">Pokud vyjde test <b>pozitivní</b>, je pravděpodobnost, že je člověk <b>skutečně nemocný</b>, jen tolik. Z '+(o.tp+o.fp)+' pozitivních je nemocných '+o.tp+', zdravých (falešný poplach) '+o.fp+'.'+rn+'</div>';
     ct.innerHTML='<tr><th></th><th>test +</th><th>test −</th><th>celkem</th></tr><tr><th>nemocní</th><td class="tp"><span class="v">'+o.tp+'</span></td><td class="fn"><span class="v">'+o.fn+'</span></td><td>'+o.sick+'</td></tr><tr><th>zdraví</th><td class="fp"><span class="v">'+o.fp+'</span></td><td class="tn"><span class="v">'+o.tn+'</span></td><td>'+o.healthy+'</td></tr><tr><th>celkem</th><td>'+(o.tp+o.fp)+'</td><td>'+(o.fn+o.tn)+'</td><td>1000</td></tr>';
     drawGrid();}
   const sp=slider('prevalence',.001,.2,.001,prev,v=>pct(v,1),v=>{prev=v;bexSel.value='';bexDesc.textContent=BEXDESC_CUST;bexDesc.style.display='block';upd();});
@@ -2134,7 +2134,7 @@ const bayesModule={id:'bayes',num:'03',label:'Bayes',render(stage){
   c.append(el('div',{class:'ctl',style:'margin-bottom:10px'},el('label',{},'Příklad'),bexSel,el('span')));
   c.append(el('div',{class:'controls'},sp.row,ss.row,sc.row));
   c.append(bexDesc);
-  c.append(legend([{c:C.coral,t:'nemocný + pozitivní'},{c:C.violet,t:'nemocný + negativní'},{c:C.amber,t:'zdravý + pozitivní (falešný poplach)'},{c:hexA(C.faint,.6),t:'zdravý + negativní'}]));
+  c.append(legend([{c:C.teal,t:'nemocný + pozitivní'},{c:C.violet,t:'nemocný + negativní'},{c:C.amber,t:'zdravý + pozitivní (falešný poplach)'},{c:hexA(C.faint,.6),t:'zdravý + negativní'}]));
   c.append(gc.w,post,ct);stage.append(c);
   appendAppHint(stage);
   upd();setTimeout(drawGrid,40);
