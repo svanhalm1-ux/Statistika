@@ -288,6 +288,16 @@ table.ct td.tp .v{color:var(--coral)}table.ct td.fp .v{color:var(--amber)}table.
 table.ct.tl th,table.ct.tl td{text-align:left;vertical-align:top}
 .prose .chapleg{margin:18px 0 6px;font-size:14px}
 .prose .chapleg .symrow{font-size:13.5px}
+.setcalc{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"ex" "dia" "sets" "expr" "prob";gap:0}
+.setcalc .sc-ex{grid-area:ex}.setcalc .sc-dia{grid-area:dia;margin-bottom:14px}.setcalc .sc-sets{grid-area:sets}.setcalc .sc-expr{grid-area:expr}.setcalc .sc-prob{grid-area:prob}
+.setcalc .sc-restop{font-family:var(--mono);font-size:13px;color:var(--teal);margin:0 0 6px;word-break:break-word}
+.setrow{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+.setrow label{flex:none;width:38px;font-family:var(--mono);font-weight:600;font-size:14px;color:var(--text)}
+.setrow input{flex:1;min-width:0;margin:0}
+.setrow .btn,.setrow .setrow-sp{flex:none;width:40px;padding:6px 0!important;text-align:center}
+@media(min-width:1000px){.setcalc{grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:22px;grid-template-areas:"ex dia" "sets dia" "expr dia" "prob prob"}
+ .setcalc .sc-dia{align-self:start;position:sticky;top:16px}}
+.setcalc .sc-restop .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;vertical-align:0}
 </style>
 <style id="vzhled-pismo-barvy">
 /* Vzhled 2026-10: jedno písmo na text (Inter s tabulkovými číslicemi), Fraunces na nadpisy; plochy odstínem místo linek a stínů */
@@ -1311,7 +1321,7 @@ function statBlocks(defs){const wrap=el('div',{class:'stats'});const refs={};
 function card(titleHtml){const c=el('div',{class:'card'});if(titleHtml)c.append(el('div',{class:'card-head'},el('div',{class:'t',html:String(titleHtml).replace(/[α-ωϑϕ]+/g,m=>'<span class="nc">'+m+'</span>')})));return c;}
 function chartCanvas(tall){const w=el('div',{class:'chart-wrap'});const cv=el('canvas',{class:'chart'+(tall?' chart-tall':'')});w.append(cv);return {w:w,cv:cv};}
 function legend(items){const l=el('div',{class:'legend'});items.forEach(it=>l.append(el('span',{},el('i',{style:'background:'+it.c}),it.t)));return l;}
-function header(stage,num,title,lede){stage.append(el('div',{class:'eyebrow'},'Kapitola '+num),el('h2',{},title));if(lede)stage.append(el('p',{class:'lede'},lede));}
+function header(stage,num,title,lede){if(/^\d/.test(num))stage.append(el('div',{class:'eyebrow'},'Kapitola '+num));stage.append(el('h2',{},title));if(lede)stage.append(el('p',{class:'lede'},lede));}
 try{if(/(^|[#?&])qa\b/.test(location.hash+location.search))window.QA_MODE=1;}catch(e){}
 function appendAppHint(stage){const idx=MODULES.findIndex(m=>m.id===current);if(idx<0)return;
   const wrap=el('div',{class:'chapnav'});
@@ -1558,14 +1568,14 @@ const kvalModule={id:'kval',num:'24',label:'Kvalitativní data',render(stage){
 
 /* H HISTORY */
 const histModule={id:'hist',num:'H',label:'Historie',render(stage){
-  stage.append(el('div',{class:'eyebrow'},'Odbočka'),el('h2',{},'Jak se statistika vyvíjela'),el('p',{class:'lede'},'Od hazardu přes hvězdy a pivo až k počítačům — proč jednotlivé nástroje vznikly a kdo je potřeboval.'));
+  stage.append(el('h2',{},'Jak se statistika vyvíjela'),el('p',{class:'lede'},'Od hazardu přes hvězdy a pivo až k počítačům — proč jednotlivé nástroje vznikly a kdo je potřeboval.'));
   stage.append(tpl('L-hist'));
   appendAppHint(stage);
 }};
 
 /* T THEORY */
 const teorieModule={id:'teorie',num:'T',label:'Teorie',render(stage){
-  stage.append(el('div',{class:'eyebrow'},'Teoretický výklad'),el('h2',{},'Souvislý výklad látky'),el('p',{class:'lede'},'Pojmy, vzorce a souvislosti celého kurzu na jednom místě.'));
+  stage.append(el('h2',{},'Souvislý výklad látky'),el('p',{class:'lede'},'Pojmy, vzorce a souvislosti celého kurzu na jednom místě.'));
   stage.append(tpl('L-teorie'));
   appendAppHint(stage);
 }};
@@ -1731,8 +1741,9 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
   const probBox=el('div',{class:'callout',style:'margin-top:14px;display:none'});
   const vres=el('div',{style:'font-family:var(--mono);font-size:15px;margin:12px 0 4px;color:var(--teal);word-break:break-word'});
   const vcnt=el('div',{style:'font-size:12.5px;color:var(--muted);margin-bottom:8px'});
+  const vresTop=el('div',{class:'sc-restop'});
   const scc=chartCanvas();scc.cv.style.height='280px';const sctx2=scc.cv.getContext('2d');
-  const vnNote=el('div',{style:'font-size:12.5px;color:var(--muted);margin-top:8px;display:none'});const vnCache={key:''};
+  const vnNote=el('div',{style:'font-size:12.5px;color:var(--muted);margin-top:8px;display:none'});const vnCache={key:''};const setAnim={cur:null,ov:null,raf:0};
   function parseSetTxt(t){const out=[];const seen={};const parts=[];
     String(t||'').split(';').forEach(seg=>seg.split(/,\s+/).forEach(p=>{p=p.trim();
       if(/^-?\d+,\d+$/.test(p))parts.push(p);else p.split(',').forEach(q=>parts.push(q.trim()));}));
@@ -1751,11 +1762,12 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
   const boolOps={or:(a,b)=>a||b,and:(a,b)=>a&&b,diff:(a,b)=>a&&!b,xor:(a,b)=>a!==b,not:a=>!a};
   function buildRows(){rowsBox.innerHTML='';
     setsArr.forEach((sObj,i)=>{const inp=el('input',{type:'text',class:'practice-input',style:'width:100%',value:sObj.v});
-      inp.addEventListener('input',()=>{sObj.v=inp.value;exSel.value='';scDesc.textContent=SCDESC_CUST;scDesc.style.display='block';drawSets();});
+      const onEd=()=>{if(sObj.v===inp.value)return;sObj.v=inp.value;exSel.value='';scDesc.textContent=SCDESC_CUST;scDesc.style.display='block';drawSets();};
+      ['input','keyup','compositionend','change'].forEach(ev=>inp.addEventListener(ev,onEd));
       const rm=el('button',{class:'btn ghost',style:'padding:6px 10px;font-size:13px',onClick:()=>{if(setsArr.length<=2)return;setsArr.splice(i,1);exSel.value='';scDesc.textContent=SCDESC_CUST;scDesc.style.display='block';buildRows();buildPresets();drawSets();}},'✕');
       rm.style.visibility=setsArr.length>2?'visible':'hidden';
-      rowsBox.append(el('div',{class:'ctl'},el('label',{},'Množina '+NAME(i)),inp,rm));});
-    rowsBox.append(el('div',{class:'ctl'},el('label',{},'Universum U'),uIn,el('span')));
+      rowsBox.append(el('div',{class:'setrow'},el('label',{title:'Množina '+NAME(i)},NAME(i)+' ='),inp,rm));});
+    rowsBox.append(el('div',{class:'setrow'},el('label',{title:'Universum U'},'U ='),uIn,el('span',{class:'setrow-sp'})));
     try{addBtn.style.display=setsArr.length>=MAXSETS?'none':'';}catch(e){}}
   function buildPresets(){preSel.innerHTML='';const has3=setsArr.length>=3;
     const opts=[['','— vlastní výraz —'],['A ∪ B','A ∪ B'],['A ∩ B','A ∩ B'],['A ∖ B','A ∖ B'],['B ∖ A','B ∖ A'],['A △ B','A △ B'],["A'",'A′ (doplněk)'],["(A ∪ B)'",'(A ∪ B)′']];
@@ -1763,8 +1775,10 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
     opts.push(['Z','Z — zbytek mimo všechny množiny'],['Z ∪ A','Z ∪ A'],['U ∖ A','U ∖ A (totéž co A′)']);
     opts.forEach(o=>preSel.append(el('option',{value:o[0]},o[1])));}
   preSel.addEventListener('change',()=>{if(preSel.value){exprIn.value=preSel.value;drawSets();}});
-  exprIn.addEventListener('input',()=>{preSel.value='';drawSets();});
-  uIn.addEventListener('input',()=>{exSel.value='';scDesc.textContent=SCDESC_CUST;scDesc.style.display='block';drawSets();});
+  let lastExpr=null,lastU=null;
+  ['input','keyup','compositionend','change'].forEach(ev=>{
+    exprIn.addEventListener(ev,()=>{if(exprIn.value===lastExpr)return;lastExpr=exprIn.value;preSel.value='';drawSets();});
+    uIn.addEventListener(ev,()=>{if(uIn.value===lastU)return;lastU=uIn.value;exSel.value='';scDesc.textContent=SCDESC_CUST;scDesc.style.display='block';drawSets();});});
   function insSym(ch){const st=exprIn.selectionStart!=null?exprIn.selectionStart:exprIn.value.length,en=exprIn.selectionEnd!=null?exprIn.selectionEnd:st;
     exprIn.value=exprIn.value.slice(0,st)+ch+exprIn.value.slice(en);exprIn.focus();exprIn.selectionStart=exprIn.selectionEnd=st+ch.length;preSel.value='';drawSets();}
   const diaSel=el('select',{});[['auto','Automaticky'],['venn','Vennův — všechny kombinace'],['euler','Eulerův — jen skutečné průniky']].forEach(o=>diaSel.append(el('option',{value:o[0]},o[1])));
@@ -1781,8 +1795,9 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
   // Eulerův diagram: kruhy se překrývají jen tam, kde data opravdu mají společné prvky.
   // Vrací {SH, pos, masks} nebo null, když se rozvržení nepodaří (příliš mnoho kombinací).
   const eulerCache={key:'',val:null};
-  function eulerLayout(n,sizes,occ,box){
-    const key=n+'|'+sizes.join(',')+'|'+occ.join(',')+'|'+box.join(',');
+  const eulerPrev={n:0,X:null,Y:null};
+  function eulerLayout(n,sizes,occ,box,inter){inter=inter||[];
+    const key=n+'|'+sizes.join(',')+'|'+occ.join(',')+'|'+box.join(',')+'|'+inter.map(r2=>r2.join(',')).join(';');
     if(eulerCache.key===key)return eulerCache.val;
     const [ux,uy,uw,uh]=box;
     const need=[],sub=[];for(let i=0;i<n;i++){need.push(new Array(n).fill(false));sub.push(new Array(n).fill(false));}
@@ -1799,13 +1814,18 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
     const RS=n<=7?60:30;for(let rs=0;rs<RS;rs++){
       const X=[],Y=[];const spread=Math.sqrt(n)*1.6;
       for(let i=0;i<n;i++){X.push((rnd()-.5)*2*spread);Y.push((rnd()-.5)*2*spread);}
+      // první pokus začne z minulého rozložení, aby se kruhy při úpravě dat jen posunuly a nepřeskládaly
+      if(rs===0&&eulerPrev.n===n&&eulerPrev.X){for(let i=0;i<n;i++){X[i]=eulerPrev.X[i];Y[i]=eulerPrev.Y[i];}}
       for(let it=0;it<700;it++){const st=it<400?0.3*(1-it/400)+0.05:0.6;
         for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){
           let dx=X[j]-X[i],dy=Y[j]-Y[i],d=Math.sqrt(dx*dx+dy*dy);if(d<1e-6){dx=rnd()-.5;dy=rnd()-.5;d=Math.sqrt(dx*dx+dy*dy);}
           let lo,hi;
           if(sub[i][j]){lo=0;hi=Math.max(0,r[j]-r[i]-0.18*r[i]);}
           else if(sub[j][i]){lo=0;hi=Math.max(0,r[i]-r[j]-0.18*r[j]);}
-          else if(need[i][j]){const mn=Math.abs(r[i]-r[j])+0.35*Math.min(r[i],r[j]),mx=r[i]+r[j]-0.35*Math.min(r[i],r[j]);lo=mn;hi=Math.max(mn,mx);}
+          else if(need[i][j]){const mr=Math.min(r[i],r[j]),mn=Math.abs(r[i]-r[j])+0.35*mr,mx=r[i]+r[j]-0.35*mr;lo=mn;hi=Math.max(mn,mx);
+            // hloubka překryvu podle podílu společných prvků: málo společných = mělký překryv
+            const ci=inter[i]&&inter[i][j],sm=Math.min(sizes[i],sizes[j]);
+            if(ci&&sm>0){const fr=Math.min(1,ci/sm),dt=hi-(hi-lo)*fr;lo=Math.max(lo,dt-0.12*mr);hi=Math.min(hi,dt+0.12*mr);if(hi<lo)hi=lo;}}
           else{lo=r[i]+r[j]+0.3;hi=1e9;}
           let f=0;if(d<lo)f=d-lo;else if(d>hi)f=d-hi;
           if(f!==0){const mvx=dx/d*f*st*.5,mvy=dy/d*f*st*.5;X[i]+=mvx;Y[i]+=mvy;X[j]-=mvx;Y[j]-=mvy;}}
@@ -1827,9 +1847,10 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
       // množiny bez společných prvků se nesmí ani dotknout
       for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(!need[i][j]&&!sub[i][j]&&!sub[j][i]){
         const dx=SH[i].cx-SH[j].cx,dy=SH[i].cy-SH[j].cy;if(Math.sqrt(dx*dx+dy*dy)<SH[i].rx+SH[j].rx+6)score=Math.min(score,-1);}
-      if(!best||score>best.score)best={score:score,SH:SH,pos:P};
+      if(!best||score>best.score)best={score:score,SH:SH,pos:P,X:X.slice(),Y:Y.slice()};
       if(best.score>=14)break;}
     const val=(best&&best.score>=6)?{SH:best.SH,pos:best.pos,masks:Object.keys(best.pos).map(Number)}:null;
+    if(val){eulerPrev.n=n;eulerPrev.X=best.X;eulerPrev.Y=best.Y;}
     eulerCache.key=key;eulerCache.val=val;return val;}
   const denseWarn=el('div',{class:'callout warn',style:'display:none;margin-top:10px'});
   function roundRectPath(g,x,y,w2,h2,r2){if(g.roundRect){g.beginPath();g.roundRect(x,y,w2,h2,r2);}else{g.beginPath();g.rect(x,y,w2,h2);}}
@@ -1840,6 +1861,7 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
     let res=null,err=null;
     try{res=parseExpr(exprIn.value,n=>{if(n==='Z')return omega;if(n==='U')return effU;if(!(n in named))throw 'neznámá množina '+n;return named[n];},makeSetOps(effU));}
     catch(ex){err=String(ex);}
+    vresTop.innerHTML='';vresTop.append(el('span',{class:'sw',style:'background:'+hexA(C.green,.5)}),document.createTextNode('zvýrazněno: '+(exprIn.value.trim()||'—')+' = '+(err?'?':(res.size?'{ '+[...res].join(', ')+' }':'∅'))));
     if(err){vres.style.color='var(--coral)';vres.textContent='Chyba: '+err;vcnt.textContent='';probBox.style.display='none';}
     else{vres.style.color='var(--teal)';const arr=[...res];
       vres.textContent=arr.length?('{ '+arr.join(', ')+' }'):'∅ (prázdná množina)';
@@ -1864,7 +1886,7 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
     // režim kresby: Vennův (1–3 kruhy, 4–5 elipsy, všechny kombinace) nebo Eulerův (jen obsazené oblasti); jinak mapa
     const w=scc.cv.clientWidth||520;
     const sparse=n>=2&&sparseData(n,occ),wish=diaSel.value;
-    const tryEuler=n>=2&&(n>=6||wish==='euler'||(wish==='auto'&&sparse));
+    const tryEuler=n>=2&&(n>=6||wish==='euler'||wish==='auto');
     let mode=null,EU=null,h=0;
     // shodné (neprázdné) množiny kreslí Eulerův diagram jako jeden kruh „A = B“
     const grpOf=[],grpMem=[];{const seen={};for(let i2=0;i2<n;i2++){const st2=named[NAME(i2)];const key=st2.size?[...st2].sort().join('\u0001'):'∅'+i2;
@@ -1872,7 +1894,9 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
     const ng=grpMem.length,g2o=gm=>{let m=0;for(let g=0;g<ng;g++)if(gm>>g&1)grpMem[g].forEach(i2=>{m|=1<<i2;});return m;};
     if(tryEuler){h=n<=3?300:380;
       const occG=[...new Set(occ.map(m=>{let gm=0;for(let i2=0;i2<n;i2++)if(m>>i2&1)gm|=1<<grpOf[i2];return gm;}))].sort((p,q)=>p-q);
-      const EG=eulerLayout(ng,grpMem.map(mem=>named[NAME(mem[0])].size),occG,[14,12,w-28,h-24]);
+      const gSet=grpMem.map(mem=>named[NAME(mem[0])]);
+      const inter=gSet.map(a=>gSet.map(b=>{let c=0;a.forEach(x=>{if(b.has(x))c++;});return c;}));
+      const EG=eulerLayout(ng,gSet.map(st2=>st2.size),occG,[14,12,w-28,h-24],inter);
       if(EG){const pos2={};Object.keys(EG.pos).forEach(k=>{pos2[g2o(+k)]=EG.pos[k];});
         EU={SH:grpOf.map(g=>EG.SH[g]),pos:pos2,masks:EG.masks.map(g2o)};mode='euler';}}
     if(!mode){mode=n<=3?'circ':(n<=5?'ell':(n<=8?'grid':'none'));h=n<=3?280:340;}
@@ -1890,7 +1914,7 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
       :mode==='grid'?'Karnaughova mapa: každé z '+tot+' políček je jedna kombinace „patří / nepatří“. Řádek říká, do kterých z '+NAME(0)+'–'+NAME(rowBits-1)+' prvek patří (A′ = nepatří do A), sloupec totéž pro '+NAME(rowBits)+'–'+NAME(n-1)+'. Levé horní políčko je Z, zbytek mimo všechny množiny.'
       :'';
     vnNote.style.display=(n>=4||mode==='euler')?'block':'none';
-    if(tryEuler&&mode!=='euler'){
+    if(tryEuler&&mode!=='euler'&&(wish==='euler'||n>=6)){
       denseWarn.innerHTML='<span class="ic">!</span><div><b>Množiny se překrývají příliš mnoha způsoby.</b> V datech je '+combos+' různých kombinací příslušnosti (z '+tot+' možných) a jako kruhy se to nakreslit nedá'+(mode==='grid'?' — proto je místo diagramu Karnaughova mapa.':(mode==='none'?'. Pro '+n+' množin už nejde ani mapa, výsledek výrazu nahoře ale platí.':' — proto je tu Vennův diagram se všemi kombinacemi.'))+' Eulerův diagram vyjde, když se každá množina překrývá jen s několika dalšími.</div>';
       denseWarn.style.display='flex';}
     else denseWarn.style.display='none';
@@ -1946,37 +1970,6 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
     }
     const shapePath=(g,S)=>{g.beginPath();if(g.ellipse){g.ellipse(S.cx,S.cy,S.rx,S.ry,S.rot,0,Math.PI*2);}else{g.save();g.translate(S.cx,S.cy);g.rotate(S.rot);g.scale(S.rx,S.ry);g.arc(0,0,1,0,Math.PI*2);g.restore();}};
     const qv=(S,x,y)=>{const c=Math.cos(S.rot),s2=Math.sin(S.rot),dx=x-S.cx,dy=y-S.cy,u=(dx*c+dy*s2)/S.rx,v=(-dx*s2+dy*c)/S.ry;return u*u+v*v;};
-    // zvýraznění oblastí výrazu
-    const maskList=mode==='euler'?EU.masks.concat(EU.masks.indexOf(0)<0?[0]:[]):[...Array(1<<n).keys()];
-    if(!err){maskList.forEach(mask=>{
-      if(!inExpr(mask))return;
-      const t=document.createElement('canvas');t.width=Math.round(w*dpr);t.height=Math.round(h*dpr);const g=t.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
-      g.save();for(let i2=0;i2<n;i2++){if(mask&(1<<i2)){shapePath(g,SH[i2]);g.clip();}}
-      g.fillStyle=hl;roundRectPath(g,ux,uy,uw,uh,12);g.fill();g.restore();
-      g.globalCompositeOperation='destination-out';
-      for(let i2=0;i2<n;i2++){if(!(mask&(1<<i2))){shapePath(g,SH[i2]);g.fill();}}
-      sctx2.drawImage(t,0,0,w,h);});}
-    // obrysy + jména množin
-    const gcx=SH.reduce((s2,e)=>s2+e.cx,0)/n,gcy=SH.reduce((s2,e)=>s2+e.cy,0)/n;
-    for(let i2=0;i2<n;i2++){const S=SH[i2];const same=mode==='euler'?grpMem[grpOf[i2]]:[i2];if(same[0]!==i2)continue;sctx2.strokeStyle=hexA(circCol[i2],.9);sctx2.lineWidth=2;shapePath(sctx2,S);sctx2.stroke();
-      let lx,ly;
-      if(mode==='circ'){lx=S.cx+(S.cx<w/2?-1:(S.cx>w/2?1:0))*S.rx*.78;ly=S.cy+(S.cy<h/2?-1:1)*S.rx*.78;}
-      else if(mode==='euler'){let dx=S.cx-gcx,dy=S.cy-gcy,L=Math.sqrt(dx*dx+dy*dy);if(L<1){dx=0;dy=-1;L=1;}
-        const a0=Math.atan2(dy,dx);let bs=-1e9;
-        const par=SH.map((T,j)=>j!==i2&&Math.hypot(S.cx-T.cx,S.cy-T.cy)+S.rx<=T.rx+1);const skipJ=j=>same.indexOf(j)>-1;
-        [[S.rx+11,0],[S.rx-13,0.3]].forEach(([rad,pen])=>{if(rad<8)return;
-          for(let k=0;k<24;k++){const an=a0+(k%2?1:-1)*Math.ceil(k/2)*Math.PI/12,px=S.cx+Math.cos(an)*rad,py=S.cy+Math.sin(an)*rad+5;
-            if(px<ux+12||px>ux+uw-12||py<uy+16||py>uy+uh-6)continue;
-            let sc2=-k*0.01-pen;
-            for(let j=0;j<n;j++){if(j===i2||skipJ(j))continue;const T=SH[j],dd=Math.hypot(px-T.cx,py-5-T.cy);
-              if((dd<=T.rx)!==par[j])sc2-=1;if(Math.abs(dd-T.rx)<10)sc2-=0.6;}
-            if(sc2>bs){bs=sc2;lx=px;ly=py;}}});
-        if(lx===undefined){lx=S.cx;ly=S.cy-S.rx+17;}}
-      else{const c=Math.cos(S.rot),s2=Math.sin(S.rot),sg=((S.cx-gcx)*c+(S.cy-gcy)*s2)>=0?1:-1;
-        lx=S.cx+sg*c*(S.rx+11);ly=S.cy+sg*s2*(S.rx+11)+5;
-        lx=Math.max(ux+12,Math.min(ux+uw-12,lx));ly=Math.max(uy+16,Math.min(uy+uh-6,ly));}
-      sctx2.fillStyle=circCol[i2];sctx2.font='600 15px Inter';sctx2.textAlign='center';sctx2.fillText(same.map(NAME).join(' = '),lx,ly);}
-    omegaLbl(ux+18,uy+uh-10);
     // pozice popisků oblastí
     let pos={};
     if(mode==='euler'){pos=EU.pos;
@@ -2001,6 +1994,56 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
         vnCache.key=key;vnCache.pos=P;}
       pos=vnCache.pos;
     }
+    // ---- plynulý přesun kruhů, když se změní vztahy mezi množinami ----
+    if(setAnim.ov){SH=setAnim.ov.SH;pos=setAnim.ov.pos;}
+    else{
+      const tgt={mode:mode,n:n,w:w,SH:SH.map(o=>Object.assign({},o)),pos:Object.assign({},pos)};
+      const fr=setAnim.cur;cancelAnimationFrame(setAnim.raf);setAnim.raf=0;
+      const animOK=!REDUCE&&fr&&fr.n===n&&fr.w===w&&(mode==='circ'||mode==='euler')&&(fr.mode==='circ'||fr.mode==='euler')
+        &&fr.SH.some((o,i2)=>Math.hypot(o.cx-tgt.SH[i2].cx,o.cy-tgt.SH[i2].cy)+Math.abs(o.rx-tgt.SH[i2].rx)>2);
+      if(animOK){const t0=performance.now(),DUR=600;
+        const lerpG=k=>({mode:mode,n:n,w:w,
+          SH:tgt.SH.map((o,i2)=>{const f=fr.SH[i2];return {cx:f.cx+(o.cx-f.cx)*k,cy:f.cy+(o.cy-f.cy)*k,rx:f.rx+(o.rx-f.rx)*k,ry:f.ry+(o.ry-f.ry)*k,rot:o.rot};}),
+          pos:Object.fromEntries(Object.keys(tgt.pos).map(m=>{const p0=fr.pos[m],p1=tgt.pos[m];return [m,p0?{x:p0.x+(p1.x-p0.x)*k,y:p0.y+(p1.y-p0.y)*k,m:p1.m}:p1];}))});
+        const step=()=>{const k0=Math.min(1,(performance.now()-t0)/DUR),k=k0<.5?4*k0*k0*k0:1-Math.pow(-2*k0+2,3)/2;
+          if(k0<1){setAnim.ov=lerpG(k);setAnim.cur=setAnim.ov;try{drawSets();}finally{setAnim.ov=null;}setAnim.raf=requestAnimationFrame(step);}
+          else{setAnim.cur=null;setAnim.raf=0;drawSets();}};
+        const g0=lerpG(0);SH=g0.SH;pos=g0.pos;setAnim.cur=g0;setAnim.raf=requestAnimationFrame(step);}
+      else setAnim.cur=tgt;}
+    // zvýraznění oblastí výrazu
+    const maskList=mode==='euler'?EU.masks.concat(EU.masks.indexOf(0)<0?[0]:[]):[...Array(1<<n).keys()];
+    if(!err){maskList.forEach(mask=>{
+      if(!inExpr(mask))return;
+      const t=document.createElement('canvas');t.width=Math.round(w*dpr);t.height=Math.round(h*dpr);const g=t.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
+      g.save();for(let i2=0;i2<n;i2++){if(mask&(1<<i2)){shapePath(g,SH[i2]);g.clip();}}
+      g.fillStyle=hl;roundRectPath(g,ux,uy,uw,uh,12);g.fill();g.restore();
+      g.globalCompositeOperation='destination-out';
+      for(let i2=0;i2<n;i2++){if(!(mask&(1<<i2))){shapePath(g,SH[i2]);g.fill();}}
+      sctx2.drawImage(t,0,0,w,h);});}
+    // obrysy + jména množin
+    const gcx=SH.reduce((s2,e)=>s2+e.cx,0)/n,gcy=SH.reduce((s2,e)=>s2+e.cy,0)/n;
+    const placedL=[],itemPts=Object.keys(buckets).map(Number).filter(m=>pos[m]).map(m=>pos[m]);
+    for(let i2=0;i2<n;i2++){const S=SH[i2];const same=mode==='euler'?grpMem[grpOf[i2]]:[i2];if(same[0]!==i2)continue;sctx2.strokeStyle=hexA(circCol[i2],.9);sctx2.lineWidth=2;shapePath(sctx2,S);sctx2.stroke();
+      let lx,ly;
+      if(mode==='circ'){lx=S.cx+(S.cx<w/2?-1:(S.cx>w/2?1:0))*S.rx*.78;ly=S.cy+(S.cy<h/2?-1:1)*S.rx*.78;}
+      else if(mode==='euler'){let dx=S.cx-gcx,dy=S.cy-gcy,L=Math.sqrt(dx*dx+dy*dy);if(L<1){dx=0;dy=-1;L=1;}
+        const a0=Math.atan2(dy,dx);let bs=-1e9;
+        const par=SH.map((T,j)=>j!==i2&&Math.hypot(S.cx-T.cx,S.cy-T.cy)+S.rx<=T.rx+1);const skipJ=j=>same.indexOf(j)>-1;
+        [[S.rx+11,0],[S.rx-13,0.3]].forEach(([rad,pen])=>{if(rad<8)return;
+          for(let k=0;k<24;k++){const an=a0+(k%2?1:-1)*Math.ceil(k/2)*Math.PI/12,px=S.cx+Math.cos(an)*rad,py=S.cy+Math.sin(an)*rad+5;
+            if(px<ux+12||px>ux+uw-12||py<uy+16||py>uy+uh-6)continue;
+            let sc2=-k*0.01-pen;
+            placedL.forEach(L=>{if(Math.abs(px-L.x)<24&&Math.abs(py-L.y)<16)sc2-=1.5;});
+            itemPts.forEach(q=>{if(Math.abs(px-q.x)<16&&Math.abs(py-5-q.y)<14)sc2-=0.8;});
+            for(let j=0;j<n;j++){if(j===i2||skipJ(j))continue;const T=SH[j],dd=Math.hypot(px-T.cx,py-5-T.cy);
+              if((dd<=T.rx)!==par[j])sc2-=1;if(Math.abs(dd-T.rx)<10)sc2-=0.6;}
+            if(sc2>bs){bs=sc2;lx=px;ly=py;}}});
+        if(lx===undefined){lx=S.cx;ly=S.cy-S.rx+17;}}
+      else{const c=Math.cos(S.rot),s2=Math.sin(S.rot),sg=((S.cx-gcx)*c+(S.cy-gcy)*s2)>=0?1:-1;
+        lx=S.cx+sg*c*(S.rx+11);ly=S.cy+sg*s2*(S.rx+11)+5;
+        lx=Math.max(ux+12,Math.min(ux+uw-12,lx));ly=Math.max(uy+16,Math.min(uy+uh-6,ly));}
+      sctx2.fillStyle=circCol[i2];sctx2.font='600 15px Inter';sctx2.textAlign='center';sctx2.fillText(same.map(NAME).join(' = '),lx,ly);placedL.push({x:lx,y:ly});}
+    omegaLbl(ux+18,uy+uh-10);
     // popisky prvků
     sctx2.font='11px Inter';sctx2.textAlign='center';
     Object.keys(buckets).forEach(k=>{const mask=+k,items=buckets[k],p=pos[mask];if(!p)return;
@@ -2011,17 +2054,16 @@ const basicsModule={id:'basics',num:'01',label:'Základy',render(stage){
       if(extra>0){sctx2.fillStyle=C.faint;sctx2.fillText('+'+extra,p.x,p.y+((show.length-1)/2+1)*14+4);}});
   }
   const addBtn=el('button',{class:'btn teal',onClick:()=>{if(setsArr.length>=MAXSETS)return;setsArr.push({v:''});exSel.value='';scDesc.textContent=SCDESC_CUST;scDesc.style.display='block';buildRows();buildPresets();drawSets();}},'+ Přidat množinu');
-  c3.append(el('div',{class:'ctl',style:'margin-bottom:10px'},el('label',{},'Příklad'),exSel,el('span')));
-  c3.append(scDesc);
-  c3.append(rowsBox);
-  c3.append(el('div',{class:'btn-row',style:'margin:10px 0 14px'},addBtn));
-  c3.append(el('div',{class:'ctl',style:'margin-bottom:8px'},el('label',{},'Operace'),preSel,el('span')));
-  c3.append(el('div',{class:'ctl',style:'margin-bottom:6px'},el('label',{},'Výraz'),exprIn,el('span')));
-  c3.append(symRow);
-  c3.append(vres,vcnt,probBox);
-  c3.append(legend([{c:hexA(C.green,.5),t:'zvýrazněná oblast = výsledek výrazu'}]));
-  c3.append(el('div',{class:'ctl',style:'margin:4px 0 10px'},el('label',{},'Diagram'),diaSel,el('span')));
-  c3.append(scc.w,vnNote,denseWarn);stage.append(c3);
+  /* rozvržení: na širokém displeji diagram vpravo (zůstává na očích při psaní), na mobilu diagram nad množinami */
+  const gEx=el('div',{class:'sc-ex'},el('div',{class:'ctl',style:'margin-bottom:10px'},el('label',{},'Příklad'),exSel,el('span')),scDesc);
+  const gSets=el('div',{class:'sc-sets'},rowsBox,el('div',{class:'btn-row',style:'margin:10px 0 14px'},addBtn));
+  const gExpr=el('div',{class:'sc-expr'},el('div',{class:'ctl',style:'margin-bottom:8px'},el('label',{},'Operace'),preSel,el('span')),
+    el('div',{class:'ctl',style:'margin-bottom:6px'},el('label',{},'Výraz'),exprIn,el('span')),symRow,vres,vcnt,
+    el('div',{class:'ctl',style:'margin:6px 0 10px'},el('label',{},'Diagram'),diaSel,el('span')));
+  const gDia=el('div',{class:'sc-dia'},vresTop,scc.w,vnNote,denseWarn);
+  const gProb=el('div',{class:'sc-prob'},probBox);
+  c3.append(el('div',{class:'setcalc'},gEx,gDia,gSets,gExpr,gProb));stage.append(c3);
+  try{let rw=0;new ResizeObserver(()=>{const w=scc.w.clientWidth;if(w&&w!==rw){rw=w;drawSets();}}).observe(scc.w);}catch(e){}
   buildRows();buildPresets();drawSets();setTimeout(drawSets,40);
 
   appendAppHint(stage);
