@@ -2253,13 +2253,14 @@ const distModule={id:'dist',num:'04',label:'Rozdělení',render(stage){
   let rkSim=null;
   const sMF=slider('MTTF (dny)',2,200,1,20,v=>fmt(v,0),()=>rkRun());
   const sMR=slider('MTTR (dny)',0.5,40,0.5,5,v=>fmt(v,1),()=>rkRun());
-  const rkDesc=el('div',{style:'font-size:13px;color:var(--muted);margin:2px 0 10px'},'Simulace: doby provozu i oprav jsou náhodné (exponenciální) s průměry MTTF a MTTR. Každá změna posuvníku spustí novou simulaci.');
-  rk.append(el('div',{class:'controls',style:'margin-top:14px'},sMF.row,sMR.row),rkDesc,
+  const sCY=slider('cyklů v simulaci',1,1000,1,300,v=>fmt(v,0),()=>rkRun());
+  const rkDesc=el('div',{style:'font-size:13px;color:var(--muted);margin:2px 0 10px'},'Simulace: doby provozu i oprav jsou náhodné (exponenciální) s průměry MTTF a MTTR. Jeden cyklus je jeden provoz a jedna oprava, délka simulace je počet cyklů krát (MTTF + MTTR). Každá změna posuvníku spustí novou simulaci.');
+  rk.append(el('div',{class:'controls',style:'margin-top:14px'},sMF.row,sMR.row,sCY.row),rkDesc,
     el('div',{class:'btn-row',style:'margin:0 0 12px'},
       btn('Výpadky elektřiny: 99 dní / 1 den','ghost',()=>{sMF.set(99);sMR.set(1);rkRun();}),
       btn('Nová simulace','amber',()=>rkRun())));
   const tl=chartCanvas();tl.cv.style.height='86px';
-  rk.append(el('div',{style:'font-size:12px;color:var(--muted);margin-bottom:6px'},'Jeden obnovovaný prvek — prvních 10 cyklů provozu a oprav'),tl.w,
+  rk.append(el('div',{style:'font-size:12px;color:var(--muted);margin-bottom:6px'},'Jeden obnovovaný prvek — nejvýš prvních 10 cyklů provozu a oprav'),tl.w,
     legend([{c:hexA(C.green,.6),t:'provoz (průměrně MTTF)'},{c:C.coral,t:'oprava (průměrně MTTR)'}]));
   const lq=chartCanvas(),rq=chartCanvas();
   rk.append(el('div',{class:'dual',style:'margin-top:14px'},
@@ -2270,7 +2271,7 @@ const distModule={id:'dist',num:'04',label:'Rozdělení',render(stage){
   const rkNote=el('div',{class:'callout',style:'margin-top:12px'});rk.append(rkNote);
   stage.append(rk);
   const chQ=new Chart(lq.cv,{padL:62,padB:44,padR:18}),chF=new Chart(rq.cv,{padL:64,padB:44,padR:30});
-  function rkRun(){const mf=sMF.get(),mr=sMR.get(),cyc=mf+mr,H=300*cyc;let t=0,down=0,nf=0;const ev=[],run=[];
+  function rkRun(){const mf=sMF.get(),mr=sMR.get(),cyc=mf+mr,H=sCY.get()*cyc;let t=0,down=0,nf=0;const ev=[],run=[];
     while(t<H){const up=rexp(1/mf);ev.push({a:t,b:t+up,s:1});t+=up;if(t>=H)break;run.push({x:t,y:down/t});nf++;
       const r=rexp(1/mr);ev.push({a:t,b:t+r,s:0});down+=Math.min(r,H-t);t+=r;run.push({x:Math.min(t,H),y:down/Math.min(t,H)});}
     rkSim={ev:ev,run:run,nf:nf,H:H,frac:down/H,mf:mf,mr:mr};rkDraw();}
@@ -2279,7 +2280,7 @@ const distModule={id:'dist',num:'04',label:'Rozdělení',render(stage){
     // časová osa
     const cv=tl.cv,g=cv.getContext('2d'),dpr=window.devicePixelRatio||1,w=cv.clientWidth||520,h=cv.clientHeight||86;
     cv.width=w*dpr;cv.height=h*dpr;g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
-    const W=10*(mf+mr),pl=8,pr=8,y0=12,bh=34,X=x=>pl+(w-pl-pr)*x/W;
+    const W=Math.min(10*(mf+mr),H),pl=8,pr=8,y0=12,bh=34,X=x=>pl+(w-pl-pr)*x/W;
     ev.forEach(e=>{if(e.a>=W)return;const a=X(e.a),b=X(Math.min(e.b,W));g.fillStyle=e.s?hexA(C.green,.6):C.coral;g.fillRect(a,y0,Math.max(1.5,b-a),bh);});
     g.strokeStyle=hexA(C.muted,.4);g.lineWidth=1;g.beginPath();g.moveTo(pl,y0+bh+6);g.lineTo(w-pr,y0+bh+6);g.stroke();
     g.fillStyle=C.faint;g.font='11px Inter';g.textBaseline='top';
@@ -2299,7 +2300,7 @@ const distModule={id:'dist',num:'04',label:'Rozdělení',render(stage){
      // křivka na konci simulace nad čarou → popisek pod čáru, jinak nad ni (a vždy uvnitř grafu)
      let ty=chF.Y(Q)+(frac>Q?13:-13);if(ty<chF.Y(ymax)+9)ty=chF.Y(Q)+13;if(ty>chF.Y(0)-9)ty=chF.Y(Q)-13;
      cf.fillStyle=hexA(C.panel,.92);cf.fillRect(tx-4,ty-8,tw+8,16);cf.fillStyle=C.amber;cf.textAlign='left';cf.textBaseline='middle';cf.fillText(t2,tx,ty);}
-    rkNote.innerHTML='<span class="ic">i</span><div>Prvek se za '+fmt(H,0)+' dní porouchal '+nf+'× a mimo provoz byl '+pct(frac,2)+' času. Vzorec dává '+pct(Q,2)+'. Na začátku simulace podíl skáče — záleží na tom, kdy přišly první poruchy — a s délkou provozu se ustálí na hodnotě ze vzorce.'+(Q<0.02?' Při tak malém Q je oprava ve srovnání s provozem krátká, proto jsou červené úseky na časové ose jen tenké čárky.':'')+'</div>';}
+    rkNote.innerHTML='<span class="ic">i</span><div>Jeden cyklus provozu a opravy trvá průměrně '+fmt(mf+mr,1)+' dní. Simulace běží '+fmt(sCY.get(),0)+' '+(sCY.get()===1?'cyklus':sCY.get()<5?'cykly':'cyklů')+', tedy '+fmt(H,0)+' dní, a pravý graf sahá až sem. Čím víc cyklů, tím víc se podíl času mimo provoz ustálí na hodnotě ze vzorce. Prvek se za tu dobu porouchal '+nf+'× a mimo provoz byl '+pct(frac,2)+' času. Vzorec dává '+pct(Q,2)+'. Na začátku simulace podíl skáče, protože záleží na tom, kdy přišly první poruchy.'+(Q<0.02?' Při tak malém Q je oprava ve srovnání s provozem krátká, proto jsou červené úseky na časové ose jen tenké čárky.':'')+'</div>';}
   rkRun();setTimeout(rkDraw,40);
   window.addEventListener('resize',()=>{if(document.body.contains(rk))rkDraw();});
   appendAppHint(stage);
