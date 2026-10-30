@@ -1563,7 +1563,7 @@ function a11yPass(root){
   if(!root||!root.querySelectorAll)return;
   const list=[];if(root.matches&&root.matches('canvas,input,textarea'))list.push(root);
   root.querySelectorAll('canvas,input,textarea').forEach(e=>list.push(e));
-  {const GL={'+':'Přiblížit','−':'Oddálit','⌂':'Celý pohled','⛶':'Celá obrazovka','✕':'Zavřít'};const bl=[];if(root.matches&&root.matches('button'))bl.push(root);root.querySelectorAll('button').forEach(b=>bl.push(b));
+  {const GL={'+':'Přiblížit','−':'Oddálit','⌂':'Celá mapa (maximální oddálení na střed)','↺':'Obnovit původní rozložení mapy','⛶':'Celá obrazovka','✕':'Zavřít'};const bl=[];if(root.matches&&root.matches('button'))bl.push(root);root.querySelectorAll('button').forEach(b=>bl.push(b));
     bl.forEach(b=>{if(b.hasAttribute('aria-label')||b.hasAttribute('aria-labelledby'))return;const g=b.textContent.trim();if(GL[g]){b.setAttribute('aria-label',GL[g]);if(!b.title)b.title=GL[g];}});
     const lv=[];if(root.matches&&root.matches('.pfeedback,.monty-msg,.quiz-score .s'))lv.push(root);root.querySelectorAll('.pfeedback,.monty-msg,.quiz-score .s').forEach(x=>lv.push(x));lv.forEach(x=>{if(!x.hasAttribute('aria-live'))x.setAttribute('aria-live','polite');});}
   list.forEach(e=>{
@@ -3588,13 +3588,13 @@ function applyThemeCore(key){const t=THEMES[key];if(!t)return;currentTheme=key;c
   const _ae=document.activeElement,_bx=_ae&&_ae.closest?(_ae.closest('#themebar')||_ae.closest('#modetoggle')):null,_bid=_bx?_bx.id:null,_bl=_bx?(_ae.getAttribute('aria-label')||_ae.textContent):null;
   buildThemeBar();buildModeToggle();buildFormToggle();
   if(_bid){try{const nb=document.getElementById(_bid);const f=[].find.call(nb.querySelectorAll('[tabindex],button'),x=>(x.getAttribute('aria-label')||x.textContent)===_bl);if(f)f.focus({preventScroll:true});}catch(e){}}}
-let fbg='tint';
+let fbg='white';
 function applyFbg(){const c=document.documentElement.classList;c.toggle('m-dark',mode==='dark');c.toggle('fbg-white',fbg==='white');c.toggle('fbg-grey',fbg==='grey');}
 function saveLook(){Store.set('odnahody.vzhled',{t:currentTheme,m:mode,f:fbg});}
-function buildFormToggle(){const box=document.getElementById('formtoggle');if(!box)return;box.innerHTML='';box.append(el('div',{class:'tt'},'Pozadí vzorců'));const row=el('div',{class:'row'});[['tint','Barevné'],['white','Bílé'],['grey','Šedé']].forEach(m=>row.append(el('button',{class:(fbg===m[0]?'on':''),'aria-pressed':fbg===m[0]?'true':'false',onClick:()=>setFbg(m[0])},m[1])));box.append(row);}
-function setFbg(v){fbg=(v==='white'||v==='grey')?v:'tint';applyFbg();saveLook();buildFormToggle();}
+function buildFormToggle(){const box=document.getElementById('formtoggle');if(!box)return;box.innerHTML='';box.append(el('div',{class:'tt'},'Pozadí vzorců'));const row=el('div',{class:'row'});[['white','Bílé'],['tint','Barevné'],['grey','Šedé']].forEach(m=>row.append(el('button',{class:(fbg===m[0]?'on':''),'aria-pressed':fbg===m[0]?'true':'false',onClick:()=>setFbg(m[0])},m[1])));box.append(row);}
+function setFbg(v){fbg=(v==='tint'||v==='grey')?v:'white';applyFbg();saveLook();buildFormToggle();}
 function applyTheme(key){applyThemeCore(key);saveLook();softRefresh();}
-function buildModeToggle(){const box=document.getElementById('modetoggle');if(!box)return;box.innerHTML='';box.append(el('div',{class:'tt'},'Pozadí'));const row=el('div',{class:'row'});[['dark','Tmavé'],['light','Světlé']].forEach(m=>row.append(el('button',{class:(mode===m[0]?'on':''),'aria-pressed':mode===m[0]?'true':'false',onClick:()=>setMode(m[0])},m[1])));box.append(row);}
+function buildModeToggle(){const box=document.getElementById('modetoggle');if(!box)return;box.innerHTML='';box.append(el('div',{class:'tt'},'Pozadí'));const row=el('div',{class:'row'});[['light','Světlé'],['dark','Tmavé']].forEach(m=>row.append(el('button',{class:(mode===m[0]?'on':''),'aria-pressed':mode===m[0]?'true':'false',onClick:()=>setMode(m[0])},m[1])));box.append(row);}
 function setMode(m){mode=m;applyThemeCore(currentTheme);saveLook();softRefresh();}
 /* Tisk: v tmavém režimu se na dobu tisku dočasně přepne světlé pozadí (inline proměnné by jinak přebily tiskové CSS) */
 (function(){let saved=null;
@@ -4572,10 +4572,10 @@ const mapaModule={id:'mapa',num:'M',label:'Mapa rozdělení',render(stage){
     d:'Počet pokusů do prvního úspěchu. Nemá paměť: po deseti neúspěších je pravděpodobnost úspěchu stejná jako na začátku.',ex:'Kolikátým pokusem přijde první úspěch.',E:'1/p',V:'(1−p)/p²',
     f:k=>mGeom(k,.35),disc:[1,10]},
    {id:'negb',t:'Negativně binomické',sh:'Neg. binom.',p:'(r, p)',g:'d',x:761,y:35,
-    d:'Počet pokusů do r-tého úspěchu — součet r nezávislých geometrických čekání.',ex:'Kolik pokusů do třetí trefy.',E:'r/p',V:'r(1−p)/p²',
+    d:'Počet pokusů do r-tého úspěchu (např. do třetí trefy). Součet r nezávislých geometrických čekání.',ex:'Kolik pokusů do třetí trefy.',E:'r/p',V:'r(1−p)/p²',
     f:k=>mNegb(k,3,.4),disc:[3,14]},
    {id:'pois',t:'Poissonovo',sh:'Poisson',p:'(λ)',g:'d',x:526,y:310,nav:'dist',
-    d:'Počet vzácných nezávislých událostí za daný čas či plochu. Jediný parametr λ je zároveň průměr i rozptyl.',ex:'Poruchy za směnu; příchody do fronty.',E:'λ',V:'λ',
+    d:'Počet vzácných událostí za pevný čas nebo na pevné ploše, když přicházejí nezávisle a stálou rychlostí. Parametr λ je průměr i rozptyl.',ex:'Poruchy za směnu; příchody do fronty.',E:'λ',V:'λ',
     f:k=>mPois(k,3.5),disc:[0,12]},
    {id:'hyp',t:'Hypergeometrické',sh:'Hypergeom.',p:'(N, M, n)',g:'d',x:428,y:103,
     d:'Jako binomické, ale <b>bez vracení</b> — každý tah mění šance dalších. Model namátkové kontroly dávky. Značení: N je rozsah souboru, M počet „úspěšných“ (např. vadných) prvků v něm a n počet tažených prvků (stejně jako v Teorii).',ex:'Kolik vadných kusů vytáhneš při kontrole.',E:'n·M/N',V:'n·(M/N)·(1−M/N)·(N−n)/(N−1)',
@@ -4587,43 +4587,43 @@ const mapaModule={id:'mapa',num:'M',label:'Mapa rozdělení',render(stage){
     d:'Symetrické rozdělení tvaru zvonu. Podle centrální limitní věty se k němu blíží součet mnoha nezávislých veličin.',ex:'Výšky, chyby měření, průměry velkých výběrů.',E:'μ',V:'σ²',
     f:x=>mNorm(x,0,1),cont:[-3.6,3.6]},
    {id:'snorm',t:'Normované normální',sh:'N(0, 1)',p:'(0, 1)',g:'c',x:95,y:470,nav:'zscore',
-    d:'Normální po standardizaci: střední hodnota 0, rozptyl 1. Z jeho tabulky se čtou pravděpodobnosti pro libovolné normální rozdělení.',ex:'Z-skóre; kritické hodnoty testů.',E:'0',V:'1',
+    d:'Normální rozdělení po standardizaci: střední hodnota 0, rozptyl 1. Stačí jedna tabulka, protože jakékoli normální rozdělení na něj převedeš (odečteš μ a podělíš σ).',ex:'Z-skóre; kritické hodnoty testů.',E:'0',V:'1',
     f:x=>mNorm(x,0,1),cont:[-3.6,3.6]},
    {id:'unif',t:'Rovnoměrné',sh:'Rovnom.',p:'(a, b)',g:'c',x:877,y:460,nav:'dist',
     d:'Každý podinterval stejné délky má stejnou pravděpodobnost. Počítačové generátory náhodných čísel vyrábějí právě rovnoměrné rozdělení na (0, 1).',ex:'Čekání na tramvaj, která jezdí přesně podle jízdního řádu, když na zastávku přijdeš v náhodnou chvíli.',E:'(a+b)/2',V:'(b−a)²/12',
     f:x=>mUnif(x,0,1),cont:[-0.35,1.35]},
    {id:'exp',t:'Exponenciální',sh:'Exponenc.',p:'(λ)',g:'c',x:908,y:357,nav:'dist',
-    d:'Doba čekání na událost, bez paměti. Ve spolehlivosti doba do poruchy při stálé intenzitě poruch z(t) = λ; střední doba do poruchy MTTF = 1/λ.',ex:'Životnost součástky; čas mezi zákazníky.',E:'1/λ',V:'1/λ²',
+    d:'Doba čekání na další událost, která přichází stálou rychlostí λ. Nemá paměť: dosavadní čekání nezkracuje zbývající. Ve spolehlivosti doba do poruchy při stálé intenzitě poruch z(t) = λ; střední doba do poruchy MTTF = 1/λ.',ex:'Životnost součástky; čas mezi zákazníky.',E:'1/λ',V:'1/λ²',
     f:x=>mExp(x,1),cont:[-0.2,4.6]},
    {id:'gam',t:'Gama (Erlangovo)',sh:'Gama',p:'(r, λ)',g:'c',x:709,y:428,
-    d:'Doba čekání na r-tou událost. Speciálními případy jsou exponenciální (r = 1) a χ² (r = ν/2, λ = ½).',ex:'Doba do třetí poruchy.',E:'r/λ',V:'r/λ²',
+    d:'Doba čekání na r-tou událost, tedy součet r exponenciálních čekání. Speciální případy: exponenciální (r = 1) a χ² (r = ν/2, λ = ½).',ex:'Doba do třetí poruchy.',E:'r/λ',V:'r/λ²',
     f:x=>mGam(x,3,1),cont:[-0.2,10]},
    {id:'beta',t:'Beta',sh:'Beta',p:'(α, β)',g:'c',x:757,y:569,
-    d:'Rozdělení pro <b>podíl</b> — nabývá hodnot jen mezi 0 a 1. Podle α a β má tvar písmene U, je rovnoměrné, šikmé, nebo zvonovité.',ex:'Nejistota o pravděpodobnosti; podíl zmetků.',E:'α/(α+β)',V:'αβ/((α+β)²(α+β+1))',
+    d:'Rozdělení pro neznámý podíl nebo pravděpodobnost, hodnoty jen mezi 0 a 1. Podle α a β je rovnoměrné, šikmé, zvonovité, nebo ve tvaru U.',ex:'Nejistota o pravděpodobnosti; podíl zmetků.',E:'α/(α+β)',V:'αβ/((α+β)²(α+β+1))',
     f:x=>mBeta(x,2,4),cont:[0,1]},
    {id:'logn',t:'Lognormální',sh:'Lognorm.',p:'(μ, σ²)',g:'c',x:207,y:357,
-    d:'Veličina, jejíž logaritmus má normální rozdělení. Vzniká, když se vlivy <b>násobí</b>, ne sčítají, a proto je šikmé doprava.',ex:'Příjmy, ceny, velikosti měst.',E:'e^(μ+σ²/2)',V:'(e^σ²−1)·e^(2μ+σ²)',
+    d:'Veličina, jejíž logaritmus je normální. Vzniká, když se vlivy <b>násobí</b>, ne sčítají; je kladné a šikmé doprava.',ex:'Příjmy, ceny, velikosti měst.',E:'e^(μ+σ²/2)',V:'(e^σ²−1)·e^(2μ+σ²)',
     f:x=>mLogn(x,0,.6),cont:[0,5]},
    {id:'weib',t:'Weibullovo',sh:'Weibull',p:'(λ, α)',g:'c',x:976,y:170,nav:'dist',
-    d:'Wb(λ, α) — model životnosti. Intenzita poruch z(t) = αλ<sup>α</sup>t<sup>α−1</sup> podle tvarového parametru α klesá (α < 1, dětské nemoci), je stálá (α = 1), nebo roste (α > 1, opotřebení). Střední hodnota E(T) = MTTF.',ex:'Životnost ložisek a elektroniky; rychlost větru.',E:'Γ(1+1/α)/λ',V:'[Γ(1+2/α) − Γ(1+1/α)²]/λ²',
+    d:'Model životnosti. Intenzita poruch z(t) = αλ<sup>α</sup>t<sup>α−1</sup> podle tvaru α klesá (α < 1, dětské nemoci), je stálá (α = 1), nebo roste (α > 1, opotřebení). Střední hodnota E(T) = MTTF.',ex:'Životnost ložisek a elektroniky; rychlost větru.',E:'Γ(1+1/α)/λ',V:'[Γ(1+2/α) − Γ(1+1/α)²]/λ²',
     f:x=>mWeib(x,2,1),cont:[0,3]},
    {id:'cau',t:'Cauchyho',sh:'Cauchy',p:'',g:'c',x:171,y:636,
-    d:'Zvonovitý tvar s tak těžkými konci, že <b>nemá střední hodnotu ani rozptyl</b>. Protipříklad k centrální limitní větě: průměr Cauchyho veličin má zase Cauchyho rozdělení a k normálnímu se neblíží.',ex:'Poměr dvou nezávislých normovaných normálních veličin.',E:'neexistuje',V:'neexistuje',
+    d:'Zvonovitý tvar, ale s tak dlouhými konci, že <b>nemá střední hodnotu ani rozptyl</b>. Průměr Cauchyho veličin je zase Cauchyho, takže centrální limitní věta neplatí.',ex:'Poměr dvou nezávislých normovaných normálních veličin.',E:'neexistuje',V:'neexistuje',
     f:x=>mCau(x),cont:[-5,5]},
    {id:'lap',t:'Dvojité exponenciální',sh:'Dvojité exp.',p:'(μ, b)',g:'c',x:1042,y:248,
-    d:'Laplaceovo rozdělení: dvě zrcadlově spojené exponenciální hustoty, špičaté uprostřed, s těžšími konci než normální.',ex:'Rozdíl dvou nezávislých čekacích dob se stejným λ.',E:'μ',V:'2b²',
+    d:'Dvě zrcadlově spojené exponenciální hustoty: špičaté uprostřed, s těžšími konci než normální (velké odchylky jsou častější).',ex:'Rozdíl dvou nezávislých čekacích dob se stejným λ.',E:'μ',V:'2b²',
     f:x=>mLap(x),cont:[-5,5]},
    {id:'chi2',t:'Chí-kvadrát',sh:'χ²',p:'(ν)',g:'s',x:436,y:616,nav:'sampling',
-    d:'Součet čtverců ν nezávislých normovaných normálních. Používá se v testech o rozptylu a v χ² testech kvalitativních dat.',ex:'Test dobré shody; test nezávislosti.',E:'ν',V:'2ν',
+    d:'Součet ν čtverců nezávislých veličin N(0, 1); ν jsou stupně volnosti. Hodnoty jsou kladné, tvar šikmý doprava. Používá se v testech o rozptylu a v χ² testech kvalitativních dat.',ex:'Test dobré shody; test nezávislosti.',E:'ν',V:'2ν',
     f:x=>mChi2(x,4),cont:[0,16]},
    {id:'tdist',t:'Studentovo t',sh:'t',p:'(ν)',g:'s',x:228,y:762,nav:'sampling',
-    d:'Podobá se normálnímu, ale má těžší konce, protože σ neznáme a odhadujeme ho z dat. S rostoucím ν se blíží normálnímu.',ex:'t-testy, intervaly spolehlivosti.',E:'0, ν>1',V:'ν/(ν−2), ν>2',
+    d:'Podobá se normálnímu, ale má těžší konce, protože σ neznáme a odhadujeme ho z dat. S rostoucím ν (stupně volnosti) se blíží normálnímu.',ex:'t-testy, intervaly spolehlivosti.',E:'0, ν>1',V:'ν/(ν−2), ν>2',
     f:x=>mT(x,4),cont:[-4.5,4.5]},
    {id:'fdist',t:'Fisherovo F',sh:'F',p:'(ν₁, ν₂)',g:'s',x:695,y:690,nav:'sampling',
-    d:'Poměr dvou nezávislých χ², každého poděleného svými stupni volnosti. Slouží k porovnávání rozptylů.',ex:'F-test shody rozptylů; ANOVA.',E:'ν₂/(ν₂−2), ν₂>2',V:'2ν₂²(ν₁+ν₂−2)/[ν₁(ν₂−2)²(ν₂−4)], ν₂>4',
+    d:'Poměr dvou nezávislých χ², každé podělené svými stupni volnosti. Slouží k porovnání rozptylů: při stejném rozptylu vychází poměr kolem 1.',ex:'F-test shody rozptylů; ANOVA.',E:'ν₂/(ν₂−2), ν₂>2',V:'2ν₂²(ν₁+ν₂−2)/[ν₁(ν₂−2)²(ν₂−4)], ν₂>4',
     f:x=>mF(x,6,10),cont:[0,4]}
   ];
-  const NODE={};D.forEach((n,i)=>{NODE[n.id]=n;n._fx=0;n._fy=0;n._z=0.85+((i*0.47)%1)*0.45;});
+  const NODE={};D.forEach((n,i)=>{NODE[n.id]=n;n.x0=n.x;n.y0=n.y;n._fx=0;n._fy=0;n._z=0.85+((i*0.47)%1)*0.45;});
 
   /* ── edges (všech 33 vazeb ověřeno numericky) ── */
   const E=[
@@ -4709,14 +4709,18 @@ const mapaModule={id:'mapa',num:'M',label:'Mapa rozdělení',render(stage){
   function fit(){const d=dims();const s=Math.max(d.w/W0,d.h/H0)*0.98;const N0=NODE['norm'];tgt={s:s,ox:d.w/(2*s)-N0.x,oy:(d.h+padT())/(2*s)-N0.y};clampCam(tgt);}
   const MARG=50;
   function padT(){return 0;}
-  const BB=(()=>{let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;D.forEach(n=>{x0=Math.min(x0,n.x-NW/2);x1=Math.max(x1,n.x+NW/2);y0=Math.min(y0,n.y-NH/2);y1=Math.max(y1,n.y+NH/2);});return{x0:x0-MARG,x1:x1+MARG,y0:y0-MARG,y1:y1+MARG};})();
-  function sMin(){const d=dims();return Math.min(d.w/(BB.x1-BB.x0),(d.h-padT())/(BB.y1-BB.y0))*0.98;}
+  const BB=(()=>{let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;D.forEach(n=>{x0=Math.min(x0,n.x-NW/2);x1=Math.max(x1,n.x+NW/2);y0=Math.min(y0,n.y-NH/2);y1=Math.max(y1,n.y+NH/2);});const MX=300;/* vodorovná rezerva po stranách: po přiblížení i oddálení jde mapou posouvat a uzly přesouvat až k okraji plátna */return{x0:x0-MARG-MX,x1:x1+MARG+MX,y0:y0-MARG,y1:y1+MARG,mx:MX};})();
+  /* hranice pohledu: okraj kolem uzlů je pevný v pixelech obrazovky (MXPX), takže při oddálení se ve „světě“ zvětší a při přiblížení zmenší */
+  const MXPX=130;
+  function ext(){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;D.forEach(n=>{x0=Math.min(x0,n.x-NW/2);x1=Math.max(x1,n.x+NW/2);y0=Math.min(y0,n.y-NH/2);y1=Math.max(y1,n.y+NH/2);});return{x0:x0-MARG,x1:x1+MARG,y0:y0-MARG,y1:y1+MARG};}
+  function sMin(){const d=dims();const e=ext();return Math.min(d.w/(e.x1-e.x0),(d.h-padT())/(e.y1-e.y0))*0.98;}
   function clampCam(c){const d=dims();const vw=d.w/c.s,vh=(d.h-padB)/c.s;const tp=padT()/c.s;
-    if(vw>=BB.x1-BB.x0)c.ox=vw/2-(BB.x0+BB.x1)/2;
-    else c.ox=Math.min(-BB.x0,Math.max(vw-BB.x1,c.ox));
-    const H=BB.y1-BB.y0+tp;
-    if(vh>=H)c.oy=vh/2-(BB.y0-tp+BB.y1)/2;
-    else c.oy=Math.min(tp-BB.y0,Math.max(vh-BB.y1,c.oy));}
+    const e=ext(),m=MXPX/c.s,B={x0:e.x0-m,x1:e.x1+m,y0:e.y0,y1:e.y1};
+    if(vw>=B.x1-B.x0)c.ox=vw/2-(B.x0+B.x1)/2;
+    else c.ox=Math.min(-B.x0,Math.max(vw-B.x1,c.ox));
+    const H=B.y1-B.y0+tp;
+    if(vh>=H)c.oy=vh/2-(B.y0-tp+B.y1)/2;
+    else c.oy=Math.min(tp-B.y0,Math.max(vh-B.y1,c.oy));}
   function X(x){return (x+cam.ox)*cam.s;} function Y(y){return (y+cam.oy)*cam.s;}
   function invX(px){return px/cam.s-cam.ox;} function invY(py){return py/cam.s-cam.oy;}
   function nodeCol(n){return n.g==='d'?C.teal:n.g==='c'?C.amber:C.violet;}
@@ -4859,16 +4863,32 @@ const mapaModule={id:'mapa',num:'M',label:'Mapa rozdělení',render(stage){
 
   /* ── interaction ── */
   const ptrs=new Map();let dragged=false,startD=0,startS=1;
+  /* zámek mapy: zamčená mapa jen reaguje na klepnutí (výběr) a nechává stránku rolovat; odemčená jde posouvat, zoomovat a lze přesouvat jednotlivá rozdělení */
+  let locked=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches),dragN=null,dragOff=null,fsOn=false,nativeFS=false;
+  const eLocked=()=>locked&&!fsOn;
+  let lockBtn=null;
+  function applyLock(){const l=eLocked();wrap.style.touchAction=l?'pan-y':'none';cv.style.touchAction=l?'pan-y':'none';cv.style.cursor=l?'default':'grab';
+    if(lockBtn){lockBtn.textContent=locked?'🔒':'🔓';lockBtn.title=locked?'Mapa je zamčená – odemknout (posun, zoom, přesouvání rozdělení)':'Mapa je odemčená – zamknout';lockBtn.setAttribute('aria-label',lockBtn.title);lockBtn.setAttribute('aria-pressed',locked?'true':'false');}}
+  function resetMap(){D.forEach(n=>{n.x=n.x0;n.y=n.y0;});Store.del('odnahody.mapa');}
+  function saveMap(){const o={};D.forEach(n=>{if(Math.abs(n.x-n.x0)>0.5||Math.abs(n.y-n.y0)>0.5)o[n.id]=[Math.round(n.x),Math.round(n.y)];});if(Object.keys(o).length)Store.set('odnahody.mapa',o);else Store.del('odnahody.mapa');}
+  {const sv=Store.get('odnahody.mapa',null);if(sv&&typeof sv==='object')D.forEach(n=>{const q=sv[n.id];if(Array.isArray(q)&&isFinite(q[0])&&isFinite(q[1])){n.x=Math.max(BB.x0+NW/2,Math.min(BB.x1-NW/2,+q[0]));n.y=Math.max(BB.y0+NH/2,Math.min(BB.y1-NH/2,+q[1]));}});}
   cv.addEventListener('pointerdown',ev=>{cv.setPointerCapture(ev.pointerId);
     ptrs.set(ev.pointerId,{x:ev.offsetX,y:ev.offsetY});dragged=false;
-    if(ptrs.size===2){const p=[...ptrs.values()];startD=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);startS=cam.s;}
-    cv.style.cursor='grabbing';});
+    if(eLocked())return;
+    if(ptrs.size===1){const n=hitNode(invX(ev.offsetX),invY(ev.offsetY));if(n){dragN=n;dragOff={x:invX(ev.offsetX)-nx_(n),y:invY(ev.offsetY)-ny_(n)};}}
+    if(ptrs.size===2){dragN=null;const p=[...ptrs.values()];startD=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);startS=cam.s;}
+    cv.style.cursor=dragN?'grabbing':'grabbing';});
   cv.addEventListener('pointermove',ev=>{
     if(!ptrs.has(ev.pointerId)){
       const n=hitNode(invX(ev.offsetX),invY(ev.offsetY));
-      if(n!==hover){hover=n;cv.style.cursor=n?'pointer':'grab';if(!animRaf)draw();}
+      if(n!==hover){hover=n;cv.style.cursor=n?(eLocked()?'pointer':'grab'):(eLocked()?'default':'grab');if(!animRaf)draw();}
       return;}
     const prev=ptrs.get(ev.pointerId);const cur={x:ev.offsetX,y:ev.offsetY};ptrs.set(ev.pointerId,cur);
+    if(eLocked()){if(Math.abs(cur.x-prev.x)+Math.abs(cur.y-prev.y)>2)dragged=true;return;}
+    if(dragN&&ptrs.size===1){const dx0=cur.x-prev.x,dy0=cur.y-prev.y;if(Math.abs(dx0)+Math.abs(dy0)>1)dragged=true;
+      if(dragged){dragN.x=Math.max(BB.x0+NW/2,Math.min(BB.x1-NW/2,invX(cur.x)-dragOff.x-dragN._fx));dragN.y=Math.max(BB.y0+NH/2,Math.min(BB.y1-NH/2,invY(cur.y)-dragOff.y-dragN._fy));
+        if(sel===dragN)tgt={s:cam.s,ox:cam.ox,oy:cam.oy};draw();}
+      return;}
     if(ptrs.size===2){const p=[...ptrs.values()];const d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
       if(startD>0){const ns=Math.max(sMin(),Math.min(3.4,startS*d/startD));
         const mid={x:(p[0].x+p[1].x)/2,y:(p[0].y+p[1].y)/2};
@@ -4878,7 +4898,7 @@ const mapaModule={id:'mapa',num:'M',label:'Mapa rozdělení',render(stage){
     const dx=cur.x-prev.x,dy=cur.y-prev.y;
     if(Math.abs(dx)+Math.abs(dy)>2)dragged=true;
     cam.ox+=dx/cam.s;cam.oy+=dy/cam.s;clampCam(cam);tgt.ox=cam.ox;tgt.oy=cam.oy;draw();});
-  function endPtr(ev){ptrs.delete(ev.pointerId);if(ptrs.size<2)startD=0;cv.style.cursor='grab';}
+  function endPtr(ev){if(dragN&&dragged&&!eLocked())saveMap();ptrs.delete(ev.pointerId);if(ptrs.size<2)startD=0;if(!ptrs.size)dragN=null;cv.style.cursor=eLocked()?'default':'grab';}
   cv.addEventListener('pointerup',ev=>{
     if(!dragged&&ptrs.size===1){const wx=invX(ev.offsetX),wy=invY(ev.offsetY);
       const n=hitNode(wx,wy);
@@ -4886,15 +4906,14 @@ const mapaModule={id:'mapa',num:'M',label:'Mapa rozdělení',render(stage){
       else{const e=hitEdge(wx,wy);if(e){if(e===selEdge)clearSel();else pickEdge(e);}else if(sel||selEdge)clearSel();}}
     endPtr(ev);});
   cv.addEventListener('pointercancel',endPtr);
-  cv.addEventListener('wheel',ev=>{ev.preventDefault();
+  cv.addEventListener('wheel',ev=>{if(eLocked())return;ev.preventDefault();
     const f=ev.deltaY<0?1.14:1/1.14;const ns=Math.max(sMin(),Math.min(3.4,cam.s*f));
     const wx=invX(ev.offsetX),wy=invY(ev.offsetY);
     cam.s=ns;cam.ox=ev.offsetX/ns-wx;cam.oy=ev.offsetY/ns-wy;clampCam(cam);tgt={s:cam.s,ox:cam.ox,oy:cam.oy};draw();},{passive:false});
 
   /* ── zoom buttons + legend ── */
-  const zoomBox=el('div',{style:'position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:6px;z-index:3'});
+  const zoomBox=el('div',{style:'position:absolute;right:10px;bottom:10px;max-height:calc(100% - 20px);display:flex;flex-direction:column;flex-wrap:wrap-reverse;justify-content:flex-end;gap:6px;z-index:3'});
   const zb=(t,fn)=>{const b=el('button',{style:'width:38px;height:38px;padding:0;font-size:17px;line-height:1;background:var(--panel);border:1px solid var(--border);border-radius:10px;color:var(--text);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)'},t);b.addEventListener('click',fn);return b;};
-  let fsOn=false,nativeFS=false;
   function fitH(){if(fsOn)return;const ww=wrap.clientWidth||cv.clientWidth||360;const hh=Math.max(240,Math.min(Math.round(ww*(H0/W0)*0.94+18),Math.min((window.innerHeight||800)*0.64,520)));cv.style.height=hh+'px';}
   let fsPh=null;
   let lgPh=null;
@@ -4931,7 +4950,7 @@ const mapaModule={id:'mapa',num:'M',label:'Mapa rozdělení',render(stage){
     document.body.style.overflow=on?'hidden':'';
     cv.style.height=on?'100%':'';wrap.style.height=on?'100%':'';if(!on)fitH();}
   function afterFS(){[70,260,650].forEach(tt=>setTimeout(()=>{if(fsOn)syncFS(false);fit();if(fsOn&&(sel||selEdge))refocus();cam={s:tgt.s,ox:tgt.ox,oy:tgt.oy};draw();},tt));}
-  function setFS(on){fsOn=on;closeBtn.style.display=on?'':'none';fsBtn.textContent=on?'✕':'⛶';fsBtn.setAttribute('aria-label',on?'Zavřít celou obrazovku':'Celá obrazovka');
+  function setFS(on){fsOn=on;applyLock();closeBtn.style.display=on?'':'none';fsBtn.textContent=on?'✕':'⛶';fsBtn.setAttribute('aria-label',on?'Zavřít celou obrazovku':'Celá obrazovka');
     legendBox.style.top=on?'auto':'10px';legendBox.style.bottom=on?'14px':'auto';
     cssFS(on);syncFS(false);
     if(!nativeFS){[].forEach.call(document.body.children,e=>{if(e!==wrap&&e.tagName!=='SCRIPT')e.inert=on;});
@@ -4959,8 +4978,11 @@ const mapaModule={id:'mapa',num:'M',label:'Mapa rozdělení',render(stage){
       tgt.s=Math.min(3.4,cam.s*1.32);tgt.ox=w/tgt.s-wx;tgt.oy=h/tgt.s-wy;clampCam(tgt);go();}),
     zb('−',()=>{const w=cv.clientWidth/2,h=cv.clientHeight/2;const wx=invX(w),wy=invY(h);
       tgt.s=Math.max(sMin(),cam.s/1.32);tgt.ox=w/tgt.s-wx;tgt.oy=h/tgt.s-wy;clampCam(tgt);go();}),
-    zb('⌂',()=>{clearSel();fit();cam={s:tgt.s,ox:tgt.ox,oy:tgt.oy};draw();}),
+    zb('⌂',()=>{clearSel();const d=dims(),e=ext();tgt.s=sMin();tgt.ox=d.w/(2*tgt.s)-(e.x0+e.x1)/2;tgt.oy=(d.h-padB)/(2*tgt.s)-(e.y0+e.y1)/2;clampCam(tgt);go();}),
+    zb('↺',()=>{resetMap();clearSel();fit();cam={s:tgt.s,ox:tgt.ox,oy:tgt.oy};draw();}),
+    (lockBtn=zb('',()=>{locked=!locked;applyLock();})),
     fsBtn);
+  applyLock();
   wrap.append(zoomBox);
   const closeBtn=el('button',{style:'position:absolute;top:10px;right:10px;z-index:4;display:none;width:40px;height:40px;padding:0;font-size:18px;line-height:1;background:var(--panel);border:1px solid var(--border);border-radius:11px;color:var(--text);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.2)'},'✕');
   closeBtn.addEventListener('click',toggleFS);
@@ -4981,7 +5003,7 @@ const mapaModule={id:'mapa',num:'M',label:'Mapa rozdělení',render(stage){
   const panel=el('div',{style:'margin-top:14px','aria-live':'polite'});
   if(window.ResizeObserver)new ResizeObserver(()=>{if(fsOn&&(sel||selEdge)){const hh=panel.offsetHeight;if(hh!==padB){padB=hh;zoomBox.style.bottom=(hh+10)+'px';refocus();}}}).observe(panel);
   function showIntro(){panel.innerHTML='';
-    panel.append(el('div',{class:'callout',html:'<span class="ic">★</span><div><b>Klikni na rozdělení</b>: zobrazí se, co modeluje, s odkazem do kapitoly. <b>Klikni na čáru mezi dvěma</b>: zobrazí se, proč vazba platí; u některých limit ji ukáže i posuvník. Opětovným kliknutím na vybrané rozdělení nebo čáru se výběr zruší, přiblížení zůstane. Mapou se posouvá tažením prstem či myší, přibližuje prsty, kolečkem nebo tlačítky vpravo dole; tlačítko ⛶ ji roztáhne na celou obrazovku (popis vybraného rozdělení nebo vazby se tam zobrazí ve spodním panelu).</div>'}));}
+    panel.append(el('div',{class:'callout',html:'<span class="ic">★</span><div><b>Klikni na rozdělení</b>: zobrazí se, co modeluje, s odkazem do kapitoly. <b>Klikni na čáru mezi dvěma</b>: zobrazí se, proč vazba platí; u některých limit ji ukáže i posuvník. Opětovným kliknutím na vybrané rozdělení nebo čáru se výběr zruší, přiblížení zůstane. Mapou se posouvá tažením prstem či myší, přibližuje prsty, kolečkem nebo tlačítky vpravo dole. Jednotlivá rozdělení si můžeš přesouvat tažením (rozložení se v prohlížeči zapamatuje), tlačítko ⌂ mapu oddálí celou na střed, tlačítko ↺ vrátí původní rozložení uzlů. Na dotykových zařízeních je mapa zamčená, aby nebránila rolování stránky; odemkneš ji tlačítkem se zámkem (🔒 / 🔓); tlačítko ⛶ ji roztáhne na celou obrazovku (popis vybraného rozdělení nebo vazby se tam zobrazí ve spodním panelu).</div>'}));}
 
   const NODE2DIST={bern:'bernoulli',bin:'binomial',pois:'poisson',geom:'geometric',unif:'uniform',norm:'normal',exp:'exponential',weib:'weibull'};
   const NODE2STAT={chi2:'chi',tdist:'t',fdist:'f'};
@@ -5639,8 +5661,8 @@ function wireChrome(){const d=document.getElementById('drawer'),b=document.getEl
   document.getElementById('settingsBtn').addEventListener('click',()=>{d.classList.remove('open');p.classList.toggle('open');refresh();});
   b.addEventListener('click',()=>{d.classList.remove('open');p.classList.remove('open');refresh();});
   const tab=document.getElementById('drawerTab');if(tab)tab.addEventListener('click',()=>{p.classList.remove('open');d.classList.add('open');refresh();});let tsx=0,tsy=0,track=false,wasOpen=false;window.addEventListener('touchstart',e=>{const t=e.touches[0];wasOpen=d.classList.contains('open');if(t.clientX<28||wasOpen){tsx=t.clientX;tsy=t.clientY;track=true;}else track=false;},{passive:true});window.addEventListener('touchend',e=>{if(!track)return;track=false;const t=e.changedTouches[0],dx=t.clientX-tsx,dy=t.clientY-tsy;if(Math.abs(dx)<55||Math.abs(dy)>Math.abs(dx))return;if(dx>0&&!wasOpen){p.classList.remove('open');d.classList.add('open');}else if(dx<0&&wasOpen){d.classList.remove('open');}refresh();},{passive:true});window.addEventListener('keydown',e=>{if(e.key==='Escape'){const wd=d.classList.contains('open'),wp=p.classList.contains('open');d.classList.remove('open');p.classList.remove('open');refresh();if(wd&&mb)mb.focus();else if(wp&&sb)sb.focus();}});}
-function boot(){const _sk=document.getElementById('skipLink');if(_sk)_sk.addEventListener('click',e=>{e.preventDefault();const h=stageEl.querySelector('h2');if(h){h.setAttribute('tabindex','-1');h.focus();}else stageEl.focus();});(function(){const tag=()=>{stageEl.querySelectorAll('[data-nav]:not([tabindex])').forEach(a=>{a.setAttribute('tabindex','0');a.setAttribute('role','link');});};new MutationObserver(tag).observe(stageEl,{childList:true,subtree:true});stageEl.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('[data-nav]')){e.preventDefault();e.target.click();}});})();buildNav();{const sv=Store.get('odnahody.vzhled',null);if(sv&&sv.m==='dark')mode='dark';if(sv&&(sv.f==='white'||sv.f==='grey')){fbg=sv.f;applyFbg();}applyThemeCore(sv&&typeof sv.t==='string'&&Object.prototype.hasOwnProperty.call(THEMES,sv.t)?sv.t:'flkr');}wireChrome();
-  window.addEventListener('storage',e=>{if(e.key!=='odnahody.vzhled')return;try{const v=JSON.parse(e.newValue||'null');if(v&&typeof v.t==='string'&&Object.prototype.hasOwnProperty.call(THEMES,v.t)){mode=v.m==='dark'?'dark':'light';fbg=(v.f==='white'||v.f==='grey')?v.f:'tint';applyFbg();applyThemeCore(v.t);softRefresh();}}catch(err){}});
+function boot(){const _sk=document.getElementById('skipLink');if(_sk)_sk.addEventListener('click',e=>{e.preventDefault();const h=stageEl.querySelector('h2');if(h){h.setAttribute('tabindex','-1');h.focus();}else stageEl.focus();});(function(){const tag=()=>{stageEl.querySelectorAll('[data-nav]:not([tabindex])').forEach(a=>{a.setAttribute('tabindex','0');a.setAttribute('role','link');});};new MutationObserver(tag).observe(stageEl,{childList:true,subtree:true});stageEl.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('[data-nav]')){e.preventDefault();e.target.click();}});})();buildNav();{const sv=Store.get('odnahody.vzhled',null);if(sv&&sv.m==='dark')mode='dark';if(sv&&(sv.f==='tint'||sv.f==='grey'))fbg=sv.f;applyFbg();applyThemeCore(sv&&typeof sv.t==='string'&&Object.prototype.hasOwnProperty.call(THEMES,sv.t)?sv.t:'flkr');}wireChrome();
+  window.addEventListener('storage',e=>{if(e.key!=='odnahody.vzhled')return;try{const v=JSON.parse(e.newValue||'null');if(v&&typeof v.t==='string'&&Object.prototype.hasOwnProperty.call(THEMES,v.t)){mode=v.m==='dark'?'dark':'light';fbg=(v&&(v.f==='tint'||v.f==='grey'))?v.f:'white';applyFbg();applyThemeCore(v.t);softRefresh();}}catch(err){}});
   stageEl.addEventListener('click',e=>{const t=e.target.closest('[data-nav]');if(!t)return;e.preventDefault();
     if(t.dataset.dist)window.__chapFocus={t:'dist',k:t.dataset.dist};
     else if(t.dataset.stat)window.__chapFocus={t:'stat',k:t.dataset.stat};
