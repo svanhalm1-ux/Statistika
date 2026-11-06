@@ -669,6 +669,35 @@ table.ct tbody tr:hover{background:color-mix(in srgb,var(--text) 4%,transparent)
 @media(hover:none){.chapcard::after{display:none}}
 @media(prefers-reduced-motion:reduce){.chapcard{animation:none}.chapcard:hover,.chapnav a:hover,.door:hover:not(.disabled){transform:none}}
 @media print{html::before,html::after{display:none}.card,.q,.chapcard,.stat{box-shadow:none!important}}
+
+/* ---------- Theme colour: light mode takes on each theme's hue ----------
+   Light mode used one shared neutral for every theme, so themes differed only in
+   accent. Surfaces are now tinted from the theme accent (var(--teal)). */
+html:not(.m-dark){
+  --surf:color-mix(in srgb,var(--panel) 96%,var(--teal));
+  --surf2:color-mix(in srgb,var(--panel2) 93%,var(--teal));
+}
+html:not(.m-dark)::before{
+  background:
+    radial-gradient(900px 520px at 8% -8%,color-mix(in srgb,var(--teal) 15%,transparent),transparent 70%),
+    radial-gradient(800px 560px at 96% -4%,color-mix(in srgb,var(--amber) 11%,transparent),transparent 68%),
+    color-mix(in srgb,var(--bg) 98%,var(--teal))}
+html:not(.m-dark) .topbar{background:color-mix(in srgb,color-mix(in srgb,var(--bg) 97%,var(--teal)) 78%,transparent)}
+html:not(.m-dark) .drawer{background:color-mix(in srgb,var(--surf) 94%,transparent)}
+html:not(.m-dark) .card,html:not(.m-dark) .chapcard,html:not(.m-dark) .q,html:not(.m-dark) .chapnav a{background:var(--surf)}
+html:not(.m-dark) .stat,html:not(.m-dark) .opt,html:not(.m-dark) .symleg,html:not(.m-dark) .distinfo{background:var(--surf2)}
+html:not(.m-dark) .chart-wrap{background:color-mix(in srgb,var(--bg) 72%,transparent)}
+html:not(.m-dark) .hero{background:
+    radial-gradient(600px 300px at 85% 0%,color-mix(in srgb,var(--amber) 20%,transparent),transparent 70%),
+    radial-gradient(520px 320px at 0% 100%,color-mix(in srgb,var(--teal) 22%,transparent),transparent 70%),
+    var(--surf)}
+html:not(.m-dark) .chapcard .cnum{background:color-mix(in srgb,var(--teal) 14%,transparent);color:var(--text)}
+
+/* ---------- Hover: card keeps its surface, the chapter-number pill lights up ---------- */
+html.m-dark .chapcard:hover,html.m-dark .chapnav a:hover{background:var(--panel)}
+html:not(.m-dark) .chapcard:hover,html:not(.m-dark) .chapnav a:hover{background:var(--surf)}
+html .chapcard:hover .cnum{background:color-mix(in srgb,var(--amber) 24%,transparent);color:var(--amber);box-shadow:0 0 0 1px color-mix(in srgb,var(--amber) 38%,transparent)}
+html:not(.m-dark) .chapcard:hover .cnum{background:color-mix(in srgb,var(--amber) 22%,var(--surf));color:color-mix(in srgb,var(--amber) 75%,var(--text))}
 </style>
 </head>
 <body>
