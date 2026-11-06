@@ -3651,10 +3651,10 @@ const quizModule={id:'quiz',num:'27',label:'Kvíz',render(stage){
     if(!saved.items.length)saved=newSet();
     Store.set(QKEY,saved);total=saved.items.length;scoreEl.textContent='0 / '+total;{const nG=saved.items.filter(x=>x.t==='G').length,nT=total-nG;if(LENS.indexOf(total)>-1){LEN=total;N_T=SPLIT[LEN][0];N_G=SPLIT[LEN][1];}else{N_T=nT;N_G=nG;}lenSel.value=LENS.indexOf(total)>-1?String(total):lenSel.value;updInfo();}
     saved.items.forEach((it,idx)=>{const qd=el('div',{class:'q'});
-      let qtext,opts,correct,expl,order;
-      if(it.t==='T'){const b=QBANK[QIDX.get(it.id)];qtext=el('div',{class:'qt'},b.q);opts=b.o;correct=b.a;expl=el('div',{class:'explain'},b.e);
+      let qtext,opts,correct,expl,order,fillX;
+      if(it.t==='T'){const b=QBANK[QIDX.get(it.id)];qtext=el('div',{class:'qt'},b.q);opts=b.o;correct=b.a;expl=el('div',{class:'explain'});fillX=()=>{expl.textContent=b.e;};
         order=(Array.isArray(it.perm)&&it.perm.length===4&&[0,1,2,3].every(v=>it.perm.indexOf(v)>-1))?it.perm:[0,1,2,3];}
-      else{qtext=el('div',{class:'qt',html:safeHtml(it.q)});opts=it.o;correct=it.a;expl=el('div',{class:'explain',html:'<b>Řešení:</b> '+safeHtml(it.e)});order=[0,1,2,3];}
+      else{qtext=el('div',{class:'qt',html:safeHtml(it.q)});opts=it.o;correct=it.a;expl=el('div',{class:'explain'});fillX=()=>{expl.innerHTML='<b>Řešení:</b> '+safeHtml(it.e);};order=[0,1,2,3];}
       qd.append(el('div',{class:'qn'},'Otázka '+(idx+1)+(it.t==='G'?' · výpočet':'')),qtext);
       expl.style.display='none';let selected=-1;
       const optBtns=opts.map((o,oi)=>{const bt=el('button',{class:'opt'},el('span',{class:'optl'}),document.createTextNode(o));
@@ -3663,7 +3663,7 @@ const quizModule={id:'quiz',num:'27',label:'Kvíz',render(stage){
       const finish=remember=>{if(qd.dataset.done||selected<0)return;qd.dataset.done='1';
         optBtns.forEach((bb,bi)=>{bb.disabled=true;bb.classList.remove('sel');if(bi===correct)bb.classList.add('correct');});
         if(selected===correct){score++;}else optBtns[selected].classList.add('wrong');
-        expl.style.display='block';confirmBtn.style.display='none';scoreEl.textContent=score+' / '+total+(list.querySelectorAll('[data-done="1"]').length>=total?' — hotovo ('+Math.round(100*score/total)+' %)':'');expl.setAttribute('role','status');if(remember){try{expl.setAttribute('tabindex','-1');expl.focus({preventScroll:true});}catch(e){}}
+        fillX();expl.style.display='block';confirmBtn.style.display='none';scoreEl.textContent=score+' / '+total+(list.querySelectorAll('[data-done="1"]').length>=total?' — hotovo ('+Math.round(100*score/total)+' %)':'');expl.setAttribute('role','status');if(remember){try{expl.setAttribute('tabindex','-1');expl.focus({preventScroll:true});}catch(e){}}
         if(remember){let write=true;try{const cs=Store.get(QKEY,null);if(cs&&Array.isArray(cs.items)&&cs.ans&&typeof cs.ans==='object'){if(JSON.stringify(cs.items)===JSON.stringify(saved.items))saved.ans=Object.assign({},cs.ans,saved.ans);else write=false;}}catch(e){}saved.ans[idx]=selected;if(write)Store.set(QKEY,saved);else{expl.append(el('div',{style:'margin-top:8px;font-size:12.5px;color:var(--muted)'},'Pozor: sada se mezitím změnila v jiné záložce, tato odpověď se neuloží.'));}}};
       const confirmBtn=btn('Potvrdit odpověď','teal',()=>finish(true));confirmBtn.disabled=true;
       qd.append(el('div',{class:'btn-row'},confirmBtn),expl);list.append(qd);
@@ -4411,10 +4411,11 @@ const practiceModule={id:'practice',num:'26',label:'Procvičování',render(stag
         bt.addEventListener('click',()=>{if(cur.done)return;mcSel=oi;mcBtns.forEach((bb,bi)=>{bb.classList.toggle('sel',bi===oi);bb.setAttribute('aria-pressed',bi===oi?'true':'false');});});return bt;});
       cur.order.forEach((oi,pos)=>{mcBtns[oi].firstChild.textContent=optLetter(pos)+')';optsEl.append(mcBtns[oi]);});}
     optsEl.style.display=cur.mc?'':'none';input.style.display=cur.mc?'none':'';
-    qEl.innerHTML=nbp(cur.q);input.value='';feedback.textContent='';feedback.className='pfeedback';solEl.style.display='none';solEl.innerHTML='<b>Řešení:</b> '+nbp(cur.sol);if(typeof solBtn!=='undefined'&&solBtn)solBtn.textContent='Zobrazit řešení';if(typeof updLegend==='function')updLegend();if(!(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches))input.focus();}
+    qEl.innerHTML=nbp(cur.q);input.value='';feedback.textContent='';feedback.className='pfeedback';solEl.style.display='none';solEl.innerHTML='';if(typeof solBtn!=='undefined'&&solBtn)solBtn.textContent='Zobrazit řešení';if(typeof updLegend==='function')updLegend();if(!(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches))input.focus();}
   function markMC(){if(!cur||!cur.mc)return;mcBtns.forEach((bb,bi)=>{if(bi===cur.a)bb.classList.add('correct');});}
-  function reveal(){solEl.style.display='block';if(solBtn)solBtn.textContent='Skrýt řešení';markMC();updLegend();}
-  function toggleSol(){const vis=solEl.style.display==='block';solEl.style.display=vis?'none':'block';solBtn.textContent=vis?'Zobrazit řešení':'Skrýt řešení';if(!vis){markMC();if(cur)cur.peeked=true;}updLegend();}
+  function fillSol(){if(cur)solEl.innerHTML='<b>Řešení:</b> '+nbp(cur.sol);}
+  function reveal(){fillSol();solEl.style.display='block';if(solBtn)solBtn.textContent='Skrýt řešení';markMC();updLegend();}
+  function toggleSol(){const vis=solEl.style.display==='block';if(!vis)fillSol();solEl.style.display=vis?'none':'block';solBtn.textContent=vis?'Zobrazit řešení':'Skrýt řešení';if(!vis){markMC();if(cur)cur.peeked=true;}updLegend();}
   function checkMC(){if(cur.done){return;}if(mcSel<0){feedback.textContent='Vyber jednu z možností a–d.';feedback.className='pfeedback';return;}
     const ok=mcSel===cur.a;cur.done=true;mcBtns.forEach(bb=>{bb.disabled=true;bb.classList.remove('sel');});
     if(!ok)mcBtns[mcSel].classList.add('wrong');
