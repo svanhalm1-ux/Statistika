@@ -698,6 +698,15 @@ html.m-dark .chapcard:hover,html.m-dark .chapnav a:hover{background:var(--panel)
 html:not(.m-dark) .chapcard:hover,html:not(.m-dark) .chapnav a:hover{background:var(--surf)}
 html .chapcard:hover .cnum{background:color-mix(in srgb,var(--amber) 24%,transparent);color:var(--amber);box-shadow:0 0 0 1px color-mix(in srgb,var(--amber) 38%,transparent)}
 html:not(.m-dark) .chapcard:hover .cnum{background:color-mix(in srgb,var(--amber) 22%,var(--surf));color:color-mix(in srgb,var(--amber) 75%,var(--text))}
+
+/* ---------- Accent fill (FLKŘ keeps its lighter green in light mode; text/links stay dark for contrast) ---------- */
+.btn.teal{color:var(--btn-ink-t,var(--btn-ink));
+  background:linear-gradient(180deg,color-mix(in srgb,var(--teal-fill,var(--teal)) 90%,#fff),var(--teal-fill,var(--teal)));
+  box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 8px 20px -10px var(--teal-fill,var(--teal))}
+input[type=range]::-webkit-slider-thumb{background:var(--teal-fill,var(--teal));box-shadow:0 0 0 1px color-mix(in srgb,var(--teal-fill,var(--teal)) 70%,#000),0 4px 10px -2px color-mix(in srgb,var(--teal-fill,var(--teal)) 60%,transparent)}
+input[type=range]::-moz-range-thumb{background:var(--teal-fill,var(--teal))}
+.stat.teal::before{background:var(--teal-fill,var(--teal))}
+.eyebrow::before{background:linear-gradient(90deg,var(--amber),var(--teal-fill,var(--teal)))}
 </style>
 </head>
 <body>
@@ -1590,7 +1599,7 @@ html:not(.m-dark) .chapcard:hover .cnum{background:color-mix(in srgb,var(--amber
 <p>Kritická hodnota pro <span class="m mm nw" data-h="n = 10"><math><mi>n</mi></math><math><mrow><mo>=</mo><mn>10</mn></mrow></math></span> a oboustranné <span class="m mm nw" data-h="α = 0,05"><math><mi>α</mi></math><math><mrow><mo>=</mo><mn>0</mn><mo separator="true" lspace="0em" rspace="0em">,</mo><mn>05</mn></mrow></math></span> je 8. Platí 4 ≤ 8, <span class="m mm nw" data-h="H&lt;sub&gt;0&lt;/sub&gt;"><math><msub><mi>H</mi><mn>0</mn></msub></math></span> zamítáme (přesná p-hodnota 0,014). Wilcoxonův test využil velikost rozdílů, a proto na rozdíl od znaménkového testu efekt odhalil.</p></div>
 <p>Pro <span class="m mm nw" data-h="n"><math><mi>n</mi></math></span> zhruba nad 20 se používá normální aproximace pro kterýkoli z obou součtů (<span class="m mm nw" data-h="W&lt;sup&gt;+&lt;/sup&gt;"><math><msup><mi>W</mi><mo lspace="0em" rspace="0em">+</mo></msup></math></span> nebo <span class="m mm nw" data-h="W&lt;sup&gt;−&lt;/sup&gt;"><math><msup><mi>W</mi><mo lspace="0em" rspace="0em">−</mo></msup></math></span>), obecně značený <span class="m mm nw" data-h="W"><math><mi>W</mi></math></span>, s <span class="m mm nw" data-h="E(W) = n(n+1)/4"><math><mrow><mi>E</mi><mo form="prefix" stretchy="false">(</mo><mi>W</mi><mo form="postfix" stretchy="false">)</mo></mrow></math><math><mrow><mo>=</mo><mi>n</mi><mo form="prefix" stretchy="false">(</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo form="postfix" stretchy="false">)</mo><mi>/</mi><mn>4</mn></mrow></math></span> a <span class="m mm nw" data-h="D(W) = n(n+1)(2n+1)/24"><math><mrow><mi>D</mi><mo form="prefix" stretchy="false">(</mo><mi>W</mi><mo form="postfix" stretchy="false">)</mo></mrow></math><math><mrow><mo>=</mo><mi>n</mi><mo form="prefix" stretchy="false">(</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo form="postfix" stretchy="false">)</mo><mo form="prefix" stretchy="false">(</mo><mn>2</mn><mi>n</mi><mo>+</mo><mn>1</mn><mo form="postfix" stretchy="false">)</mo><mi>/</mi><mn>24</mn></mrow></math></span>. Simulace níže počítá p-hodnotu <b>přesně</b> z rozdělení <span class="m mm nw" data-h="W"><math><mi>W</mi></math></span>, pokud je rozdílů méně než 50, žádný z nich není nulový a žádné dva nemají stejnou absolutní hodnotu; jinak použije tuto aproximaci (při shodách je p-hodnota jen přibližná a prahy se v různém software liší). V závorce za p-hodnotou je uvedeno, který způsob se použil. Test předpokládá, že rozdělení rozdílů je za <span class="m mm nw" data-h="H&lt;sub&gt;0&lt;/sub&gt;"><math><msub><mi>H</mi><mn>0</mn></msub></math></span> symetrické kolem nuly; bez symetrie netestuje medián, a pro hypotézu o mediánu je pak vhodnější znaménkový test.</p>
 <p>Znaménkový i Wilcoxonův test se dají použít i pro <b>jeden výběr</b> proti mediánu <span class="m mm nw" data-h="m&lt;sub&gt;0&lt;/sub&gt;"><math><msub><mi>m</mi><mn>0</mn></msub></math></span>: místo rozdílů po − před se vezmou rozdíly <span class="m mm nw" data-h="x&lt;sub&gt;i&lt;/sub&gt; − m&lt;sub&gt;0&lt;/sub&gt;"><math><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo></mrow><mrow><msub><mi>m</mi><mn>0</mn></msub></mrow></math></span>.</p>
-<div class="callout"><span class="ic">!</span><div>Párový návrh je vlastnost <i>sběru dat</i>. Dvouvýběrový test použitý na párová data ztrácí sílu, protože do rozptylu započítá i rozdíly mezi jednotkami.</div></div>
+<div class="callout"><span class="ic">!</span><div>Párový návrh je vlastnost <i>sběru dat</i>. Dvouvýběrový test použitý na párová data ztrácí sílu, protože do rozptylu započítá i rozdíly mezi jednotkami. Dlaždice „dvouvýběrový“ v simulátoru počítá Welchův test (jako kalkulačka v kap. 18); protože „před“ a „po“ mají stejný počet hodnot, vychází u něj stejné <i>t</i> jako u klasického dvouvýběrového testu, liší se jen stupně volnosti.</div></div>
 <p><a class="kx" data-nav="param">→ 18 · Parametrické testy</a> · <a class="kx" data-nav="nonparam">→ 21 · Neparametrické testy</a></p>
 <p><a class="kx" data-nav="ht">→ 15 · Testování hypotéz</a></p>
 </div>
@@ -3703,7 +3712,7 @@ const covModule={id:'cov',num:'11',label:'Korelace',render(stage){
   c.append(el('div',{class:'btn-row'},btn('Nová data','teal',gen),btn('Lineární','ghost',()=>{mode='linear';gen();}),btn('Parabola (r≈0)','ghost',()=>{mode='quad';gen();}),btn('Kruh (r≈0)','ghost',()=>{mode='circle';gen();})));
   c.append(legend([{c:hexA(C.teal,.7),t:'data'},{c:C.amber,t:'regresní přímka (jen v lineárním režimu)'}]));
   c.append(cc.w,S.wrap);stage.append(c);
-  c.append(starHint('Nastav <b>ρ = 0,5</b> a klikej na <b>Nová data</b>: při 30 bodech výběrové r kolísá zhruba mezi 0,2 a 0,7, při 500 bodech obvykle jen mezi 0,43 a 0,56. Pak zvol <b>Parabola</b>: závislost je zřejmá, přesto vyjde r ≈ 0, protože r měří jen přímkový vztah.'));appendAppHint(stage);
+  c.append(starHint('Nastav <b>ρ = 0,5</b> a klikej na <b>Nová data</b>: při 30 bodech výběrové r vyjde asi v 95 % pokusů mezi 0,18 a 0,73, při 500 bodech mezi 0,43 a 0,56. Pak zvol <b>Parabola</b>: závislost je zřejmá, přesto vyjde r ≈ 0, protože r měří jen přímkový vztah.'));appendAppHint(stage);
   gen();setTimeout(draw,40);
   (window.__softHooks=window.__softHooks||[]).push(draw);
 }};
@@ -3827,11 +3836,11 @@ const bootModule={id:'boot',num:'22',label:'Bootstrap',render(stage){
 
 let currentTheme='flkr';let mode='light';
 const THEMES={
-  flkr:{name:'FLKŘ (UTB)',bg:'#111310',bg2:'#0C0D0A',panel:'#191C17',panel2:'#22261E',raised:'#2C3126',border:'#353A2C',text:'#EFF1E9',muted:'#9DA491',faint:'#898F7E',amber:'#E37222',teal:'#C9DD03',coral:'#F27F76',violet:'#7EA3C4',green:'#8FC24B'},
+  flkr:{name:'FLKŘ (UTB)',bg:'#111310',bg2:'#0C0D0A',panel:'#191C17',panel2:'#22261E',raised:'#2C3126',border:'#353A2C',text:'#EFF1E9',muted:'#9DA491',faint:'#898F7E',amber:'#E37222',teal:'#C9DD03',coral:'#F27F76',violet:'#7EA3C4',green:'#8FC24B',lightFill:'#C8D010',lightInk:'#14200A'},
   midnight:{name:'Půlnoc',bg:'#0E1322',bg2:'#0B0F1B',panel:'#151C2E',panel2:'#1B2540',raised:'#202B49',border:'#28324F',text:'#EAEEF8',muted:'#8B96B4',faint:'#868FA7',amber:'#F4B740',teal:'#34D2C8',coral:'#FF6B81',violet:'#9D8DF1',green:'#5FD68A'},
-  carbon:{name:'Uhlík',bg:'#0D0F13',bg2:'#090A0D',panel:'#16191F',panel2:'#1D2129',raised:'#262B34',border:'#2F343E',text:'#ECEEF2',muted:'#949BA7',faint:'#848A94',amber:'#F5BA45',teal:'#F06BDA',coral:'#FF6E8A',violet:'#B49BFA',green:'#57D98A'},
+  carbon:{name:'Uhlík',bg:'#0D0F13',bg2:'#090A0D',panel:'#16191F',panel2:'#1D2129',raised:'#262B34',border:'#2F343E',text:'#ECEEF2',muted:'#949BA7',faint:'#848A94',amber:'#F5BA45',teal:'#F06BDA',coral:'#FF7A55',violet:'#B49BFA',green:'#57D98A'},
   forest:{name:'Les',bg:'#0D1614',bg2:'#091110',panel:'#132420',panel2:'#193029',raised:'#21423A',border:'#274A40',text:'#E8F0EA',muted:'#8CA79A',faint:'#83998E',amber:'#E8B24C',teal:'#4CD98A',coral:'#F4896B',violet:'#83C6E6',green:'#B4E05C'},
-  wine:{name:'Vínová',bg:'#15111F',bg2:'#100C18',panel:'#1E1830',panel2:'#271E3F',raised:'#322751',border:'#392B57',text:'#EFEAF6',muted:'#A093B6',faint:'#9387A7',amber:'#F3D35F',teal:'#FF6B5E',coral:'#FF8FBF',violet:'#B79BF7',green:'#6FD99A'},
+  wine:{name:'Vínová',bg:'#15111F',bg2:'#100C18',panel:'#1E1830',panel2:'#271E3F',raised:'#322751',border:'#392B57',text:'#EFEAF6',muted:'#A093B6',faint:'#9387A7',amber:'#F3D35F',teal:'#FF8FBF',coral:'#FF6B5E',violet:'#B79BF7',green:'#6FD99A'},
   ember:{name:'Meď',bg:'#14110D',bg2:'#0F0C08',panel:'#1F1A14',panel2:'#29221A',raised:'#342A1F',border:'#3B2F23',text:'#F1ECE3',muted:'#A99C89',faint:'#948A7B',amber:'#F0A63C',teal:'#A98BFF',coral:'#EE7B6B',violet:'#9DB4E8',green:'#86C77E'}
 };
 function buildThemeBar(){const bar=document.getElementById('themebar');if(!bar)return;bar.innerHTML='';
@@ -3839,7 +3848,7 @@ function buildThemeBar(){const bar=document.getElementById('themebar');if(!bar)r
   const row=el('div',{class:'swatches'});
   const light=(mode==='light');
   Object.keys(THEMES).forEach(key=>{const t=THEMES[key];
-    const bg=light?LIGHT.bg:t.bg,ca=light?darkenTo(t.amber,.46):t.amber,ct=light?darkenTo(t.teal,.46):t.teal,cc=light?darkenTo(t.coral,.5):t.coral;
+    const bg=light?LIGHT.bg:t.bg,ca=light?darkenTo(t.amber,.46):t.amber,ct=light?(t.lightFill||darkenTo(t.teal,.46)):t.teal,cc=light?darkenTo(t.coral,.5):t.coral;
     const sw=el('div',{class:'swatch'+(key===currentTheme?' active':''),role:'button',tabindex:'0',title:t.name,'aria-label':'Motiv '+t.name,'aria-pressed':key===currentTheme?'true':'false',style:'background:'+bg,onClick:()=>applyTheme(key)},
       el('i',{style:'background:'+ca}),el('i',{style:'background:'+ct}),el('i',{style:'background:'+cc}));
     sw.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();applyTheme(key);}});
@@ -3856,7 +3865,7 @@ function applyThemeCore(key){const t=THEMES[key];if(!t)return;currentTheme=key;c
   set('border-soft',hexA(N.muted,.16));set('text',N.text);set('muted',N.muted);set('faint',N.faint);set('prose',N.prose);set('grid',hexA(N.muted,.14));
   set('amber',amber);set('teal',teal);set('coral',coral);set('violet',violet);set('green',green);
   set('amber-d',hexA(amber,.15));set('teal-d',hexA(teal,.14));set('coral-d',hexA(coral,.16));{const pas=mixHex(t.teal,'#FFFFFF',light?.5:.4);set('tint-a',hexA(pas,light?.08:.08));set('tint-b',hexA(pas,light?.3:.26));}
-  set('btn-ink',light?'#FFFFFF':'#151208');const mixc=(a,b,t)=>{const A=parseInt(a.slice(1),16),B=parseInt(b.slice(1),16);const f=(x,y)=>Math.round(x+(y-x)*t),H=x=>x.toString(16).padStart(2,'0');return '#'+H(f(A>>16&255,B>>16&255))+H(f(A>>8&255,B>>8&255))+H(f(A&255,B&255));};const sbv=mixc(N.bg,N.muted,light?.6:.5),sbhv=mixc(N.bg,N.muted,light?.82:.78);set('sb',sbv);set('sb-h',sbhv);r.setProperty('color-scheme',light?'light':'dark');r.setProperty('scrollbar-color',sbv+' transparent');if(document.body)document.body.style.scrollbarColor=sbv+' transparent';
+  set('btn-ink',light?'#FFFFFF':'#151208');set('teal-fill',(light&&t.lightFill)?t.lightFill:teal);set('btn-ink-t',(light&&t.lightInk)?t.lightInk:(light?'#FFFFFF':'#151208'));const mixc=(a,b,t)=>{const A=parseInt(a.slice(1),16),B=parseInt(b.slice(1),16);const f=(x,y)=>Math.round(x+(y-x)*t),H=x=>x.toString(16).padStart(2,'0');return '#'+H(f(A>>16&255,B>>16&255))+H(f(A>>8&255,B>>8&255))+H(f(A&255,B&255));};const sbv=mixc(N.bg,N.muted,light?.6:.5),sbhv=mixc(N.bg,N.muted,light?.82:.78);set('sb',sbv);set('sb-h',sbhv);r.setProperty('color-scheme',light?'light':'dark');r.setProperty('scrollbar-color',sbv+' transparent');if(document.body)document.body.style.scrollbarColor=sbv+' transparent';
   set('hero-bg',light?N.panel:t.panel);
   set('hero-fade',light?hexA(N.bg,.82):hexA(t.bg2,.82));
   C.bg=N.bg;C.panel=N.panel;C.panel2=N.panel2;C.raised=N.raised;C.text=N.text;C.muted=N.muted;C.faint=N.faint;C.grid=hexA(N.muted,.14);
@@ -4644,7 +4653,8 @@ const podilModule={id:'podil',num:'16',label:'Podíl',render(stage){
     if(bad){let w='';
       if(badCI)w+='interval: n·p̂ = '+fmt(n*ph,1)+' nebo n·(1−p̂) = '+fmt(n*(1-ph),1)+' je pod 5, normální aproximace intervalu je tady nespolehlivá';
       if(badT)w+=(w?'; ':'')+'test: n·p₀ = '+fmt(n*p0,1)+' nebo n·(1−p₀) = '+fmt(n*(1-p0),1)+' je pod 5, normální aproximace testu je tady nespolehlivá';
-      warn.innerHTML='<span class="ic">!</span><div><b>Podmínka aproximace neplatí</b> ('+w+'). Zvětši n, nebo posuň '+(badT&&!badCI?'p₀':'p')+' dál od okraje.</div>';}
+      const clip=(badCI&&(last.lo<0||last.hi>1))?' Waldův interval tu vychází ('+pct(last.lo,1)+'; '+pct(last.hi,1)+'); v dlaždici je ořezaný na 0–100 %.':'';
+      warn.innerHTML='<span class="ic">!</span><div><b>Podmínka aproximace neplatí</b> ('+w+'). Zvětši n, nebo posuň '+(badT&&!badCI?'p₀':'p')+' dál od okraje.'+clip+'</div>';}
     draw();}
   function sim1000(){for(let i=0;i<1000;i++){const x=drawPoll();const ph=x/n,se=Math.sqrt(ph*(1-ph)/n);
       sims.push(ph);coverAll++;if(p>=ph-1.96*se&&p<=ph+1.96*se)coverIn++;}
@@ -4744,7 +4754,7 @@ const pairModule={id:'pair',num:'20',label:'Párové testy',render(stage){
     d=after.map((a,i)=>a-before[i]);sv0=d.length?{a:after[0],d:d[0]}:null;applyOut();
     upd();}
   function applyOut(){if(!d.length)return;if(outlier){after[0]=before[0]-5.5;d[0]=-5.5;}else if(sv0){after[0]=sv0.a;d[0]=sv0.d;}}
-  const st=statBlocks([{key:'t',label:'párový t-test',color:'teal'},{key:'sg',label:'znaménkový test',color:'amber'},{key:'w',label:'Wilcoxonův párový',color:'violet'},{key:'two',label:'dvouvýběrový (ignoruje páry)',color:'coral'}]);
+  const st=statBlocks([{key:'t',label:'párový t-test',color:'teal'},{key:'sg',label:'znaménkový test',color:'amber'},{key:'w',label:'Wilcoxonův párový',color:'violet'},{key:'two',label:'dvouvýběrový Welch (ignoruje páry)',color:'coral'}]);
   const cc=chartCanvas(true);const ch=new Chart(cc.cv,{padL:50,padR:14,padB:40});
   const fp=p=>p<0.001?'p < 0,001':'p = '+fmt(p,3);
   function upd(){const pt=pairedT(d),ps=signTestP(d),pwx=wilcoxonPx(d),pw=pwx.p,p2=welchT(before,after).p;
