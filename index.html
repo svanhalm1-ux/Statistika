@@ -4475,14 +4475,14 @@ const practiceModule={id:'practice',num:'26',label:'Procvičování',render(stag
   PARTS.forEach(pp=>{const og=el('optgroup',{label:'Část '+pp[1]});og.append(el('option',{value:pp[0]},'Celá část '+pp[1].split(' · ')[0]));
     pp[2].forEach(k=>og.append(el('option',{value:k},CH[k][0])));sel.append(og);});
   sel.value=topic;sel.setAttribute('aria-label','Okruh');
-  const TYPES=[['mix','Výpočty i teorie'],['calc','Jen výpočty'],['theory','Jen teorie']];
+  const TYPES=[['mix','Výpočty i teorie'],['calc','Jen výpočty'],['theory','Jen teorie'],['formula','Jen vzorce']];
   let typ=Store.get('odnahody.procvicovani.typ','mix');if(!TYPES.some(t=>t[0]===typ))typ='mix';
   const typSel=el('select',{'aria-label':'Typ úloh'});TYPES.forEach(t=>typSel.append(el('option',{value:t[0]},t[1])));typSel.value=typ;
   const typNote=el('span',{style:'font-size:12.5px;color:var(--faint)'});
   // skutečný režim: když okruh nemá výpočty (Paradoxy, Historie) nebo teorii, volba se přepne na to, co existuje
-  const effTyp=()=>{const hasG=TOPICS[topic].length>0,hasT=THEO[topic].length>0;if(!hasG)return 'theory';if(!hasT)return 'calc';return typ;};
+  const effTyp=()=>{const hasG=TOPICS[topic].length>0,hasT=THEO[topic].length>0;if(!hasG)return 'theory';if(typ==='formula')return 'formula';if(!hasT)return 'calc';return typ;};
   const syncTyp=()=>{const hasG=TOPICS[topic].length>0,hasT=THEO[topic].length>0;
-    [...typSel.options].forEach(o=>{o.disabled=(o.value==='calc'&&!hasG)||(o.value==='theory'&&!hasT)||(o.value==='mix'&&!(hasG&&hasT));});
+    [...typSel.options].forEach(o=>{o.disabled=((o.value==='calc'||o.value==='formula')&&!hasG)||(o.value==='theory'&&!hasT)||(o.value==='mix'&&!(hasG&&hasT));});
     typSel.value=effTyp();typNote.textContent=effTyp()!==typ?'V tomto okruhu je dostupná jen jedna varianta.':'';};
   sel.addEventListener('change',()=>{topic=sel.value;Store.set('odnahody.procvicovani.okruh',topic);syncTyp();newProblem();showScore();});
   typSel.addEventListener('change',()=>{typ=typSel.value;Store.set('odnahody.procvicovani.typ',typ);syncTyp();newProblem();});
@@ -4504,11 +4504,25 @@ const practiceModule={id:'practice',num:'26',label:'Procvičování',render(stag
   const optsEl=el('div',{class:'practice-opts'});let mcSel=-1,mcBtns=[];
   function pickTheory(src){const S=(src||THEO)[topic];const pool=S.filter(i=>recentT.indexOf(i)<0);const i=pick(pool.length?pool:S);recentT.push(i);if(recentT.length>Math.min(8,Math.floor(S.length/2)))recentT.shift();return i;}
   const GTOL={vazeny:c=>0.0501,mttrPotreba:c=>0.004*Math.abs(c.ans)+0.02,mttrQ:c=>0.004*c.ans+0.0001,linTrans:c=>0.01,median5:c=>0.01,rozpeti:c=>0.01,regSklon:c=>0.01,mttfExp:c=>0.5,mttfWeib:c=>0.5+0.002*c.ans,iqr8:c=>0.01};
+  // režim „Jen vzorce“: k vygenerované úloze se vybírá vzorec, kterým se řeší
+  const NOFORM=new Set(['kostka','dvekostky','karta','kostkaSoucin','kostkaRozdil','median5','median6','modus','kostkaPodm','poradiSoucet','poradiShoda','ciZMezi','ciZmenaN','zskorePorov','rovnomerne','kartaPodm','llnZvetseni','bootPerc','osudi','karty2']);
+  const FGROUPS=[['se','vyberDX','llnPrumerSD','cltInterval','vyberN'],['inkluze','mnozNasobky','union','mnozNikdo','mnozDeMorgan','mnozNeslucitelne'],['ocek','chi2tab','gof','chiPrispevek'],['podilci','podilMoE','podilse','velikostVzorku'],['ci','ciMeze','ciSirka','ciN'],['binom','binomAspon','binomNejvys','mince'],['poisson','poissonAspon','poissonNejvys'],['geom','geomDo'],['hypergeom','hypergeomZadna'],['expon','exponMezi','mttfLambda'],['normalprob','normalNad','zskore','zskoretail','zskoreMezi','zskoreSym','cltPrumer'],['zskoreInv','zskoreZpet','zskoreSigma'],['kombinace','loterieTiket','podaniRukou','kombKomise'],['variance','varTabulka'],['ev','evTabulka','kostkaEV','evPojistka'],['soucetVar','rozdilVar','soucetSD','cltSoucet'],['mttrQ','pohotovost','mttrPotreba'],['mttfExp','mttfWeib'],['weibull','weibullEta'],['correl','korelZKov'],['spearman','spearmanVzorec'],['regSklon','regB0'],['pred','reziduum','regZmena'],['vartest','varZChi'],['fTest','fTestSmodch'],['t2vyb','welchSE'],['parovyt','parovyPrumer'],['anovaF','anovaDf'],['mannU','mannU2'],['uTest','kritHodnota'],['podminena','podmTabulka','mnozPodmVenn'],['uplnaP','bayesStroj','bayes'],['aspon','minceSekv','mnozAsponJeden'],['rozptylVyb','smodch4'],['variace','permutace','variaceOpak','permOpak'].slice(0,0)];
+  const fGroup=k=>{const g=FGROUPS.find(a=>a.indexOf(k)>-1);return g||[k];};
+  function formulaProblem(){const el0=TOPICS[topic].filter(k=>FORM[k]&&!NOFORM.has(k));const gn=pick(el0.length?el0:Object.keys(GEN).filter(k=>FORM[k]&&!NOFORM.has(k)));
+    const right=FORM[gn],grp=fGroup(gn),used=new Set([right]),wrong=[];
+    const chs=Object.keys(CH).filter(c=>CH[c][1].indexOf(gn)>-1),part=PARTS.find(pp=>pp[2].some(c=>chs.indexOf(c)>-1));
+    const pools=[[].concat(...chs.map(c=>CH[c][1])),part?[].concat(...part[2].map(c=>CH[c][1])):[],Object.keys(GEN)];
+    for(const pool of pools){for(const k of shuffled([...new Set(pool)])){if(wrong.length>=3)break;const f=FORM[k];if(!f||NOFORM.has(k)||grp.indexOf(k)>-1||used.has(f))continue;if(wrong.some(w=>fGroup(w.k).indexOf(k)>-1))continue;used.add(f);wrong.push({k:k,f:f});}if(wrong.length>=3)break;}
+    const g=GEN[gn]();const o=[right].concat(wrong.map(w=>w.f)),order=shuffled([0,1,2,3]);
+    return {mc:true,fm:true,q:g.q+'<div style="margin-top:10px;font-weight:600">Kterým vzorcem se úloha řeší?</div>',o:o,a:0,order:order,sol:'Správný vzorec: <b>'+optLetter(order.indexOf(0))+') '+escHtml(right)+'</b>. '+g.sol};}
   function newProblem(){const gens=TOPICS[topic],th=THEO[topic];
+    if(effTyp()==='formula'){cur=formulaProblem();return finishProblem();}
     const et=effTyp();const useT=th.length&&(et==='theory'||!gens.length||(et==='mix'&&Math.random()<0.3));
     const cq=CALCQ[topic],useCQ=!useT&&cq.length&&(!gens.length||Math.random()<Math.min(0.2,cq.length/(cq.length+3*gens.length)+0.05));
     if(useT||useCQ){const b=QBANK[pickTheory(useCQ?CALCQ:THEO)],order=shuffled([0,1,2,3]);cur={mc:true,q:escHtml(b.q),o:b.o,a:b.a,order:order,sol:'Správná odpověď: <b>'+optLetter(order.indexOf(b.a))+') '+escHtml(b.o[b.a])+'</b>. '+escHtml(b.e)};}
     else{const gn=pick(gens);const gapOk=a=>isFinite(a.v)&&Math.abs(a.v-cur.ans)>Math.max(0.0012,0.004*Math.abs(cur.ans));let t0=0;do{cur=GEN[gn]();t0++;}while(cur.alts&&!cur.alts.every(gapOk)&&t0<40);cur.key=gn;if(cur.alts)cur.alts=cur.alts.filter(gapOk);if(cur.tol==null&&GTOL[gn])cur.tol=GTOL[gn](cur);}
+    finishProblem();}
+  function finishProblem(){
     if(!cur.mc&&cur.kind!=='int'&&typeof cur.sol==='string'){const bs=cur.sol.match(/<b>[^<]*<\/b>/g);if(bs){const dv=parseAns(bs[bs.length-1].replace(/<\/?b>/g,'').replace(/&nbsp;|\u00a0/g,''));if(dv!==null&&isFinite(dv)){const t0=cur.tol!=null?cur.tol:ansTol(cur.ans,cur.kind),er=Math.abs(dv-cur.ans);if(er>t0&&er<=0.01*Math.max(Math.abs(cur.ans),0.5)+0.0006)cur.tol=er*1.02+1e-9;}}}
     cur.done=false;mcSel=-1;optsEl.innerHTML='';mcBtns=[];
     if(cur.mc){mcBtns=cur.o.map((o,oi)=>{const bt=el('button',{class:'opt'},el('span',{class:'optl'}),document.createTextNode(o));
