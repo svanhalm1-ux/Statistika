@@ -343,6 +343,7 @@ table.ct.tl th,table.ct.tl td{text-align:left;vertical-align:top}
 .defbox{margin:8px 0 14px;padding:10px 14px;border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:10px;background:var(--panel);font-size:14.5px;line-height:1.55;color:var(--prose)}
 li>.defbox{margin-top:8px}
 @media print{.mapctl{display:none!important}}
+@media (max-width:899px){.card>.controls{position:sticky;top:56px;z-index:6;background:inherit;margin-left:-13px;margin-right:-13px;padding:10px 13px 12px;gap:8px;box-shadow:0 8px 10px -9px rgba(0,0,0,.35)}}
 </style>
 <style id="vzhled-pismo-barvy">
 html.fbg-white .formula{background:#FFFFFF;border-color:#D9DDD3;color:#16181A}
@@ -1740,21 +1741,21 @@ const DISTS={
     ks:q=>Array.from({length:q.n+1},(_,i)=>i),mean:q=>q.n*q.p,vari:q=>q.n*q.p*(1-q.p),sample:q=>rbinom(q.n,q.p)},
   poisson:{label:'Poissonovo',kind:'d',params:[{k:'lam',label:'λ',min:.2,max:18,step:.2,def:4}],
     pmf:(x,q)=>Math.exp(-q.lam+x*Math.log(q.lam)-LF[x]),
-    ks:q=>{const hi=Math.min(60,Math.ceil(q.lam+4*Math.sqrt(q.lam))+2);return Array.from({length:hi+1},(_,i)=>i);},
+    ks:q=>{const hi=Math.min(60,Math.ceil(q.lam+4*Math.sqrt(q.lam))+2);return Array.from({length:hi+1},(_,i)=>i);},kview:Array.from({length:41},(_,i)=>i),
     mean:q=>q.lam,vari:q=>q.lam,sample:q=>rpois(q.lam)},
   geometric:{label:'Geometrické',kind:'d',params:[{k:'p',label:'p',min:.05,max:.95,step:.01,def:.35}],
     pmf:(x,q)=>x>=1?Math.pow(1-q.p,x-1)*q.p:0,
-    ks:q=>{const hi=Math.min(45,Math.ceil(Math.log(.002)/Math.log(1-q.p)));return Array.from({length:Math.max(2,hi)},(_,i)=>i+1);},
+    ks:q=>{const hi=Math.min(45,Math.ceil(Math.log(.002)/Math.log(1-q.p)));return Array.from({length:Math.max(2,hi)},(_,i)=>i+1);},kview:Array.from({length:45},(_,i)=>i+1),
     mean:q=>1/q.p,vari:q=>(1-q.p)/(q.p*q.p),sample:q=>rgeom(q.p)},
   uniform:{label:'Rovnoměrné',kind:'c',params:[{k:'a',label:'a',min:-5,max:5,step:.5,def:0},{k:'b',label:'b',min:-4,max:10,step:.5,def:4}],
-    link:(k,v,q,sl)=>{if(k==='a'&&v>q.b-.5){q.b=Math.min(10,v+.5);sl.b.set(q.b);if(q.a>q.b-.5){q.a=q.b-.5;sl.a.set(q.a);}}else if(k==='b'&&v<q.a+.5){q.a=Math.max(-5,v-.5);sl.a.set(q.a);if(q.b<q.a+.5){q.b=q.a+.5;sl.b.set(q.b);}}},
-    pdf:(x,q)=>(x>=q.a&&x<=q.b)?1/(q.b-q.a):0,range:q=>[q.a-(q.b-q.a)*.12,q.b+(q.b-q.a)*.12],
+    link:(k,v,q,sl)=>{if(k==='a'&&v>q.b-1){q.b=Math.min(10,v+1);sl.b.set(q.b);if(q.a>q.b-1){q.a=q.b-1;sl.a.set(q.a);}}else if(k==='b'&&v<q.a+1){q.a=Math.max(-5,v-1);sl.a.set(q.a);if(q.b<q.a+1){q.b=q.a+1;sl.b.set(q.b);}}},
+    pdf:(x,q)=>(x>=q.a&&x<=q.b)?1/(q.b-q.a):0,range:q=>[q.a-(q.b-q.a)*.12,q.b+(q.b-q.a)*.12],view:[-6,11,1.05],
     mean:q=>(q.a+q.b)/2,vari:q=>Math.pow(q.b-q.a,2)/12,sample:q=>runif(q.a,q.b)},
-  normal:{label:'Normální',kind:'c',params:[{k:'mu',label:'μ',min:-5,max:5,step:.2,def:0},{k:'sigma',label:'σ',min:.3,max:4,step:.1,def:1}],
+  normal:{label:'Normální',kind:'c',params:[{k:'mu',label:'μ',min:-4,max:4,step:.2,def:0},{k:'sigma',label:'σ',min:.8,max:3,step:.1,def:1}],
     pdf:(x,q)=>Math.exp(-Math.pow(x-q.mu,2)/(2*q.sigma*q.sigma))/(q.sigma*Math.sqrt(2*Math.PI)),
-    range:q=>[q.mu-4*q.sigma,q.mu+4*q.sigma],mean:q=>q.mu,vari:q=>q.sigma*q.sigma,sample:q=>rnorm(q.mu,q.sigma)},
-  exponential:{label:'Exponenciální',kind:'c',params:[{k:'lam',label:'λ',min:.2,max:3,step:.1,def:1}],
-    pdf:(x,q)=>x>=0?q.lam*Math.exp(-q.lam*x):0,range:q=>[0,6/q.lam],
+    range:q=>[q.mu-4*q.sigma,q.mu+4*q.sigma],view:[-10,10,0.55],mean:q=>q.mu,vari:q=>q.sigma*q.sigma,sample:q=>rnorm(q.mu,q.sigma)},
+  exponential:{label:'Exponenciální',kind:'c',params:[{k:'lam',label:'λ',min:.2,max:2,step:.1,def:1}],
+    pdf:(x,q)=>x>=0?q.lam*Math.exp(-q.lam*x):0,range:q=>[0,6/q.lam],view:[0,8,2.1],
     mean:q=>1/q.lam,vari:q=>1/(q.lam*q.lam),sample:q=>rexp(q.lam)},
   weibull:{label:'Weibullovo',kind:'c',params:[{k:'lam',label:'λ',min:.2,max:3,step:.1,def:1},{k:'g',label:'α',min:.2,max:2,step:.05,def:1.5},{k:'ex',label:'exponent α − 1',min:-.8,max:1,step:.05,def:.5,fmt:v=>fmt(v,2).replace('-','−')}],
     link:(k,v,q,sl)=>{if(k==='g'){q.ex=v-1;sl.ex.set(v-1);}else if(k==='ex'){q.g=v+1;sl.g.set(v+1);}},
@@ -2713,22 +2714,26 @@ const distModule={id:'dist',num:'04',label:'Rozdělení',render(stage){
   let key='binomial',params={};
   const sel=el('select',{});Object.keys(DISTS).forEach(k=>sel.append(el('option',{value:k},DISTS[k].label)));sel.value=key;
   const ctlBox=el('div',{class:'controls'});
-  const info=el('div',{class:'distinfo'});
+  const info=el('details',{class:'distinfo'});info.open=!!(window.matchMedia&&window.matchMedia('(min-width:900px)').matches);
   const left=el('div');left.append(el('div',{style:'font-size:12px;color:var(--muted);margin-bottom:6px'},'1 · Pravděpodobnost / hustota'));
   const lc=chartCanvas();left.append(lc.w);
+  const bandChk=el('input',{type:'checkbox'});bandChk.checked=true;bandChk.addEventListener('change',()=>draw());
+  const bandRows=el('div',{style:'font-size:13px'});
+  const bandBox=el('div',{style:'display:none;margin-top:8px'},el('label',{style:'display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;margin-bottom:4px;cursor:pointer'},bandChk,'Pásma ±1σ, ±2σ, ±3σ'),bandRows);
+  left.append(bandBox);
   const right=el('div');right.append(el('div',{style:'font-size:12px;color:var(--muted);margin-bottom:6px'},'2 · Distribuční funkce F(x)'));
   const rc=chartCanvas();right.append(rc.w);
   const dual=el('div',{class:'dual'},left,right);
   const S=statBlocks([{key:'m',label:'střední hodnota E(X)',color:'amber'},{key:'v',label:'rozptyl D(X)',color:'teal'},{key:'s',label:'směr. odchylka σ',color:'violet'},{key:'t',label:'typ'}]);
   const chL=new Chart(lc.cv,{padL:56,padB:44}),chR=new Chart(rc.cv,{padL:56,padB:44});
-  function updInfo(){const di=DINFO[key];let h='<div class="di-m">'+di.m+'</div><div class="di-h">Co dělají posuvníky</div><ul class="di-ul">';
+  function updInfo(){const di=DINFO[key];let h='<summary style="cursor:pointer;font-weight:600">Popis a posuvníky · '+DISTS[key].label+'</summary><div class="di-m" style="margin-top:10px">'+di.m+'</div><div class="di-h">Co dělají posuvníky</div><ul class="di-ul">';
     di.p.forEach(pp=>h+='<li><b>'+pp[0]+'</b> — '+pp[1]+'</li>');h+='</ul><div class="di-ex"><b>Příklad:</b> '+di.ex+'</div>'+(di.note?'<div class="di-ex" style="color:var(--muted)"><b>Značení:</b> '+di.note+'</div>':'')+(di.warn?'<div class="callout warn" style="margin:12px 0 0"><span class="ic">!</span><div>'+di.warn+'</div></div>':'');info.innerHTML=h;}
   function buildCtl(){ctlBox.innerHTML='';params={};const d=DISTS[key];const sl={};
     d.params.forEach(p=>{params[p.k]=p.def;const s=slider(p.label,p.min,p.max,p.step,p.def,p.fmt||(v=>p.int?fmt(v,0):fmt(v,2)),v=>{params[p.k]=v;if(d.link)d.link(p.k,v,params,sl);draw();});sl[p.k]=s;ctlBox.append(s.row);});}
   function draw(){const d=DISTS[key],q=params;
     S.set('m',fmt(d.mean(q),3));S.set('v',fmt(d.vari(q),3));S.set('s',fmt(Math.sqrt(d.vari(q)),3));S.set('t',d.kind==='d'?'diskrétní':'spojité');
     chL.resize();chR.resize();chL.clear();chR.clear();
-    if(d.kind==='d'){const ks=d.ks(q);const ys=ks.map(k=>({x:k,y:d.pmf(k,q)}));const ymax=Math.max.apply(null,ys.map(p=>p.y))*1.18;
+    if(d.kind==='d'){bandBox.style.display='none';const ks=d.kview||d.ks(q);const ys=ks.map(k=>({x:k,y:d.pmf(k,q)}));const ymax=Math.max.apply(null,ys.map(p=>p.y))*1.18;
       const _step=Math.max(1,Math.ceil(ks.length/10));const _xv=ks.filter((_,i)=>i%_step===0||i===ks.length-1);
       chL.dom(ks[0]-.7,ks[ks.length-1]+.7,0,ymax);chL.grid({xvals:_xv,yfmt:v=>fmt(v,2),xfmt:v=>fmt(v,0)});
       chL.axisX('x — počet / hodnota');chL.axisY('P(X = x)');
@@ -2737,10 +2742,15 @@ const distModule={id:'dist',num:'04',label:'Rozdělení',render(stage){
       chR.dom(ks[0]-.7,ks[ks.length-1]+.7,0,1.05);chR.grid({xvals:_xv,yfmt:v=>fmt(v,1),xfmt:v=>fmt(v,0)});
       chR.axisX('x — počet / hodnota');chR.axisY('F(x) = P(X ≤ x)');
       chR.steps(cd,C.amber,2.2);cd.forEach(p=>chR.dot(p.x,p.y,3,C.amber));
-    } else {const rg=d.range(q),a=rg[0],b=rg[1];const N=180;const pts=[];let ymax=0;
+    } else {const fv=d.view,rg=fv?fv:d.range(q),a=rg[0],b=rg[1];const N=fv?900:180;const pts=[];let ymax=0;
       for(let i=0;i<=N;i++){const x=a+(b-a)*i/N;const y=d.pdf(x,q);if(!isFinite(y))continue;pts.push({x:x,y:y});if(y>ymax)ymax=y;}
-      chL.dom(a,b,0,ymax*1.15);chL.grid({yfmt:v=>fmt(v,2)});chL.axisX('x — hodnota');chL.axisY('f(x) — hustota');
-      chL.curve(pts,C.violet,2.4,hexA(C.violet,.16));if(d.mean(q)<=b)chL.vline(d.mean(q),C.amber,'E(X) = '+fmt(d.mean(q),2));
+      chL.dom(a,b,0,fv?fv[2]:ymax*1.15);chL.grid({yfmt:v=>fmt(v,2)});chL.axisX('x — hodnota');chL.axisY('f(x) — hustota');
+      const bandsOn=key==='normal'&&bandChk.checked;
+      if(bandsOn){[[3,.13],[2,.24],[1,.4]].forEach(z=>{const lo=q.mu-z[0]*q.sigma,hi=q.mu+z[0]*q.sigma;const sp=pts.filter(p=>p.x>=lo&&p.x<=hi);sp.unshift({x:lo,y:d.pdf(lo,q)});sp.push({x:hi,y:d.pdf(hi,q)});chL.curve(sp,'rgba(0,0,0,0)',.01,hexA(C.teal,z[1]));});}
+      chL.curve(pts,C.violet,2.4,bandsOn?null:hexA(C.violet,.16));
+      if(key==='normal'){bandBox.style.display='';const f1=v=>fmt(v,2).replace(/(,\d*?)0+$/,'$1').replace(/,$/,'').replace('-','−');
+        bandRows.innerHTML=[[1,'68,3'],[2,'95,4'],[3,'99,7']].map(z=>'<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:14px;height:14px;border-radius:3px;flex:none;background:'+hexA(C.teal,[.6,.34,.13][z[0]-1])+'"></span><span>μ ± '+z[0]+'σ = '+f1(q.mu-z[0]*q.sigma)+' až '+f1(q.mu+z[0]*q.sigma)+' → <b>'+z[1]+' %</b> hodnot</span></div>').join('');}
+      else bandBox.style.display='none';if(d.mean(q)<=b)chL.vline(d.mean(q),C.amber,'E(X) = '+fmt(d.mean(q),2));
       let cd=[];
       if(d.cdf){cd=pts.map(p=>({x:p.x,y:d.cdf(p.x,q)}));if(pts[0].x>a)cd.unshift({x:a,y:d.cdf(a,q)});}
       else{let acc=0;for(let i=0;i<pts.length;i++){if(i>0)acc+=(pts[i].y+pts[i-1].y)/2*(pts[i].x-pts[i-1].x);cd.push({x:pts[i].x,y:acc});}
@@ -2795,7 +2805,7 @@ const distModule={id:'dist',num:'04',label:'Rozdělení',render(stage){
   c.append(el('div',{class:'ctl',style:'margin-bottom:12px'},el('label',{},'Rozdělení'),sel,el('span')));
   const DIST2MAP={bernoulli:'bern',binomial:'bin',poisson:'pois',geometric:'geom',uniform:'unif',normal:'norm',exponential:'exp',weibull:'weib'};
   c.append(el('div',{class:'btn-row',style:'margin:-4px 0 12px'},btn('Ukázat v mapě rozdělení →','ghost',()=>gotoMap(DIST2MAP[key]||'norm'))));
-  c.append(ctlBox,info,dual,S.wrap,starHint('Vyber <b>Binomické</b> a zvyšuj n při p = 0,5: sloupců je n + 1 a tvar se stále víc podobá zvonu. Pak zvol <b>Poissonovo</b> s λ = 4 a porovnej je s binomickým n = 40, p = 0,1 (také se střední hodnotou 4): tvary jsou velmi podobné.'),wb);stage.append(c);
+  c.append(info,ctlBox,dual,S.wrap,starHint('Vyber <b>Binomické</b> a zvyšuj n při p = 0,5: sloupců je n + 1 a tvar se stále víc podobá zvonu. Pak zvol <b>Poissonovo</b> s λ = 4 a porovnej je s binomickým n = 40, p = 0,1 (také se střední hodnotou 4): tvary jsou velmi podobné.'),wb);stage.append(c);
   // ===== Trenažér: poznej rozdělení =====
   (()=>{const pc=card('Trenažér · <b>Poznej rozdělení</b>');
     pc.append(el('details',{class:'symleg',style:'margin:4px 0 14px'},el('summary',{},el('span',{},'Tahák: jak poznat rozdělení')),el('div',{class:'prose',style:'padding:4px 2px 8px;font-size:14px',html:
@@ -3040,12 +3050,12 @@ const cltModule={id:'clt',num:'08',label:'CLT',render(stage){
   function drawMeans(){const d=SRC[src];const se=d.sd/Math.sqrt(nn);let a=d.mu-4*se,b=d.mu+4*se,bins=34;if(src==='bern'){const k=Math.max(1,Math.round((b-a)*nn/34)),w=k/nn;a=Math.floor(a*nn)/nn-0.5/nn;bins=Math.max(1,Math.ceil((b-a)/w));b=a+bins*w;}
     S.set('mu',fmt(d.mu,3));S.set('se',fmt(se,3));chR.resize();chR.clear();const pdfMax=nPdf(d.mu,d.mu,se);
     if(means.length){const H=histify(means,a,b,bins);const ymax=Math.max(pdfMax,Math.max.apply(null,H.density))*1.15;
-      chR.dom(a,b,0,ymax);chR.grid({yfmt:v=>fmt(v,2)});chR.axisX('výběrový průměr');chR.axisY('hustota');
-      H.density.forEach((dn,i)=>{const x0=a+i*H.w;chR.ctx.fillStyle=hexA(C.teal,.7);const px=chR.X(x0+H.w/2);const wpx=Math.max(2,chR.pw/bins*.9);chR.ctx.fillRect(px-wpx/2,chR.Y(dn),wpx,chR.Y(0)-chR.Y(dn));});
+      chR.dom(d.rng[0],d.rng[1],0,ymax);chR.grid({yfmt:v=>fmt(v,2)});chR.axisX('výběrový průměr');chR.axisY('hustota');
+      H.density.forEach((dn,i)=>{const x0=a+i*H.w;chR.ctx.fillStyle=hexA(C.teal,.7);const px=chR.X(x0+H.w/2);const wpx=Math.max(2,(chR.X(H.w)-chR.X(0))*.9);chR.ctx.fillRect(px-wpx/2,chR.Y(dn),wpx,chR.Y(0)-chR.Y(dn));});
       const pts=[];for(let i=0;i<=120;i++){const x=a+(b-a)*i/120;pts.push({x:x,y:nPdf(x,d.mu,se)});}chR.curve(pts,C.amber,2.4);
       const m=means.reduce((x,y)=>x+y,0)/means.length;const sd=Math.sqrt(means.reduce((x,y)=>x+Math.pow(y-m,2),0)/means.length);
       S.set('em',fmt(m,3));S.set('esd',fmt(sd,3));
-    } else {chR.dom(a,b,0,pdfMax*1.15);chR.grid({yfmt:v=>fmt(v,2)});chR.axisX('výběrový průměr');chR.axisY('hustota');const pts=[];for(let i=0;i<=120;i++){const x=a+(b-a)*i/120;pts.push({x:x,y:nPdf(x,d.mu,se)});}chR.curve(pts,hexA(C.amber,.45),2);S.set('em','—');S.set('esd','—');}
+    } else {chR.dom(d.rng[0],d.rng[1],0,pdfMax*1.15);chR.grid({yfmt:v=>fmt(v,2)});chR.axisX('výběrový průměr');chR.axisY('hustota');const pts=[];for(let i=0;i<=120;i++){const x=a+(b-a)*i/120;pts.push({x:x,y:nPdf(x,d.mu,se)});}chR.curve(pts,hexA(C.amber,.45),2);S.set('em','—');S.set('esd','—');}
     S.set('cnt',means.length);}
   function drawMean(times){const d=SRC[src];for(let t=0;t<times;t++){let s=0;for(let i=0;i<nn;i++)s+=d.s();means.push(s/nn);}if(means.length>20000)means=means.slice(-20000);drawMeans();}
   function reset(){running=false;Anim.stop();means=[];playBtn.textContent='▶ Losovat výběry';drawSource();drawMeans();}
@@ -4899,24 +4909,33 @@ const zscoreModule={id:'zscore',num:'06',label:'Z-skóre',render(stage){
   const st=statBlocks([{key:'z',label:'z-skóre u',color:'amber'},{key:'phi',label:'Φ(u) = P(X ≤ x)',color:'teal'},{key:'tail',label:'P(X > x)',color:'coral'},{key:'band',label:'uvnitř μ ± 1σ / 2σ / 3σ',color:'violet'}]);
   const cc=chartCanvas(true);const ch=new Chart(cc.cv,{padL:50,padR:14,padB:40});
   const cc2=chartCanvas();const ch2=new Chart(cc2.cv,{padL:50,padR:14,padB:40});
+  const zBand=el('input',{type:'checkbox'});zBand.addEventListener('change',()=>{zNote.style.display=zBand.checked?'none':'';draw();});
+  const zLeg=el('div',{style:'font-size:13px;display:none'});
+  function shadeA(chX,fn,a,to,color,al){const ctx=chX.ctx;ctx.beginPath();ctx.moveTo(chX.X(a),chX.Y(0));const N=90;for(let i=0;i<=N;i++){const xx=a+(to-a)*i/N;ctx.lineTo(chX.X(xx),chX.Y(fn(xx)));}ctx.lineTo(chX.X(to),chX.Y(0));ctx.closePath();ctx.fillStyle=hexA(color,al);ctx.fill();}
   function shade(chX,fn,a,to,color){const ctx=chX.ctx;ctx.beginPath();ctx.moveTo(chX.X(a),chX.Y(0));const N=90;for(let i=0;i<=N;i++){const xx=a+(to-a)*i/N;ctx.lineTo(chX.X(xx),chX.Y(fn(xx)));}ctx.lineTo(chX.X(to),chX.Y(0));ctx.closePath();ctx.fillStyle=hexA(color,.22);ctx.fill();}
   function draw(){const z=(x-mu)/sg,phi=nCdf(z);
     st.set('z',fmt(z,2));{const pz=x=>x<0.0005?'< 0,1\u00a0%':x>0.9995?'> 99,9\u00a0%':pct(x,1);st.set('phi',pz(phi));st.set('tail',pz(1-phi));}st.set('band','68 · 95 · 99,7 %');
     const a=mu-4*sg,b=mu+4*sg,ym=nPdf(mu,mu,sg)*1.14;
-    ch.resize();ch.clear();ch.dom(a,b,0,ym);
+    ch.resize();ch.clear();const hw=Math.max(60,4*sg);ch.dom(mu-hw,mu+hw,0,ym);
     ch.grid({yticks:3,yfmt:()=>'',xfmt:v=>fmt(v,0)});
-    shade(ch,xx=>nPdf(xx,mu,sg),a,Math.min(x,b),C.teal);
+    const BD=[[3,.13],[2,.24],[1,.4]];
+    if(zBand.checked){BD.forEach(q=>shadeA(ch,xx=>nPdf(xx,mu,sg),mu-q[0]*sg,mu+q[0]*sg,C.violet,q[1]));}
+    else shade(ch,xx=>nPdf(xx,mu,sg),a,Math.min(x,b),C.teal);
     const pts=[];for(let i=0;i<=140;i++){const xx=a+(b-a)*i/140;pts.push({x:xx,y:nPdf(xx,mu,sg)});}
     ch.curve(pts,C.amber,2.2);ch.vline(mu,hexA(C.text,.55),'μ = '+fmt(mu,1),0);if(x>=a&&x<=b)ch.vline(x,C.coral,'x = '+fmt(x,1),1);
     ch.axisX('původní veličina X ~ N(μ, σ²)');
     ch2.resize();ch2.clear();const zm=nPdf(0,0,1)*1.14;ch2.dom(-4,4,0,zm);
     ch2.grid({xvals:[-3,-2,-1,0,1,2,3],yticks:3,yfmt:()=>'',xfmt:v=>fmt(v,0)});
-    shade(ch2,xx=>nPdf(xx,0,1),-4,Math.max(-4,Math.min(z,4)),C.teal);
+    if(zBand.checked){BD.forEach(q=>shadeA(ch2,xx=>nPdf(xx,0,1),-q[0],q[0],C.violet,q[1]));}
+    else shade(ch2,xx=>nPdf(xx,0,1),-4,Math.max(-4,Math.min(z,4)),C.teal);
+    zLeg.style.display=zBand.checked?'':'none';
+    if(zBand.checked){const f0=v=>fmt(v,1).replace('-','−');zLeg.innerHTML=[[1,'68,3',.6],[2,'95,4',.34],[3,'99,7',.13]].map(r=>'<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:14px;height:14px;border-radius:3px;flex:none;background:'+hexA(C.violet,r[2])+'"></span><span>μ ± '+r[0]+'σ = '+f0(mu-r[0]*sg)+' až '+f0(mu+r[0]*sg)+' (u = ±'+r[0]+') → <b>'+r[1]+' %</b> hodnot</span></div>').join('');}
     const p2=[];for(let i=0;i<=140;i++){const xx=-4+8*i/140;p2.push({x:xx,y:nPdf(xx,0,1)});}
     ch2.curve(p2,C.violet,2.2);if(z>=-4&&z<=4)ch2.vline(z,C.coral,'u = '+fmt(z,2));
     ch2.axisX('normovaná U ~ N(0, 1) — tatáž plocha, jiné měřítko');}
-  c.append(cc.w,cc2.w,st.wrap,
-    el('div',{class:'callout',html:'<span class="ic">i</span><div>Obě vybarvené plochy mají <b>stejnou pravděpodobnost</b> — standardizace mění měřítko, ne pravděpodobnost. Posuň x a sleduj, jak se mění z-skóre a Φ(u).</div>'}));
+  const zNote=el('div',{class:'callout',html:'<span class="ic">i</span><div>Obě vybarvené plochy mají <b>stejnou pravděpodobnost</b> — standardizace mění měřítko, ne pravděpodobnost. Posuň x a sleduj, jak se mění z-skóre a Φ(u).</div>'});
+  c.append(cc.w,cc2.w,el('div',{style:'margin:8px 0 6px'},el('label',{style:'display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;margin-bottom:4px;cursor:pointer'},zBand,'Pásma ±1σ, ±2σ, ±3σ (místo plochy Φ)'),zLeg),st.wrap,zNote,
+    el('div',{style:'display:none',html:'<div>Obě vybarvené plochy mají <b>stejnou pravděpodobnost</b> — standardizace mění měřítko, ne pravděpodobnost. Posuň x a sleduj, jak se mění z-skóre a Φ(u).</div>'}));
   stage.append(c);c.append(starHint('U příkladu <b>Výška žen</b> (μ = 168, σ = 7) je pro x = 175 z = 1 a Φ ≈ 84,1 %, pro x = 182 je z = 2 a Φ ≈ 97,7 %. Zvyš σ na 14 a nech x = 182: z klesne na 1 a Φ zpět na 84,1 %, stejný rozdíl v centimetrech je pak menší odchylka.'));appendAppHint(stage);
   (window.__softHooks=window.__softHooks||[]).push(draw);
   sel.value='vyska';desc.textContent=PRE.vyska.d;desc.style.display='block';syncX();
@@ -4951,7 +4970,7 @@ const samplingModule={id:'sampling',num:'09',label:'Výběrová rozd.',render(st
   function draw(){if(!data.length)return;
     const sorted=data.slice().sort((a,b)=>a-b);
     const a=sorted[Math.floor(sorted.length*0.002)],b=sorted[Math.ceil(sorted.length*0.998)-1];
-    const pad=(b-a)*0.06||0.5;let lo=a-pad,hi=b+pad;if(stat==='chi'||stat==='f')lo=Math.max(0,lo);
+    const FIX={xbar:[-2.4,2.4],t:[-5,5],chi:[0,110],f:[0,6]}[stat];let lo=FIX?FIX[0]:a-((b-a)*0.06||0.5),hi=FIX?FIX[1]:b+((b-a)*0.06||0.5);if(stat==='chi'||stat==='f')lo=Math.max(0,lo);
     const items=histItems(data,lo,hi,46);
     const ym=Math.max(...items.map(i=>i.y),pdfFn()(stat==='chi'?Math.max(0.5,n-3):(stat==='f'?0.6:0)))*1.15;
     ch.resize();ch.clear();ch.dom(lo,hi,0,ym);
@@ -5056,9 +5075,9 @@ const podilModule={id:'podil',num:'16',label:'Podíl',render(stage){
   function draw(){const se=Math.sqrt(p*(1-p)/n);
     const lo=Math.max(0,p-4.4*se),hi=Math.min(1,p+4.4*se);
     ch.resize();ch.clear();
-    const ym=nPdf(p,p,se)*1.16;ch.dom(lo,hi,0,ym);
+    const ym=nPdf(p,p,se)*1.16;ch.dom(0,1,0,ym);
     ch.grid({yticks:3,yfmt:()=>'',xfmt:v=>pct(v,0)});
-    if(sims.length){ch.bars((function(){const k=Math.max(1,Math.round((hi-lo)*n/40)),w=k/n,a0=Math.floor(lo*n)/n-0.5/n,B=Math.max(1,Math.ceil((hi-a0)/w));return histItems(sims,a0,a0+B*w,B);})(),hexA(C.violet,.45));}
+    if(sims.length){ch.bars((function(){const k=Math.max(1,Math.round((hi-lo)*n/40)),w=k/n,a0=Math.floor(lo*n)/n-0.5/n,B=Math.max(1,Math.ceil((hi-a0)/w));return histItems(sims,a0,a0+B*w,B);})(),hexA(C.violet,.45),Math.max(2,(ch.X(Math.max(1,Math.round((hi-lo)*n/40))/n)-ch.X(0))*.9));}
     const pts=[];for(let i=0;i<=140;i++){const xx=lo+(hi-lo)*i/140;pts.push({x:xx,y:nPdf(xx,p,se)});}
     ch.curve(pts,C.teal,2.2);
     ch.vline(p,C.teal,'p = '+pct(p,1));ch.vline(p0,C.coral,'p₀ = '+pct(p0,1));
