@@ -907,7 +907,7 @@ input[type=range]::-moz-range-thumb{background:var(--teal-fill,var(--teal))}
 </ul>
 <p><b>Spojitá:</b></p>
 <ul>
-<li><b>Rovnoměrné</b> <span class="m mm nw" data-h="R(a,b)"><math><mrow><mi>R</mi><mo form="prefix" stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo form="postfix" stretchy="false">)</mo></mrow></math></span> na intervalu od <i>a</i> do <i>b</i> — hustota je na něm konstantní. <span class="m mm nw" data-h="f(x) = 1/(b − a)"><math><mrow><mi>f</mi><mo form="prefix" stretchy="false">(</mo><mi>x</mi><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mi>b</mi><mo>−</mo><mi>a</mi></mrow></mfrac></mrow></math></span>, <span class="m mm nw" data-h="E = (a + b)/2"><math><mrow><mi>E</mi><mo>=</mo><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mn>2</mn></mfrac></mrow></math></span>, <span class="m mm nw" data-h="D = (b − a)²/12"><math><mrow><mi>D</mi><mo>=</mo><mfrac><mrow><mo form="prefix" stretchy="false">(</mo><mi>b</mi><mo>−</mo><mi>a</mi><msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup></mrow><mn>12</mn></mfrac></mrow></math></span>.</li>
+<li><b>Rovnoměrné</b> <span class="m mm nw" data-h="R(a,b)"><math><mrow><mi>R</mi><mo form="prefix" stretchy="false">(</mo><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo form="postfix" stretchy="false">)</mo></mrow></math></span> na intervalu od <i>a</i> do <i>b</i> — hustota je na něm konstantní. <span class="m mm nw" data-h="f(x) = 1/(b − a)"><math><mrow><mi>f</mi><mo form="prefix" stretchy="false">(</mo><mi>x</mi><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mi>b</mi><mo>−</mo><mi>a</mi></mrow></mfrac></mrow></math></span>, <span class="m mm nw" data-h="E = (a + b)/2"><math><mrow><mi>E</mi><mo>=</mo><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mn>2</mn></mfrac></mrow></math></span>, <span class="m mm nw" data-h="D = (b − a)²/12"><math><mrow><mi>D</mi><mo>=</mo><mfrac><mrow><mo form="prefix" stretchy="false">(</mo><mi>b</mi><mo>−</mo><mi>a</mi><msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup></mrow><mn>12</mn></mfrac></mrow></math></span>. Pravděpodobnost intervalu je poměr délek: <b>P(c &lt; X &lt; d) = (d − c)/(b − a)</b>; distribuční funkce je F(x) = (x − a)/(b − a).</li>
 <li><b>Exponenciální</b> — doba čekání na další událost Poissonova procesu (doba do příští poruchy); nemá paměť. <span class="m mm nw" data-h="f(x) = λe&lt;sup&gt;−λx&lt;/sup&gt;"><math><mrow><mi>f</mi><mo form="prefix" stretchy="false">(</mo><mi>x</mi><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mi>λ</mi><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi><mi>x</mi></mrow></msup></mrow></math></span> pro <span class="m mm nw" data-h="x ≥ 0"><math><mrow><mi>x</mi><mo>≥</mo><mn>0</mn></mrow></math></span>, <span class="m mm nw" data-h="F(x) = 1 − e&lt;sup&gt;−λx&lt;/sup&gt;"><math><mrow><mi>F</mi><mo form="prefix" stretchy="false">(</mo><mi>x</mi><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi><mi>x</mi></mrow></msup></mrow></math></span>, <span class="m mm nw" data-h="E = 1/λ"><math><mrow><mi>E</mi><mo>=</mo><mfrac><mn>1</mn><mi>λ</mi></mfrac></mrow></math></span>, <span class="m mm nw" data-h="D = 1/λ²"><math><mrow><mi>D</mi><mo>=</mo><mfrac><mn>1</mn><msup><mi>λ</mi><mn>2</mn></msup></mfrac></mrow></math></span>. „Bez paměti“ znamená <span class="m mm" data-h="P(X &gt; s + t | X &gt; s) = P(X &gt; t) = e&lt;sup&gt;−λt&lt;/sup&gt;"><math><mrow><mi>P</mi><mo form="prefix" stretchy="false">(</mo><mi>X</mi><mo>&gt;</mo><mi>s</mi><mo>+</mo><mi>t</mi><mo lspace="0.22em" rspace="0.22em" stretchy="false">|</mo><mi>X</mi><mo>&gt;</mo><mi>s</mi><mo form="postfix" stretchy="false">)</mo></mrow></math><wbr><math><mrow><mo>=</mo><mi>P</mi><mo form="prefix" stretchy="false">(</mo><mi>X</mi><mo>&gt;</mo><mi>t</mi><mo form="postfix" stretchy="false">)</mo></mrow></math><wbr><math><mrow><mo>=</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi><mi>t</mi></mrow></msup></mrow></math></span>: délka dosavadního čekání nic nemění na tom, jak dlouho ještě budeme čekat.</li>
 <li><b>Weibullovo</b> — doba do poruchy, když se riziko s časem mění: pro <span class="m mm nw" data-h="α&amp;lt;1"><math><mi>α</mi></math><math><mrow><mo>&lt;</mo><mn>1</mn></mrow></math></span> klesá, pro <span class="m mm nw" data-h="α=1"><math><mi>α</mi></math><math><mrow><mo>=</mo><mn>1</mn></mrow></math></span> je stálé (exponenciální), pro <span class="m mm nw" data-h="α&amp;gt;1"><math><mi>α</mi></math><math><mrow><mo>&gt;</mo><mn>1</mn></mrow></math></span> roste. <a class="kx" data-nav="dist" data-dist="weibull">→ 04 · Weibullovo</a></li>
 <li><b>Erlangovo / gama</b> — součet několika exponenciálních čekání, tedy doba do k-té události.</li>
@@ -2699,7 +2699,8 @@ const bayesModule={id:'bayes',num:'03',label:'Bayes',render(stage){
 const distModule={id:'dist',num:'04',label:'Rozdělení',render(stage){
   header(stage,'04','Náhodné veličiny a rozdělení','Co která veličina modeluje a co s jejím tvarem udělají parametry.');
   stage.append(tpl('L-dist'));
-  const DINFO={
+  const DFX={bernoulli:'P(X = 1) = p, P(X = 0) = 1 − p|E(X) = p|D(X) = p(1 − p)',binomial:'P(X = k) = C(n, k) · p<sup>k</sup> · (1 − p)<sup>n − k</sup>|E(X) = np|D(X) = np(1 − p)',poisson:'P(X = k) = λ<sup>k</sup> · e<sup>−λ</sup> / k!|E(X) = D(X) = λ',geometric:'P(X = k) = (1 − p)<sup>k − 1</sup> · p|P(X > k) = (1 − p)<sup>k</sup>|E(X) = 1/p|D(X) = (1 − p)/p²',uniform:'f(x) = 1/(b − a) pro a ≤ x ≤ b|F(x) = (x − a)/(b − a)|P(c < X < d) = (d − c)/(b − a)|E(X) = (a + b)/2|D(X) = (b − a)²/12',normal:'u = (x − μ)/σ|P(X < x) = Φ(u)|Φ(−u) = 1 − Φ(u)|E(X) = μ|D(X) = σ²',exponential:'f(t) = λ · e<sup>−λt</sup>|P(T ≤ t) = 1 − e<sup>−λt</sup>|P(T > t) = e<sup>−λt</sup>|E(T) = 1/λ|D(T) = 1/λ²',weibull:'R(t) = P(T > t) = e<sup>−(λt)<sup>α</sup></sup>|F(t) = 1 − e<sup>−(λt)<sup>α</sup></sup>|E(T) = (1/λ) · Γ(1 + 1/α)'};
+const DINFO={
     bernoulli:{m:'Jediný pokus se dvěma výsledky: úspěch (1) s pravděpodobností p, jinak neúspěch (0).',p:[['p','pravděpodobnost úspěchu — čím vyšší, tím vyšší sloupec u hodnoty 1']],ex:'Hod mincí (p = 0,5); zda zákazník nakoupí; zda test vyjde pozitivně.'},
     binomial:{m:'Počet úspěchů v n nezávislých pokusech, každý s pravděpodobností p.',p:[['n','počet pokusů — výsledek jde od 0 do n úspěchů, takže sloupců je n+1 (i nula úspěchů je možná). Víc pokusů = víc sloupců a širší rozsah'],['p','posouvá těžiště: malé p doleva (málo úspěchů), velké p doprava']],ex:'počet vadných kusů v dávce; správné odpovědi v testu; počet šestek ve 12 hodech kostkou (p = 1/6).'},
     poisson:{m:'Počet vzácných nezávislých událostí za daný interval (čas, plocha).',p:[['λ','průměrný počet událostí za interval — posouvá střed i rozptyl (platí E(X) = D(X) = λ)']],ex:'Počet e-mailů za hodinu; zákazníků za minutu; poruch za měsíc.'},
@@ -2727,7 +2728,8 @@ const distModule={id:'dist',num:'04',label:'Rozdělení',render(stage){
   const S=statBlocks([{key:'m',label:'střední hodnota E(X)',color:'amber'},{key:'v',label:'rozptyl D(X)',color:'teal'},{key:'s',label:'směr. odchylka σ',color:'violet'},{key:'t',label:'typ'}]);
   const chL=new Chart(lc.cv,{padL:56,padB:44}),chR=new Chart(rc.cv,{padL:56,padB:44});
   function updInfo(){const di=DINFO[key];let h='<summary style="cursor:pointer;font-weight:600">Popis a posuvníky · '+DISTS[key].label+'</summary><div class="di-m" style="margin-top:10px">'+di.m+'</div><div class="di-h">Co dělají posuvníky</div><ul class="di-ul">';
-    di.p.forEach(pp=>h+='<li><b>'+pp[0]+'</b> — '+pp[1]+'</li>');h+='</ul><div class="di-ex"><b>Příklad:</b> '+di.ex+'</div>'+(di.note?'<div class="di-ex" style="color:var(--muted)"><b>Značení:</b> '+di.note+'</div>':'')+(di.warn?'<div class="callout warn" style="margin:12px 0 0"><span class="ic">!</span><div>'+di.warn+'</div></div>':'');info.innerHTML=h;}
+    di.p.forEach(pp=>h+='<li><b>'+pp[0]+'</b> — '+pp[1]+'</li>');h+='</ul><div class="di-ex"><b>Příklad:</b> '+di.ex+'</div>'+(di.note?'<div class="di-ex" style="color:var(--muted)"><b>Značení:</b> '+di.note+'</div>':'')+(di.warn?'<div class="callout warn" style="margin:12px 0 0"><span class="ic">!</span><div>'+di.warn+'</div></div>':'');info.innerHTML=h;
+    fbox.innerHTML='<div style="font-weight:600;margin-bottom:6px">Vzorce · '+DISTS[key].label+'</div>'+(DFX[key]||'').split('|').map(r=>'<div style="font-family:var(--mono);font-size:13.5px;line-height:1.7">'+r+'</div>').join('');}
   function buildCtl(){ctlBox.innerHTML='';params={};const d=DISTS[key];const sl={};
     d.params.forEach(p=>{params[p.k]=p.def;const s=slider(p.label,p.min,p.max,p.step,p.def,p.fmt||(v=>p.int?fmt(v,0):fmt(v,2)),v=>{params[p.k]=v;if(d.link)d.link(p.k,v,params,sl);draw();});sl[p.k]=s;ctlBox.append(s.row);});}
   function draw(){const d=DISTS[key],q=params;
@@ -2805,7 +2807,8 @@ const distModule={id:'dist',num:'04',label:'Rozdělení',render(stage){
   c.append(el('div',{class:'ctl',style:'margin-bottom:12px'},el('label',{},'Rozdělení'),sel,el('span')));
   const DIST2MAP={bernoulli:'bern',binomial:'bin',poisson:'pois',geometric:'geom',uniform:'unif',normal:'norm',exponential:'exp',weibull:'weib'};
   c.append(el('div',{class:'btn-row',style:'margin:-4px 0 12px'},btn('Ukázat v mapě rozdělení →','ghost',()=>gotoMap(DIST2MAP[key]||'norm'))));
-  c.append(info,ctlBox,dual,S.wrap,starHint('Vyber <b>Binomické</b> a zvyšuj n při p = 0,5: sloupců je n + 1 a tvar se stále víc podobá zvonu. Pak zvol <b>Poissonovo</b> s λ = 4 a porovnej je s binomickým n = 40, p = 0,1 (také se střední hodnotou 4): tvary jsou velmi podobné.'),wb);stage.append(c);
+  const fbox=el('div',{class:'callout',style:'margin:10px 0 4px;display:block'});
+  c.append(info,ctlBox,dual,fbox,S.wrap,starHint('Vyber <b>Binomické</b> a zvyšuj n při p = 0,5: sloupců je n + 1 a tvar se stále víc podobá zvonu. Pak zvol <b>Poissonovo</b> s λ = 4 a porovnej je s binomickým n = 40, p = 0,1 (také se střední hodnotou 4): tvary jsou velmi podobné.'),wb);stage.append(c);
   // ===== Trenažér: poznej rozdělení =====
   (()=>{const pc=card('Trenažér · <b>Poznej rozdělení</b>');
     pc.append(el('details',{class:'symleg',style:'margin:4px 0 14px'},el('summary',{},el('span',{},'Tahák: jak poznat rozdělení')),el('div',{class:'prose',style:'padding:4px 2px 8px;font-size:14px',html:
@@ -2835,7 +2838,7 @@ const distModule={id:'dist',num:'04',label:'Rozdělení',render(stage){
     const btns={};DISTPICK.ORDER.forEach(k=>{const lab=DISTPICK.L[k];btns[k]=el('button',{class:'opt',type:'button'},lab.charAt(0).toUpperCase()+lab.slice(1));btns[k].addEventListener('click',()=>choose(k));grid.append(btns[k]);});
     function setMode(m){mode=m;Store.set('odnahody.poznej.mod',m);bId.className='btn '+(m==='id'?'teal':'ghost');bCa.className='btn '+(m==='calc'?'teal':'ghost');next();}
     function next(){sc=DISTPICK.scenario();answered=false;calcDone=false;peek=false;
-      qEl.innerHTML=mode==='id'?nbp(sc.qid):nbp(sc.s)+'<div style="margin-top:10px;font-weight:600">Které rozdělení?</div>';
+      qEl.innerHTML=mode==='id'?nbp(sc.qid):nbp(sc.s)+'<div style="margin-top:10px;font-weight:600">1. Které rozdělení? <span style="font-weight:400;color:var(--muted)">2. Pak spočítáš.</span></div>';
       Object.values(btns).forEach(b=>{b.disabled=false;b.classList.remove('correct','wrong');});
       fb.textContent='';fb.className='pfeedback';why.style.display='none';calcBox.style.display='none';
       inp.value='';cfb.textContent='';cfb.className='pfeedback';csol.style.display='none';solB.textContent='Zobrazit řešení';}
@@ -4592,7 +4595,7 @@ const DISTPICK=(()=>{
         m:'X ~ Po(λ = '+f(l,1)+')',ans:a,key:'poisson',x:'Pozor: λ = '+r+' je na 10 minut.',
         sol:'λ = '+r+'·'+(t/10)+' = '+f(l,1)+'. P(X = '+k+') = e^(−'+f(l,1)+')·'+f(l,1)+'^'+k+' / '+k+'! = <b>'+P(a)+'</b>.'};},
     ()=>{const r=pick([.5,1,1.5,2]),w=pick([1,2]),l=r*w,a=1-Math.exp(-l);
-      return {d:'pois',s:'Na nebezpečné křižovatce se stane v průměru '+f(r,1)+' nehody za týden. Jaká je pravděpodobnost, že se za <b>'+(w===1?'příští týden':'příští 2 týdny')+'</b> stane <b>aspoň jedna</b> nehoda?',
+      return {d:'pois',s:'Na nebezpečné křižovatce se stane v průměru '+f(r,1)+' '+(r===1?'nehoda':'nehody')+' za týden. Jaká je pravděpodobnost, že se za <b>'+(w===1?'příští týden':'příští 2 týdny')+'</b> stane <b>aspoň jedna</b> nehoda?',
         m:'X ~ Po(λ = '+f(l,1)+')',ans:a,key:'poissonAspon',x:w===2?'Pozor: λ přepočti na 2 týdny.':'',
         sol:'λ = '+f(l,1)+'. P(X ≥ 1) = 1 − e^(−'+f(l,1)+') = 1 − '+P(Math.exp(-l))+' = <b>'+P(a)+'</b>.'};},
     ()=>{const r=pick([.4,.5,.8]),A=pick([2,2.5,3]),l=r*A,a=Math.exp(-l)*(1+l);
@@ -4684,7 +4687,9 @@ const DISTPICK=(()=>{
       sol:s.why};
     if(withCalc){cur.noScore=true;cur.next={q:s.s+'<div style="margin-top:10px"><b>'+s.m+'</b></div>',ans:s.ans,kind:'prob',sol:s.sol,key:s.key};}
     return cur;}
-  return {scenario,mcq,L,NAME,ORDER,WHY};
+  // jen výpočet: zadání bez názvu rozdělení, rozdělení prozradí až řešení
+  function calc(){const s=scenario();return {q:s.s,ans:s.ans,kind:'prob',key:s.key,sol:'Rozdělení: <b>'+NAME[s.d]+'</b>, '+s.m+'. '+s.why+'<br>'+s.sol};}
+  return {scenario,mcq,calc,L,NAME,ORDER,WHY};
 })();
 const practiceModule={id:'practice',num:'26',label:'Procvičování',render(stage){
   header(stage,'26','Procvičování','');
@@ -4747,9 +4752,9 @@ const practiceModule={id:'practice',num:'26',label:'Procvičování',render(stag
     if(effTyp()==='formula'){cur=formulaProblem();return finishProblem();}
     const et=effTyp();const useT=th.length&&(et==='theory'||!gens.length||(et==='mix'&&Math.random()<0.3));
     const cq=CALCQ[topic],useCQ=!useT&&cq.length&&(!gens.length||Math.random()<Math.min(0.2,cq.length/(cq.length+3*gens.length)+0.05));
-    if(gens.indexOf('binom')>-1){const w=topic==='c04'?0.35:0.12;
+    if(gens.indexOf('binom')>-1){const w=topic==='c04'?0.3:0.12;
       if(useT&&Math.random()<w){cur=DISTPICK.mcq(false);return finishProblem();}
-      if(!useT&&!useCQ&&Math.random()<w){cur=DISTPICK.mcq(true);return finishProblem();}}
+      if(!useT&&!useCQ&&Math.random()<w){cur=et==='mix'?DISTPICK.mcq(true):DISTPICK.calc();return finishProblem();}}
     if(useT||useCQ){const b=QBANK[pickTheory(useCQ?CALCQ:THEO)],order=shuffled([0,1,2,3]);cur={mc:true,q:escHtml(b.q),o:b.o,a:b.a,order:order,sol:'Správná odpověď: <b>'+optLetter(order.indexOf(b.a))+') '+escHtml(b.o[b.a])+'</b>. '+escHtml(b.e)};}
     else{const gn=pick(gens);const gapOk=a=>isFinite(a.v)&&Math.abs(a.v-cur.ans)>Math.max(0.0012,0.004*Math.abs(cur.ans));let t0=0;do{cur=GEN[gn]();t0++;}while(cur.alts&&!cur.alts.every(gapOk)&&t0<40);cur.key=gn;if(cur.alts)cur.alts=cur.alts.filter(gapOk);if(cur.tol==null&&GTOL[gn])cur.tol=GTOL[gn](cur);}
     finishProblem();}
